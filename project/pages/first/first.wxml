@@ -1,0 +1,82 @@
+<!-- 新建任务 -->
+<view class="add-page">
+
+    <view class="mod-a mt20">
+        <view class="mod t-sign-time">
+        <text class="key">所属部门</text>
+        <picker mode="selector" range="{{array}}" range-key='{{name}}'  value="{{index}}"                bindchange="listenerPickerSelected">
+    <text>{{array[index]}}</text>
+    
+</picker>
+<!-- <image class="arrow-d" src="../../image/arrow-d-0.png"></image> -->
+        </view>
+        <view class="mod t-sign-time">
+            <text class="key">施工项目</text>
+            <input bindinput="bindKeyInput" id='sgxm' value="{{task.sgxm}}" class="input" maxlength="100" placeholder="请输入施工项目" />
+            <image class="arrow-r" src="../../image/arrow-r-0.png"></image>
+        </view>   
+         
+        <view class="mod t-sign-time">
+            <text class="key">施工区域</text>
+            <input bindinput="sgqyInput" id='sgqy' value="{{task.sgqy}}" class="input" maxlength="100" placeholder="请输入施工区域" />
+            <image class="arrow-r" src="../../image/arrow-r-0.png"></image>
+        </view>      
+    </view>
+
+   
+
+    <view class="mod-a mt20">
+     <view class="mod t-sign-time">
+            <text class="key">施工日期</text>
+            <picker mode="date" value="{{task.workdate}}" bindchange="startDateChange">
+                    <view class="date">{{task.workdate}}<image class="arrow-d" src="../../image/arrow-d-0.png"></image></view>
+                </picker>
+        </view>    
+       
+       <view class="mod t-sign-time">
+            <text class="key">施工人员</text>
+            <input bindinput="bindKeyInput" id='staffname' value="{{task.staffname}}" class="input" maxlength="100" placeholder="请输入施工人员" />
+            <image class="arrow-r" src="../../image/arrow-r-0.png"></image>
+        </view>   
+
+       
+    </view>
+
+    <view class="mod-a mt20">
+     <view class="mod t-sign-time">
+            <text class="key">工作时长</text>
+            <input bindinput="bindKeyInput" id='workduringtime' value="{{task.workduringtime}}"  type='digit' maxlength="100"  value='{{task.workduringtime}}' />
+        </view>    
+       
+       <view class="mod t-sign-time">
+            <text class="key">加班时长</text>
+            <input bindinput="bindKeyInput" type='digit' id='overtime' value="{{task.overtime}}"  maxlength="100" placeholder="" />
+            
+        </view>   
+
+       
+    </view>
+
+    <!-- 我的昵称 -->
+    <view class="mod-a mt20">
+        <view class="mod t-name">
+            <text class="key">施工内容</text>
+            
+        </view>   
+        <view >
+        <textarea class='multieditbox' id='workcontent' value="{{task.workcontent}}"  placeholder='请输入施工内容'></textarea>
+        </view>
+        <view class="mod t-name"></view>
+    </view>
+
+    <!-- 创建按钮 -->
+    <view class="create">
+        <button class="btn {{creating ? 'disabled' : ''}}" bindtap="bindSubmit">{{button.txt}}</button>
+    </view>
+    
+    <!-- 提示信息 -->
+    <modal confirm-text="确定"no-confirm  no-cancel hidden="{{modalHidden}}" mask bindconfirm="modalChange">
+        请完善新建任务信息
+    </modal>
+
+</view>
