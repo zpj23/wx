@@ -1,0 +1,18 @@
+{
+	"main.html": {
+		"refer": [
+			"setting.html",
+			"kq/list.html"
+		]
+	},
+	"login.html": {
+		"refer": [
+			"main.html"
+		]
+	},
+	"kq/list.html": {
+		"refer": [
+			"kq/search.html"
+		]
+	}
+}
