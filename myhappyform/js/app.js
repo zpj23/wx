@@ -24,17 +24,17 @@
 					async:false,
 					data:'username='+loginInfo.account+"&password="+loginInfo.password,
 					dataType:'json',
-					url:'http://192.168.11.96:8080/jlLoginAction_loginByPhone',
+					url:'http://www.yzcbjj.com/jlLoginAction_loginByPhone',
 					success:function(data){
 						
 						var str=JSON.stringify(data);
 						if(data.msg){
 							authed=true; 
 						}
-						mui.toast(str);
-						console.log(str);
+					//	mui.toast(str);
+					//	console.log(str);
 						if (authed) {
-							return owner.createState(loginInfo.account, callback);
+							return owner.createState(data.data, callback);
 						} else {
 							return callback('用户名或密码错误');
 						}
@@ -59,9 +59,10 @@
 //		}
 	};
 
-	owner.createState = function(name, callback) {
+	owner.createState = function(data, callback) {
+		var user=JSON.parse(data);
 		var state = owner.getState();
-		state.account = name;
+		state.account = user.loginname;
 		state.token = "token123456789";
 		owner.setState(state);
 		return callback();

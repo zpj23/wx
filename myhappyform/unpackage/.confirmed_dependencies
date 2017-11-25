@@ -12,7 +12,13 @@
 	},
 	"kq/list.html": {
 		"refer": [
-			"kq/search.html"
+			"kq/search.html",
+			"kq/add.html"
+		]
+	},
+	"kq/add.html": {
+		"resources": [
+			"js/mui.picker.min.js"
 		]
 	}
 }
