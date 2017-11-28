@@ -78,8 +78,8 @@
 				
 				
 			    <div class="mui-button-row">
-			        <button type="button" class="mui-btn mui-btn-primary" >确认</button>
-			        <button type="button" class="mui-btn mui-btn-danger" >取消</button>
+			        <button type="button" id="saveButton" class="mui-btn mui-btn-primary" >确认</button>
+			        <button type="button" class="mui-btn mui-btn-danger " >取消</button>
 			    </div>
 			</form>
 			
@@ -134,12 +134,41 @@
 								 * 当前示例，因为内容较多，如不进行资原释放，在某些设备上会较慢。
 								 * 所以每次用完便立即调用 dispose 进行释放，下次用时再创建新实例。
 								 */
-								_self.picker.dispose();
-								_self.picker = null;
+								//_self.picker.dispose();
+								//_self.picker = null;
 							});
 						}
 						
 					});
+
+					var saveButton =document.getElementById("saveButton");
+
+					saveButton.addEventListener('tap', function() {
+
+						mui.ajax({
+				            url      : 'http://www.yzcbjj.com/',
+				            type     : 'post',
+				            data:{ 
+							    sgxm:'',
+							    sgqy:'',
+							    workdate:'',
+							    staffname:'',
+							    workduringtime:'',
+							    overtime:'',
+							    workcontent:'',
+							    remark:'',
+							    departmentname:''
+
+							},
+				            success  : function(data){
+				                mui.toast(data);
+				            },
+				            error    : function(xhr,type,errorThrown){
+				                mui.toast(type);
+				            }
+				        });
+					});
+
 			});
 			
 		</script>

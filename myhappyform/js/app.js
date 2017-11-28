@@ -31,8 +31,8 @@
 						if(data.msg){
 							authed=true; 
 						}
-					//	mui.toast(str);
-					//	console.log(str);
+						//mui.toast(str);
+						console.log(str);
 						if (authed) {
 							return owner.createState(data.data, callback);
 						} else {
@@ -60,10 +60,15 @@
 	};
 
 	owner.createState = function(data, callback) {
-		var user=JSON.parse(data);
+		console.log(data);
 		var state = owner.getState();
-		state.account = user.loginname;
-		state.token = "token123456789";
+		console.log(state);
+		state.account = data.username;
+		state.loginname=data.loginname;
+		state.departmentcode=data.departmentcode;
+		//state.token = "token123456789";
+		state.isAdmin=data.isAdmin;
+		state.id=data.id;
 		owner.setState(state);
 		return callback();
 	};
