@@ -278,9 +278,10 @@
 				"priority": 0
 			},
 			"kq/list.html": {
-				"resources": [],
+				"resources": [
+					"kq/search.html"
+				],
 				"refer": [
-					"kq/search.html",
 					"kq/add.html"
 				],
 				"priority": 0
