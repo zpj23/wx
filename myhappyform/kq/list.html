@@ -177,22 +177,54 @@
 		
 		//初始化数据
 		function initData(){
-			mui.ajax('http://www.yzcbjj.com/jlManualCheckPhoneAction_findListInfoByPhone',{
-				data:{
-					loginId:state.id,
-					isAdmin:state.isAdmin
-				},
-				dataType:'json',//服务器返回json格式数据
-				type:'get',//HTTP请求类型
-				success:function(data){
-					//获得服务器响应
-					
-				}
-			});
+			mui.toast(state.id+">>>"+state.isAdmin);
+			console.log(state.id);
+			alert(state.id+">>>"+state.isAdmin);
+			mui.ajax({
+					type:'POST',
+					async:false,
+					data:'loginId='+state.id+'&isAdmin='+state.isAdmin,
+					dataType:'json',
+					url:'http://192.168.1.88:8080/jlManualCheckPhoneAction_findListInfoByPhone',
+					success:function(data){
+						
+						var str=JSON.stringify(data);
+						if(data.msg){
+							authed=true; 
+						}
+						//mui.toast(str);
+						console.log(str);
+						if (authed) {
+							return owner.createState(data.data, callback);
+						} else {
+							return callback('用户名或密码错误');
+						}
+					},
+					error:function(xhr,type,errorThrown){
+						console.log(type);
+						console.log(xhr);
+						console.log(errorThrown);
+						
+					}
+							
+							
+				});
+//			mui.ajax({
+//	            url    : 'http://192.168.1.88:8080/jlManualCheckPhoneAction_findListInfoByPhone',
+//	            type   : 'GET',
+//	            dataType:'json',//服务器返回json格式数据
+//	            data:'loginId='+state.id+'&isAdmin='+state.isAdmin,
+//				async:false,
+//	            success  : function(data){
+//	                mui.toast(data);
+//	                console.log(data);
+//	            },
+//	            error    : function(xhr,type,errorThrown){
+//	                mui.toast(type);
+//	            }
+//	        });
 		}
 		mui.plusReady(function() {
-			
-			initData();
 			
 			mui.preload({
 				"id": 'kq_search',
@@ -237,6 +269,7 @@
 				});
 				
 			});
+			initData();
 		});
 	</script>
 </html>
