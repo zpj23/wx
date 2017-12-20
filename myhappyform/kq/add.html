@@ -25,9 +25,13 @@
 					       <!-- <button id='demo4' data-options='{"type":"date"}' class="btn mui-btn mui-btn-block">选择日期 ...</button>  -->
 					  <!--  <label id="workdate">点击选择时间</label><span class="mui-icon mui-icon-plusempty"></span>
 					   -->  <input type="text"  id="workdate" data-options='{"type":"date"}' class="mui-input-clear"  placeholder="施工日期" /> 
-					   
+					   		
 					    </div>
-						
+						<div class="mui-input-row">
+							<label>所属部门:</label>
+							<input type="text"  id="departmentname"  class="mui-input-clear"  placeholder="所属部门" readonly="readonly" />
+							<input type="hidden" id="departmentcode" />
+						</div>
 					</div>
 				</div>
 				<div class="mui-content-padded"></div>
@@ -35,15 +39,15 @@
 					<div class="mui-card-content">
 						<div class="mui-input-row">
 					        <label>施工项目:</label>
-					    <input type="text" class="mui-input-clear" placeholder="施工项目">
+					    <input type="text" id="sgxm" class="mui-input-clear" placeholder="施工项目">
 					    </div>
 					    <div class="mui-input-row">
 					        <label>施工区域:</label>
-					    <input type="text" class="mui-input-clear" placeholder="施工区域">
+					    <input type="text"  id="sgqy" class="mui-input-clear" placeholder="施工区域">
 					    </div>
 					    <div class="mui-input-row">
 					        <label>施工人员:</label>
-					    <input type="text" class="mui-input-clear" placeholder="施工人员">
+					    <input type="text" id="staffname" class="mui-input-clear" placeholder="施工人员">
 					    </div>
 					    
 					    <div class="mui-input-row">
@@ -51,7 +55,7 @@
 								<div class="mui-numbox">
 								  <!-- "-"按钮，点击可减小当前数值 -->
 								  <button class="mui-btn mui-numbox-btn-minus" type="button">-</button>
-								  <input class="mui-numbox-input" type="" value="8" />
+								  <input class="mui-numbox-input" id="workduringtime" type="number" value="8" />
 								  <!-- "+"按钮，点击可增大当前数值 -->
 								  <button class="mui-btn mui-numbox-btn-plus" type="button">+</button>
 								</div>
@@ -61,7 +65,7 @@
 					    		<div class="mui-numbox">
 								  <!-- "-"按钮，点击可减小当前数值 -->
 								  <button class="mui-btn mui-numbox-btn-minus" type="button">-</button>
-								  <input class="mui-numbox-input" type="number" />
+								  <input class="mui-numbox-input" id="overtime" type="number" />
 								  <!-- "+"按钮，点击可增大当前数值 -->
 								  <button class="mui-btn mui-numbox-btn-plus" type="button">+</button>
 								</div>
@@ -72,12 +76,13 @@
 				<div class="mui-card">
 					<div class="mui-card-content" style="padding: 15px;">
 						<label>施工内容:</label>
-						<textarea id="textarea" style="background-color: whitesmoke;" rows="9"  placeholder=""></textarea>
+						<textarea id="workcontent" style="background-color: whitesmoke;" rows="9"  placeholder=""></textarea>
 					</div>
 				</div>	
 				
 				
 			    <div class="mui-button-row">
+			    	<input type="hidden" id="id" value="" />
 			        <button type="button" id="saveButton" class="mui-btn mui-btn-primary" >确认</button>
 			        <button type="button" class="mui-btn mui-btn-danger " >取消</button>
 			    </div>
@@ -86,17 +91,59 @@
 		</div>
 		<script src="../js/mui.js"></script>
 		<script src="../js/mui.picker.min.js"></script>
+		<script src="../js/app.js"></script>
 		<script type="text/javascript">
+			var state=app.getState();
 			mui.init();
-			
+			function initData(){
+				var self = plus.webview.currentWebview();
+				var id = self.id;
+				if(id!=""){
+					mui.ajax({
+//				            url      : 'http://www.yzcbjj.com/jlManualCheckPhoneAction_saveInfoByPhone',
+				            url      : 'http://192.168.11.96:8080/jlManualCheckPhoneAction_findInfoByIdByPhone',
+				            type     : 'post',
+				            data:{ 
+							    id:id,
+							    loginId:state.id,
+								isAdmin:state.isAdmin
+							},
+				            success  : function(data){
+				            	if(data.msg){
+				            		var cinfo=data.data;
+				            		getCV('sgxm').value=cinfo.sgxm;
+							    	getCV('sgqy').value=cinfo.sgqy;
+							    	getCV('workdate').value=cinfo.workdate;
+							    	getCV('staffname').value=cinfo.staffname;
+							    	getCV('workduringtime').value=cinfo.workduringtime;
+							    	getCV('overtime').value=cinfo.overtime;
+							    	getCV('workcontent').value=cinfo.workcontent;
+							    	getCV('departmentname').value=cinfo.departmentname;
+							    	getCV('departmentcode').value=cinfo.departmentcode;
+				            	}else{
+				            		mui.toast("初始化失败");
+				            	}
+				            	
+									
+				            },
+				            error    : function(xhr,type,errorThrown){
+				                mui.toast(type);
+				            }
+				        });
+				}
+				
+			}
 			mui.plusReady(function(){
+				initData();
+				
+				
 				var workdate=document.getElementById("workdate");
 				
 				workdate.addEventListener('tap', function() {
 						var _self = this;
 						if(_self.picker) {
 							_self.picker.show(function (rs) {
-								result.innerText = '选择结果: ' + rs.text;
+//								result.innerText = '选择结果: ' + rs.text;
 								_self.picker.dispose();
 								_self.picker = null;
 							});
@@ -140,37 +187,125 @@
 						}
 						
 					});
+					//部门
+					initDepartmentData();
+					//保存按钮
+					initSaveButtonData();
+					
+					
 
-					var saveButton =document.getElementById("saveButton");
+			});
+			function initDepartmentData(){
+				var departmentname=document.getElementById("departmentname");
+				departmentname.addEventListener('tap', function() {
+					var picker = new mui.PopPicker();
+					picker.setData([{
+						    value: "HTGD",
+						    text: "海通工地"
+						}, {
+						    value: "HXGD",
+						    text: "海新工地"
+						}, {
+						    value: "ZSGD",
+						    text: "招商工地"
+						}, {
+						    value: "YZCBJJ",
+						    text: "远舟船舶家俱"
+						}, {
+						    value: "ZS",
+						    text: "舟山"
+						}, {
+						    value: "DJZG",
+						    text: "大津重工"
+						}, {
+						    value: "ZH",
+						    text: "振华"
+						}]
+					);
+							
+	//				picker.pickers[0].setSelectedValue('ZS', 2000);
+					picker.show(function(rs) {
+						departmentname.value=rs[0].text;
+	//						var str=JSON.stringify(rs);
+	//						console.log(str);
+						document.getElementById("departmentcode").value=rs[0].value;
+					});
+				});
+			}
+			function initSaveButtonData(){
+				var saveButton =document.getElementById("saveButton");
 
 					saveButton.addEventListener('tap', function() {
-
+						var flag=true;
+						if(getCV('sgxm')==""){
+							mui.toast("施工项目不能为空！");
+							flag=false;
+						}
+						if(getCV('sgqy')==""){
+							mui.toast("施工区域不能为空！");
+							flag=false;
+						}
+						if(getCV('workdate')==""){
+							mui.toast("施工日期不能为空！");
+							flag=false;
+						}
+						if(getCV('staffname')==""){
+							mui.toast("施工人员不能为空！");
+							flag=false;
+						}
+						if(!flag){
+							return;
+						}
+						
 						mui.ajax({
-				            url      : 'http://www.yzcbjj.com/',
+				            url      : 'http://www.yzcbjj.com/jlManualCheckPhoneAction_saveInfoByPhone',
+				         //   url      : 'http://192.168.11.96:8080/jlManualCheckPhoneAction_saveInfoByPhone',
 				            type     : 'post',
 				            data:{ 
-							    sgxm:'',
-							    sgqy:'',
-							    workdate:'',
-							    staffname:'',
-							    workduringtime:'',
-							    overtime:'',
-							    workcontent:'',
+							    sgxm:getCV('sgxm').value,
+							    sgqy:getCV('sgqy').value,
+							    workdate:getCV('workdate').value,
+							    staffname:getCV('staffname').value,
+							    workduringtime:getCV('workduringtime').value,
+							    overtime:getCV('overtime').value,
+							    workcontent:getCV('workcontent').value,
 							    remark:'',
-							    departmentname:''
-
+							    departmentname:getCV('departmentname').value,
+							    departmentcode:getCV('departmentcode').value,
+							    loginId:state.id,
+								isAdmin:state.isAdmin
 							},
 				            success  : function(data){
-				                mui.toast(data);
+				            	if(data.msg){
+				            		mui.openWindow({
+										id: 'kq_list',
+										url:'list.html',
+										show: {
+											aniShow: 'pop-in'
+										},
+										styles: {
+											popGesture: 'hide'
+										},
+										createNew:true,
+										waiting: {
+											autoShow: false
+										}
+										
+									});
+				            	}else{
+				            		mui.toast("保存失败");
+				            	}
+									
 				            },
 				            error    : function(xhr,type,errorThrown){
 				                mui.toast(type);
 				            }
 				        });
 					});
-
-			});
-			
+			}
+			function getCV(id){
+				return document.getElementById(id);
+			}
 		</script>
 	</body>
 
