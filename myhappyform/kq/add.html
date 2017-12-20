@@ -25,12 +25,12 @@
 					       <!-- <button id='demo4' data-options='{"type":"date"}' class="btn mui-btn mui-btn-block">选择日期 ...</button>  -->
 					  <!--  <label id="workdate">点击选择时间</label><span class="mui-icon mui-icon-plusempty"></span>
 					   -->  <input type="text"  id="workdate" data-options='{"type":"date"}' class="mui-input-clear"  placeholder="施工日期" /> 
-					   
+					   		
 					    </div>
 						<div class="mui-input-row">
 							<label>所属部门:</label>
 							<input type="text"  id="departmentname"  class="mui-input-clear"  placeholder="所属部门" readonly="readonly" />
-							<input type="hidden" id="departmentid" />
+							<input type="hidden" id="departmentcode" />
 						</div>
 					</div>
 				</div>
@@ -82,6 +82,7 @@
 				
 				
 			    <div class="mui-button-row">
+			    	<input type="hidden" id="id" value="" />
 			        <button type="button" id="saveButton" class="mui-btn mui-btn-primary" >确认</button>
 			        <button type="button" class="mui-btn mui-btn-danger " >取消</button>
 			    </div>
@@ -94,8 +95,48 @@
 		<script type="text/javascript">
 			var state=app.getState();
 			mui.init();
-			
+			function initData(){
+				var self = plus.webview.currentWebview();
+				var id = self.id;
+				if(id!=""){
+					mui.ajax({
+//				            url      : 'http://www.yzcbjj.com/jlManualCheckPhoneAction_saveInfoByPhone',
+				            url      : 'http://192.168.11.96:8080/jlManualCheckPhoneAction_findInfoByIdByPhone',
+				            type     : 'post',
+				            data:{ 
+							    id:id,
+							    loginId:state.id,
+								isAdmin:state.isAdmin
+							},
+				            success  : function(data){
+				            	if(data.msg){
+				            		var cinfo=data.data;
+				            		getCV('sgxm').value=cinfo.sgxm;
+							    	getCV('sgqy').value=cinfo.sgqy;
+							    	getCV('workdate').value=cinfo.workdate;
+							    	getCV('staffname').value=cinfo.staffname;
+							    	getCV('workduringtime').value=cinfo.workduringtime;
+							    	getCV('overtime').value=cinfo.overtime;
+							    	getCV('workcontent').value=cinfo.workcontent;
+							    	getCV('departmentname').value=cinfo.departmentname;
+							    	getCV('departmentcode').value=cinfo.departmentcode;
+				            	}else{
+				            		mui.toast("初始化失败");
+				            	}
+				            	
+									
+				            },
+				            error    : function(xhr,type,errorThrown){
+				                mui.toast(type);
+				            }
+				        });
+				}
+				
+			}
 			mui.plusReady(function(){
+				initData();
+				
+				
 				var workdate=document.getElementById("workdate");
 				
 				workdate.addEventListener('tap', function() {
@@ -187,7 +228,7 @@
 						departmentname.value=rs[0].text;
 	//						var str=JSON.stringify(rs);
 	//						console.log(str);
-						document.getElementById("departmentid").value=rs[0].value;
+						document.getElementById("departmentcode").value=rs[0].value;
 					});
 				});
 			}
@@ -221,16 +262,16 @@
 				         //   url      : 'http://192.168.11.96:8080/jlManualCheckPhoneAction_saveInfoByPhone',
 				            type     : 'post',
 				            data:{ 
-							    sgxm:getCV('sgxm'),
-							    sgqy:getCV('sgqy'),
-							    workdate:getCV('workdate'),
-							    staffname:getCV('staffname'),
-							    workduringtime:getCV('workduringtime'),
-							    overtime:getCV('overtime'),
-							    workcontent:getCV('workcontent'),
+							    sgxm:getCV('sgxm').value,
+							    sgqy:getCV('sgqy').value,
+							    workdate:getCV('workdate').value,
+							    staffname:getCV('staffname').value,
+							    workduringtime:getCV('workduringtime').value,
+							    overtime:getCV('overtime').value,
+							    workcontent:getCV('workcontent').value,
 							    remark:'',
-							    departmentname:getCV('departmentname'),
-							    departmentid:getCV('departmentid'),
+							    departmentname:getCV('departmentname').value,
+							    departmentcode:getCV('departmentcode').value,
 							    loginId:state.id,
 								isAdmin:state.isAdmin
 							},
@@ -263,7 +304,7 @@
 					});
 			}
 			function getCV(id){
-				return document.getElementById(id).value;
+				return document.getElementById(id);
 			}
 		</script>
 	</body>
