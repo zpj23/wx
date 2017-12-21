@@ -94,26 +94,36 @@
 		<script src="../js/app.js"></script>
 		<script type="text/javascript">
 			var state=app.getState();
+			var currentId="";
 			mui.init();
 			function initData(){
-				var self = plus.webview.currentWebview();
-				var id = self.id;
-				if(id!=""){
+				
+				var cid = currentId;
+//				var str=JSON.stringify(self);
+//				console.log(cid);
+				if(cid!=""&&cid!=null){
 					mui.ajax({
 //				            url      : 'http://www.yzcbjj.com/jlManualCheckPhoneAction_saveInfoByPhone',
 				            url      : 'http://192.168.11.96:8080/jlManualCheckPhoneAction_findInfoByIdByPhone',
 				            type     : 'post',
+				            dataType:'json',//服务器返回json格式数据
 				            data:{ 
-							    id:id,
+							    id:cid,
 							    loginId:state.id,
 								isAdmin:state.isAdmin
 							},
 				            success  : function(data){
+				            	
 				            	if(data.msg){
+				            		getCV('id').value=cid;
 				            		var cinfo=data.data;
 				            		getCV('sgxm').value=cinfo.sgxm;
 							    	getCV('sgqy').value=cinfo.sgqy;
-							    	getCV('workdate').value=cinfo.workdate;
+							    	var wd= new Date(cinfo.workdate);
+							    	var day=wd.getDate();
+									var month=wd.getMonth() + 1;
+									var year=wd.getFullYear();
+							    	getCV('workdate').value=year+"-"+month+"-"+day;
 							    	getCV('staffname').value=cinfo.staffname;
 							    	getCV('workduringtime').value=cinfo.workduringtime;
 							    	getCV('overtime').value=cinfo.overtime;
@@ -134,9 +144,9 @@
 				
 			}
 			mui.plusReady(function(){
-				initData();
-				
-				
+				var self=plus.webview.currentWebview();
+				currentId = self.name;
+	
 				var workdate=document.getElementById("workdate");
 				
 				workdate.addEventListener('tap', function() {
@@ -193,7 +203,8 @@
 					initSaveButtonData();
 					
 					
-
+					//initData();
+					setTimeout('initData()',1000);
 			});
 			function initDepartmentData(){
 				var departmentname=document.getElementById("departmentname");
@@ -256,12 +267,13 @@
 						if(!flag){
 							return;
 						}
-						
 						mui.ajax({
-				            url      : 'http://www.yzcbjj.com/jlManualCheckPhoneAction_saveInfoByPhone',
-				         //   url      : 'http://192.168.11.96:8080/jlManualCheckPhoneAction_saveInfoByPhone',
+				         //   url      : 'http://www.yzcbjj.com/jlManualCheckPhoneAction_saveInfoByPhone',
+				            url      : 'http://192.168.11.96:8080/jlManualCheckPhoneAction_saveInfoByPhone',
 				            type     : 'post',
-				            data:{ 
+				            dataType:'json',//服务器返回json格式数据
+				            data:{
+				            	id:getCV('id').value+'',
 							    sgxm:getCV('sgxm').value,
 							    sgqy:getCV('sgqy').value,
 							    workdate:getCV('workdate').value,

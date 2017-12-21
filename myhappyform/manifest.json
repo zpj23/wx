@@ -82,7 +82,7 @@
 		"Webview": {},
 		"NativeUI": {},
 		"Navigator": {},
-		"NativeObj": {},"Share":{},"OAuth":{},"Device":{}
+		"NativeObj": {},"OAuth":{},"Device":{}
 	},
 	"plus": {
 		"splashscreen": {
@@ -145,7 +145,7 @@
 					"ldpi": "unpackage/res/icons/48x48.png", /*大屏程序图标，分辨率：48x48*/
 					"hdpi": "unpackage/res/icons/72x72.png", /*高分屏程序图标，分辨率：72x72*/
 					"xhdpi": "unpackage/res/icons/96x96.png",/*720P高分屏程序图标，分辨率：96x96*/
-					"xxhdpi": "unpackage/res/icons/144x144.png"
+					"xxhdpi": "unpackage/res/icons/144x144.png","xxxhdpi":"unpackage/res/icons/192x192.png"
 				}
 			},
 			"splashscreen": {
@@ -282,7 +282,8 @@
 					"kq/search.html"
 				],
 				"refer": [
-					"kq/add.html"
+					"kq/add.html",
+					"main.html"
 				],
 				"priority": 0
 			},
@@ -290,7 +291,9 @@
 				"resources": [
 					"js/mui.picker.min.js"
 				],
-				"refer": [],
+				"refer": [
+					"kq/list.html"
+				],
 				"priority": 0
 			}
 		},
@@ -304,6 +307,8 @@
 		}
 	},
 	"unpackage":[
-	  "README.md"
+	  "README.md",
+	  "images/user-photo.png",
+	  "libs/easymob-webim-sdk/quickstart.md"
 	]
 }

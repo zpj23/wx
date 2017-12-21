@@ -60,9 +60,7 @@
 	};
 
 	owner.createState = function(data, callback) {
-		console.log(data);
 		var state = owner.getState();
-		console.log(state);
 		state.account = data.username;
 		state.loginname=data.loginname;
 		state.departmentcode=data.departmentcode;

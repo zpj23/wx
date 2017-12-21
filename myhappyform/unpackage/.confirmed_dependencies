@@ -1,27 +1,31 @@
 {
-	"main.html": {
-		"refer": [
-			"setting.html",
-			"kq/list.html"
-		]
-	},
-	"login.html": {
-		"refer": [
-			"main.html"
-		]
-	},
-	"kq/list.html": {
-		"refer": [
-			"kq/search.html",
-			"kq/add.html"
-		],
-		"resources": [
-			"kq/search.html"
-		]
-	},
-	"kq/add.html": {
-		"resources": [
-			"js/mui.picker.min.js"
-		]
-	}
+  "main.html": {
+    "refer": [
+      "setting.html",
+      "kq/list.html"
+    ]
+  },
+  "login.html": {
+    "refer": [
+      "main.html"
+    ]
+  },
+  "kq/list.html": {
+    "refer": [
+      "kq/search.html",
+      "kq/add.html",
+      "main.html"
+    ],
+    "resources": [
+      "kq/search.html"
+    ]
+  },
+  "kq/add.html": {
+    "resources": [
+      "js/mui.picker.min.js"
+    ],
+    "refer": [
+      "kq/list.html"
+    ]
+  }
 }

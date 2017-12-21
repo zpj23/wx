@@ -34,9 +34,10 @@
 
 	<body>
 		<header class="mui-bar mui-bar-nav">
-		    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+		    <!--<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left" ></a>-->
+		    <button id='mainPage' class=" mui-pull-left mui-btn-link">主页</button>
 		    <h1 class="mui-title">数据列表</h1>
-		    <button id='kq_add' class=" mui-pull-right mui-btn-link"><span class="mui-icon mui-icon-bars"></span></button>
+		    <button id='kq_add' class=" mui-pull-right mui-btn-link">新增</button>
 		</header>
 		<div class="mui-content">
 			<div class="mui-content-padded">
@@ -70,7 +71,7 @@
 		    </div>
 		</div>
 	</body>
-	<script src="../js/mui.min.js"></script>
+	<script src="../js/mui.js"></script>
 	<script src="../js/app.js"></script>
 	<script>
 		var state=app.getState();
@@ -89,14 +90,14 @@
 		//初始化数据
 		function initData(){
 			mui.ajax({
-	            url    : 'http://192.168.1.88:8080/jlManualCheckPhoneAction_findListInfoByPhone',
-	            type   : 'GET',
+	            url    : 'http://192.168.11.96:8080/jlManualCheckPhoneAction_findListInfoByPhone',
+	            type   : 'POST',
 	            dataType:'json',//服务器返回json格式数据
 	            data:'loginId='+state.id+'&isAdmin='+state.isAdmin,
 				async:false,
 	            success: function(data){
-	            	var str=JSON.stringify(data);
-	            	console.log(str);
+//	            	var str=JSON.stringify(data);
+//	            	console.log(str);
 	            	myList = document.getElementById("myList");
 	            	var listStr='';
 	            	var arr=new Array();
@@ -122,30 +123,33 @@
 						listStr+='</div>';
 						listStr+='</li>';
 						
-//	            		<li class="mui-table-view-cell">
-//				        	<div class="mui-slider-right mui-disabled">
-//								<a class="mui-btn mui-btn-blue">修改</a>
-//								<a class="mui-btn mui-btn-red">删除</a>
-//							</div>
-//							<div class="mui-slider-handle">
-//					            <div class="mui-table">
-//					                <div class="mui-table-cell mui-col-xs-10">
-//					                    <h4 class="mui-ellipsis">信息化推进办公室张彦合同付款信息化</h4>
-//					                    <h5>申请人：李四</h5>
-//					                    <p class="mui-h6 mui-ellipsis">Hi，李明明，申请交行信息卡，100元等你拿，李明明，申请交行信息卡，100元等你拿，</p>
-//					                </div>
-//					                <div class="mui-table-cell mui-col-xs-2 mui-text-right">
-//					                    <span class="mui-h5">12:25</span>
-//					                </div>
-//					            </div>
-//				            </div>
-//				        </li>
 	            	}
 	            	listStr+='</ul>';
 	            	myList.innerHTML=listStr;
 	            	mui('#OA_task_1').on('tap', '.editkq', function(event) {
 						var elem = this;
-						alert(this.name+">>修改考勤");
+						var cid = elem.name;
+//						var str=JSON.stringify(cid);
+//						console.log(str);
+						mui.openWindow({
+							id: 'kq_add',
+							url:'add.html',
+							show: {
+								aniShow: 'pop-in'
+							},
+							extras:{
+								name:cid
+							},
+							createNew:true,
+							styles: {
+								popGesture: 'hide'
+							},
+							
+							waiting: {
+								autoShow: false
+							}
+							
+						});
 						
 					});
 	            	var btnArray = ['确认', '取消'];
@@ -154,7 +158,29 @@
 						var li = elem.parentNode.parentNode;
 						mui.confirm('确认删除该条记录？', '警告', btnArray, function(e) {
 							if (e.index == 0) {
-								li.parentNode.removeChild(li);
+								var cid = elem.name;
+								mui.ajax({
+		//				            url      : 'http://www.yzcbjj.com/jlManualCheckPhoneAction_saveInfoByPhone',
+						            url      : 'http://192.168.11.96:8080/jlManualCheckPhoneAction_delInfoByIdByPhone',
+						            type     : 'post',
+						            dataType:'json',//服务器返回json格式数据
+						            data:{ 
+									    delId:cid,
+									    loginId:state.id,
+										isAdmin:state.isAdmin
+									},
+						            success  : function(data){
+						            	if(data.msg){
+						            		li.parentNode.removeChild(li);
+						            	}else{
+						            		mui.toast("删除失败");
+						            	}
+						            },
+						            error    : function(xhr,type,errorThrown){
+						                mui.toast(type);
+						            }
+						        });
+								
 							} else {
 								setTimeout(function() {
 									mui.swipeoutClose(li);
@@ -202,6 +228,10 @@
 					show: {
 						aniShow: 'pop-in'
 					},
+					extras:{
+						id:''
+					},
+					createNew:true,
 					styles: {
 						popGesture: 'hide'
 					},
@@ -213,6 +243,23 @@
 				});
 				
 			});
+			var mainPage = document.getElementById('mainPage');
+					mainPage.addEventListener('tap', function(event) {
+						mui.openWindow({
+							id: 'mainPage',
+							url:'../main.html',
+							show: {
+								aniShow: 'pop-in-left'
+							},
+							styles: {
+								popGesture: 'hide'
+							},
+							waiting: {
+								autoShow: false
+							}
+						});
+					});
+			
 			initData();
 		});
 	</script>
