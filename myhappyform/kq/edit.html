@@ -12,7 +12,7 @@
 	
 	<body>
 		<header class="mui-bar mui-bar-nav">
-		    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+		    <a class="mui-icon mui-icon-left-nav mui-pull-left" id="backList1"></a>
 		    <h1 class="mui-title">新增数据</h1>
 		</header>
 		<div class="mui-content">
@@ -84,7 +84,7 @@
 			    <div class="mui-button-row">
 			    	<input type="hidden" id="id" value="" />
 			        <button type="button" id="saveButton" class="mui-btn mui-btn-primary" >确认</button>
-			        <button type="button" class="mui-btn mui-btn-danger " >取消</button>
+			        <button type="button" class="mui-btn mui-btn-danger " id="cancelButton">取消</button>
 			    </div>
 			</form>
 			
@@ -95,65 +95,93 @@
 		<script type="text/javascript">
 			var state=app.getState();
 			var currentId="";
+			var listHtml=null;
+			var workdate;
+			var departmentname;
 			mui.init();
-			function initData(){
-				
-				var cid = currentId;
-//				var str=JSON.stringify(self);
-//				console.log(cid);
-				if(cid!=""&&cid!=null){
-					mui.ajax({
-//				            url      : 'http://www.yzcbjj.com/jlManualCheckPhoneAction_saveInfoByPhone',
-				            url      : 'http://192.168.11.96:8080/jlManualCheckPhoneAction_findInfoByIdByPhone',
-				            type     : 'post',
-				            dataType:'json',//服务器返回json格式数据
-				            data:{ 
-							    id:cid,
-							    loginId:state.id,
-								isAdmin:state.isAdmin
-							},
-				            success  : function(data){
-				            	
-				            	if(data.msg){
-				            		getCV('id').value=cid;
-				            		var cinfo=data.data;
-				            		getCV('sgxm').value=cinfo.sgxm;
-							    	getCV('sgqy').value=cinfo.sgqy;
-							    	var wd= new Date(cinfo.workdate);
-							    	var day=wd.getDate();
-									var month=wd.getMonth() + 1;
-									var year=wd.getFullYear();
-							    	getCV('workdate').value=year+"-"+month+"-"+day;
-							    	getCV('staffname').value=cinfo.staffname;
-							    	getCV('workduringtime').value=cinfo.workduringtime;
-							    	getCV('overtime').value=cinfo.overtime;
-							    	getCV('workcontent').value=cinfo.workcontent;
-							    	getCV('departmentname').value=cinfo.departmentname;
-							    	getCV('departmentcode').value=cinfo.departmentcode;
-				            	}else{
-				            		mui.toast("初始化失败");
-				            	}
-				            	
-									
-				            },
-				            error    : function(xhr,type,errorThrown){
-				                mui.toast(type);
-				            }
-				        });
-				}
-				
-			}
 			mui.plusReady(function(){
-				var self=plus.webview.currentWebview();
-				currentId = self.name;
-	
-				var workdate=document.getElementById("workdate");
+				//初始化日期		
+				initDateData();
+				//保存按钮
+				initSaveButtonData();
+			});
+			//添加newId自定义事件监听
+			window.addEventListener('editId',function(event){
 				
+			  //获得事件参数
+			  	currentId = event.detail.id;
+			  	
+			   
+				
+				initData();
+				
+			});
+			
+			function initData(){
+				if(currentId!=''&&currentId!=null){
+					mui.ajax({
+		            url      : app.getRequestUrl()+'/jlManualCheckPhoneAction_findInfoByIdByPhone',
+		            type     : 'post',
+		            dataType:'json',//服务器返回json格式数据
+		            data:{ 
+					    id:currentId,
+					    loginId:state.id,
+						isAdmin:state.isAdmin
+					},
+		            success  : function(data){
+		            	
+		            	if(data.msg){
+		            		getCV('id').value=currentId;
+		            		var cinfo=data.data;
+		            		getCV('sgxm').value=cinfo.sgxm;
+					    	getCV('sgqy').value=cinfo.sgqy;
+					    	var wd= new Date(cinfo.workdate);
+					    	var day=wd.getDate();
+							var month=wd.getMonth() + 1;
+							var year=wd.getFullYear();
+					    	getCV('workdate').value=year+"-"+month+"-"+day;
+					    	getCV('staffname').value=cinfo.staffname;
+					    	getCV('workduringtime').value=cinfo.workduringtime;
+					    	getCV('overtime').value=cinfo.overtime;
+					    	getCV('workcontent').value=cinfo.workcontent;
+					    	getCV('departmentname').value=cinfo.departmentname;
+					    	getCV('departmentcode').value=cinfo.departmentcode;
+					    	
+							//部门
+							initDepartmentData();
+					    	
+		            	}else{
+		            		mui.toast("初始化失败");
+		            	}
+		            	
+							
+		            },
+		            error    : function(xhr,type,errorThrown){
+		                mui.toast(type);
+		            }
+		        	});
+				}else{
+					getCV('id').value='';
+            		getCV('sgxm').value='';
+			    	getCV('sgqy').value='';
+			    	getCV('workdate').value='';
+			    	getCV('staffname').value='';
+			    	getCV('workduringtime').value='8';
+			    	getCV('overtime').value='0';
+			    	getCV('workcontent').value='';
+			    	getCV('departmentname').value='';
+			    	getCV('departmentcode').value='';
+			    	initDepartmentData();
+				}
+			}
+			function initDateData(){
+				workdate=document.getElementById("workdate");
 				workdate.addEventListener('tap', function() {
 						var _self = this;
 						if(_self.picker) {
 							_self.picker.show(function (rs) {
 //								result.innerText = '选择结果: ' + rs.text;
+								workdate.value=rs.text;
 								_self.picker.dispose();
 								_self.picker = null;
 							});
@@ -191,59 +219,86 @@
 								 * 当前示例，因为内容较多，如不进行资原释放，在某些设备上会较慢。
 								 * 所以每次用完便立即调用 dispose 进行释放，下次用时再创建新实例。
 								 */
-								//_self.picker.dispose();
-								//_self.picker = null;
+								_self.picker.dispose();
+								_self.picker = null;
 							});
 						}
 						
-					});
-					//部门
-					initDepartmentData();
-					//保存按钮
-					initSaveButtonData();
-					
-					
-					//initData();
-					setTimeout('initData()',1000);
-			});
+					}, false);
+			}
 			function initDepartmentData(){
-				var departmentname=document.getElementById("departmentname");
+				departmentname=document.getElementById("departmentname");
 				departmentname.addEventListener('tap', function() {
-					var picker = new mui.PopPicker();
-					picker.setData([{
-						    value: "HTGD",
-						    text: "海通工地"
-						}, {
-						    value: "HXGD",
-						    text: "海新工地"
-						}, {
-						    value: "ZSGD",
-						    text: "招商工地"
-						}, {
-						    value: "YZCBJJ",
-						    text: "远舟船舶家俱"
-						}, {
-						    value: "ZS",
-						    text: "舟山"
-						}, {
-						    value: "DJZG",
-						    text: "大津重工"
-						}, {
-						    value: "ZH",
-						    text: "振华"
-						}]
-					);
-							
-	//				picker.pickers[0].setSelectedValue('ZS', 2000);
-					picker.show(function(rs) {
-						departmentname.value=rs[0].text;
-	//						var str=JSON.stringify(rs);
-	//						console.log(str);
-						document.getElementById("departmentcode").value=rs[0].value;
-					});
-				});
+					var _self = this;
+					if(_self.picker) {
+						_self.picker.show(function (rs) {
+							departmentname.value=rs[0].text;
+							document.getElementById("departmentcode").value=rs[0].value;
+							_self.picker.dispose();
+							_self.picker = null;
+						});
+					} else {
+						_self.picker = new mui.PopPicker();
+						_self.picker.setData([{
+							    value: "HTGD",
+							    text: "海通工地"
+							}, {
+							    value: "HXGD",
+							    text: "海新工地"
+							}, {
+							    value: "ZSGD",
+							    text: "招商工地"
+							}, {
+							    value: "YZCBJJ",
+							    text: "远舟船舶家俱"
+							}, {
+							    value: "ZS",
+							    text: "舟山"
+							}, {
+							    value: "DJZG",
+							    text: "大津重工"
+							}, {
+							    value: "ZH",
+							    text: "振华"
+							}]
+						);
+						var dc=getCV('departmentcode').value;
+						_self.picker.pickers[0].setSelectedValue(dc, 2000);
+						_self.picker.show(function(rs) {
+							departmentname.value=rs[0].text;
+							document.getElementById("departmentcode").value=rs[0].value;
+						});
+					}		
+					
+				}, false);
 			}
 			function initSaveButtonData(){
+				var cancelbutton=document.getElementById("cancelButton");
+				cancelbutton.addEventListener('tap', function(){
+					if(!listHtml){
+					    listHtml = plus.webview.getWebviewById('kq_list');
+					}
+					mui.fire(listHtml,'listHtml',{
+						//userid:app.getState().id
+					});
+					mui.openWindow({
+					    id:'kq_list'
+					});
+				}, false);
+				var backbutton=document.getElementById("backList1");
+				backbutton.addEventListener('tap', function(){
+//					console.log(">>>>>>新增返回列表");
+					if(!listHtml){
+					    listHtml = plus.webview.getWebviewById('kq_list');
+					}
+					mui.fire(listHtml,'listHtml',{
+						//userid:app.getState().id
+					});
+					mui.openWindow({
+					    id:'kq_list'
+					});
+				}, false);
+				
 				var saveButton =document.getElementById("saveButton");
 
 					saveButton.addEventListener('tap', function() {
@@ -268,8 +323,7 @@
 							return;
 						}
 						mui.ajax({
-				         //   url      : 'http://www.yzcbjj.com/jlManualCheckPhoneAction_saveInfoByPhone',
-				            url      : 'http://192.168.11.96:8080/jlManualCheckPhoneAction_saveInfoByPhone',
+				            url      : app.getRequestUrl()+'/jlManualCheckPhoneAction_saveInfoByPhone',
 				            type     : 'post',
 				            dataType:'json',//服务器返回json格式数据
 				            data:{
@@ -289,21 +343,32 @@
 							},
 				            success  : function(data){
 				            	if(data.msg){
-				            		mui.openWindow({
-										id: 'kq_list',
-										url:'list.html',
-										show: {
-											aniShow: 'pop-in'
-										},
-										styles: {
-											popGesture: 'hide'
-										},
-										createNew:true,
-										waiting: {
-											autoShow: false
-										}
-										
+				            		
+				            		if(!listHtml){
+									    listHtml = plus.webview.getWebviewById('kq_list');
+									}
+									mui.fire(listHtml,'listHtml',{
+										//userid:app.getState().id
 									});
+									mui.openWindow({
+									    id:'kq_list'
+									});
+				            		
+//				            		mui.openWindow({
+//										id: 'kq_list',
+//										url:'list.html',
+//										show: {
+//											aniShow: 'pop-in'
+//										},
+//										styles: {
+//											popGesture: 'hide'
+//										},
+//										
+//										waiting: {
+//											autoShow: false
+//										}
+//										
+//									});
 				            	}else{
 				            		mui.toast("保存失败");
 				            	}
@@ -313,7 +378,7 @@
 				                mui.toast(type);
 				            }
 				        });
-					});
+					}, false);
 			}
 			function getCV(id){
 				return document.getElementById(id);

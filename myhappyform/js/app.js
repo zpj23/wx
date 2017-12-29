@@ -19,12 +19,13 @@
 			return callback('密码不能为空');
 		}
 		var authed;
+		console.log(owner.getRequestUrl());
 		mui.ajax({
 					type:'POST',
 					async:false,
 					data:'username='+loginInfo.account+"&password="+loginInfo.password,
 					dataType:'json',
-					url:'http://www.yzcbjj.com/jlLoginAction_loginByPhone',
+					url:owner.getRequestUrl()+'/jlLoginAction_loginByPhone',
 					success:function(data){
 						
 						var str=JSON.stringify(data);
@@ -70,7 +71,10 @@
 		owner.setState(state);
 		return callback();
 	};
-
+	owner.getRequestUrl=function(){
+		return "http://www.yzcbjj.com";
+		//return "http://192.168.11.96:8080";
+	};
 	/**
 	 * 新用户注册
 	 **/

@@ -54,7 +54,7 @@
 				padding: 0px 8px;
 			}
 			
-			.oauth-area {
+			/*.oauth-area {
 				position: absolute;
 				bottom: 20px;
 				left: 0px;
@@ -83,7 +83,7 @@
 			
 			.oauth-area .oauth-btn.disabled {
 				background-color: #ddd;
-			}
+			}*/
 		</style>
 
 	</head>
@@ -118,9 +118,7 @@
 				<!--<div class="link-area"><a id='reg'>注册账号</a> <span class="spliter">|</span> <a id='forgetPassword'>忘记密码</a>-->
 				</div>
 			</div>
-			<div class="mui-content-padded oauth-area">
-
-			</div>
+			
 		</div>
 		<script src="js/mui.min.js"></script>
 		<script src="js/mui.enterfocus.js"></script>
@@ -247,9 +245,9 @@
 							toMain();
 						});
 					});
-					$.enterfocus('#login-form input', function() {
-						$.trigger(loginButton, 'tap');
-					});
+//					$.enterfocus('#login-form input', function() {
+//						$.trigger(loginButton, 'tap');
+//					});
 					autoLoginButton.classList[settings.autoLogin ? 'add' : 'remove']('mui-active')
 					autoLoginButton.addEventListener('toggle', function(event) {
 						setTimeout(function() {

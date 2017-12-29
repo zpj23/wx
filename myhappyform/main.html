@@ -22,7 +22,7 @@
 	<body>
 		<header class="mui-bar mui-bar-nav" style="padding-right: 15px;">
 			<h1 class="mui-title">主页</h1>
-			<!--<button id='setting' class=" mui-pull-right mui-btn-link">设置</button>-->
+			<button id='setting' class=" mui-pull-right mui-btn-link">退出</button>
 		</header>
 		<div class="mui-content">
 				<ul class="mui-table-view mui-grid-view mui-grid-9">
@@ -58,7 +58,9 @@
 		<script src="js/mui.min.js"></script>
 		<script src="js/app.js"></script>
 		<script>
+			var listHtml=null;
 			(function($, doc) {
+				
 				$.init();
 				var settings = app.getSettings();
 				//
@@ -71,39 +73,32 @@
 					// 	"id":"user_list",
 					// 	"url":"usermanage/user_list.html"
 					// });
+					listHtml=$.preload({
+							id: 'kq_list',
+							url: 'kq/list.html'
+					});
 					var usermanageButton = doc.getElementById('user_manager');
 					usermanageButton.addEventListener('tap', function(event) {
-						$.openWindow({
-							id: 'kq_list',
-							url:'kq/list.html', 
-							show: {
-								aniShow: 'pop-in'
-							},
-							extras:{
-								userid:app.getState().id
-							},
-							createNew:true,
-							styles: {
-								popGesture: 'hide'
-							},
-							waiting: {
-								autoShow: false
-							}
+						if(!listHtml){
+						    listHtml = plus.webview.getWebviewById('kq_list');
+						}
+						mui.fire(listHtml,'listHtml',{
+							userid:app.getState().id
 						});
-					});
-					var settingPage = $.preload({
-						"id": 'setting',
-						"url": 'setting.html'
-					});
-					//设置
-//					var settingButton = doc.getElementById('setting');
-//					//settingButton.style.display = settings.autoLogin ? 'block' : 'none';
-//					settingButton.addEventListener('tap', function(event) {
+						mui.openWindow({
+						    id:'kq_list'
+						});
+						
 //						$.openWindow({
-//							id: 'setting',
+//							id: 'kq_list_main',
+//							url:'kq/listMain.html', 
 //							show: {
 //								aniShow: 'pop-in'
 //							},
+//							extras:{
+//								userid:app.getState().id
+//							},
+//							createNew:true,
 //							styles: {
 //								popGesture: 'hide'
 //							},
@@ -111,7 +106,64 @@
 //								autoShow: false
 //							}
 //						});
+					});
+//					var settingPage = $.preload({
+//						"id": 'setting',
+//						"url": 'setting.html'
 //					});
+					//设置
+					var settingButton = doc.getElementById('setting');
+					//settingButton.style.display = settings.autoLogin ? 'block' : 'none';
+					settingButton.addEventListener('tap', function(event) {
+						if (mui.os.ios) {
+							app.setState({});
+							mui.openWindow({
+								url: 'login.html',
+								id: 'login',
+								show: {
+									aniShow: 'pop-in'
+								},
+								waiting: {
+									autoShow: false
+								}
+							});
+							return;
+						}
+						var btnArray = [{
+							title: "注销当前账号"
+						}, {
+							title: "直接关闭应用"
+						}];
+						plus.nativeUI.actionSheet({
+							cancel: "取消",
+							buttons: btnArray
+						}, function(event) {
+							var index = event.index;
+							switch (index) {
+								case 1:
+									//注销账号
+									app.setState({});
+									/*
+									 * 注意：
+									 * 1、因本示例应用启动页就是登录页面，因此注册成功后，直接显示登录页即可；
+									 * 2、如果真实案例中，启动页不是登录页，则需修改，使用mui.openWindow打开真实的登录页面
+									 */
+									plus.webview.getLaunchWebview().show("pop-in");
+									//若启动页不是登录页，则需通过如下方式打开登录页
+			//						mui.openWindow({
+			//							url: 'login.html',
+			//							id: 'login',
+			//							show: {
+			//								aniShow: 'pop-in'
+			//							}
+			//						});
+									break;
+								case 2:
+									plus.runtime.quit();
+									break;
+							}
+						});
+					}, false);
 					
 					//--
 					$.oldBack = mui.back;

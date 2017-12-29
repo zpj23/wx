@@ -2,7 +2,8 @@
   "main.html": {
     "refer": [
       "setting.html",
-      "kq/list.html"
+      "kq/list.html",
+      "kq/listMain.html"
     ]
   },
   "login.html": {
@@ -14,7 +15,8 @@
     "refer": [
       "kq/search.html",
       "kq/add.html",
-      "main.html"
+      "main.html",
+      "kq/edit.html"
     ],
     "resources": [
       "kq/search.html"
@@ -25,7 +27,19 @@
       "js/mui.picker.min.js"
     ],
     "refer": [
+      "kq/list.html",
+      "kq/listMain.html"
+    ]
+  },
+  "kq/listMain.html": {
+    "resources": [
       "kq/list.html"
+    ],
+    "refer": [
+      "kq/list.html",
+      "kq/search.html",
+      "main.html",
+      "kq/add.html"
     ]
   }
 }

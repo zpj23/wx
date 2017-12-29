@@ -42,7 +42,7 @@
 		<div class="mui-content">
 			<div class="mui-content-padded">
 				<div class="mui-input-row mui-search" >
-					<input type="search" class="mui-input-clear" readonly="readonly" placeholder="" id="kq_search_list" />
+					<input type="search" class="mui-input-clear"  readonly="readonly" placeholder="" id="kq_search_list" />
 				</div>
 				
 			</div>
@@ -69,6 +69,20 @@
 		        
 		    </ul>-->
 		    </div>
+		    <div class="mui-content-padded">
+				<ul class="mui-pager">
+					<li class="mui-previous">
+						<a href="#" id="lastPage">
+							上一页
+						</a>
+					</li>
+					<li class="mui-next">
+						<a href="#" id="nextPage">
+							下一页
+						</a>
+					</li>
+				</ul>
+			</div>
 		</div>
 	</body>
 	<script src="../js/mui.js"></script>
@@ -76,28 +90,65 @@
 	<script>
 		var state=app.getState();
 		var myList=null;
-		mui.init({
-			subpages:[{
-		      url:'search.html',
-		      id:'kq_search',
-		      styles:{
-		        top:'45px',//mui标题栏默认高度为45px；
-		        bottom:'0px'//默认为0px，可不定义；
-		      }
-		    }]
-		});
+		var editHtml=null; 
+		var searchHtml=null;
+		var currentPage=1;
+		var totalPage=0;
 		
+		var startdate="";
+	    var enddate="";
+	    var staffname="";
+	    var departmentcode="";
+		
+		
+		
+		mui.init();
+		mui.plusReady(function(){
+			currentPage=1;
+			//初始化按钮
+			initButtons();
+			editHtml=mui.preload({
+					id: 'kq_edit',
+					url: 'edit.html'
+				});
+			searchHtml=mui.preload({
+					"id": 'kq_search',
+					"url": 'search.html'
+			});	
+		});
 		//初始化数据
 		function initData(){
+//			console.log("初始化list数据"+currentPage);
+			if(typeof(startdate)=="undefined"){
+				startdate="";
+			}
+			if(typeof(enddate)=="undefined"){
+				enddate="";
+			}
+			if(typeof(staffname)=="undefined"){
+				staffname="";
+			}
+			if(typeof(departmentcode)=="undefined"){
+				departmentcode="";
+			}
 			mui.ajax({
-	            url    : 'http://192.168.11.96:8080/jlManualCheckPhoneAction_findListInfoByPhone',
+	            url    : app.getRequestUrl()+'/jlManualCheckPhoneAction_findListInfoByPhone',
 	            type   : 'POST',
 	            dataType:'json',//服务器返回json格式数据
-	            data:'loginId='+state.id+'&isAdmin='+state.isAdmin,
+	            data:{
+	            	datemin:startdate,
+	            	datemax:enddate,
+	            	staffname:staffname,
+	            	departmentcode:departmentcode,
+	            	cpage:currentPage,
+				    loginId:state.id,
+					isAdmin:state.isAdmin
+				},
 				async:false,
 	            success: function(data){
 //	            	var str=JSON.stringify(data);
 //	            	console.log(str);
+	            	totalPage =data.totalpage;
 	            	myList = document.getElementById("myList");
 	            	var listStr='';
 	            	var arr=new Array();
@@ -112,11 +163,11 @@
 						listStr+='<div class="mui-slider-handle">';
 						listStr+='<div class="mui-table">';
 						listStr+='<div class="mui-table-cell mui-col-xs-10">';
-						listStr+='<h4 class="mui-ellipsis">'+arr[m].sgxm+'_'+arr[m].sgqy+'</h4>';
-						listStr+='<h5>'+arr[m].staffname+'</h5>';
+						listStr+='<h4 class="mui-ellipsis">'+arr[m].staffname+'</h4>';
+						listStr+='<h5>'+arr[m].sgxm+'_'+arr[m].sgqy+'</h5>';
 						listStr+='<p class="mui-h6 mui-ellipsis">'+arr[m].workcontent+'</p>';
 						listStr+='</div>';
-						listStr+='<div class="mui-table-cell mui-col-xs-2 mui-text-right">';
+						listStr+='<div class="mui-table-cell mui-col-xs-3 mui-text-right">';
 						listStr+='<span class="mui-h5">'+arr[m].workdate+'</span>';
 						listStr+='</div>';
 						listStr+='</div>';
@@ -131,24 +182,16 @@
 						var cid = elem.name;
 //						var str=JSON.stringify(cid);
 //						console.log(str);
+						
+
+						if(!editHtml){
+						    editHtml = plus.webview.getWebviewById('kq_edit');
+						}
+						mui.fire(editHtml,'editId',{
+							id:cid
+						});
 						mui.openWindow({
-							id: 'kq_add',
-							url:'add.html',
-							show: {
-								aniShow: 'pop-in'
-							},
-							extras:{
-								name:cid
-							},
-							createNew:true,
-							styles: {
-								popGesture: 'hide'
-							},
-							
-							waiting: {
-								autoShow: false
-							}
-							
+						    id:'kq_edit'
 						});
 						
 					});
@@ -160,8 +203,7 @@
 							if (e.index == 0) {
 								var cid = elem.name;
 								mui.ajax({
-		//				            url      : 'http://www.yzcbjj.com/jlManualCheckPhoneAction_saveInfoByPhone',
-						            url      : 'http://192.168.11.96:8080/jlManualCheckPhoneAction_delInfoByIdByPhone',
+						            url      : app.getRequestUrl()+'/jlManualCheckPhoneAction_delInfoByIdByPhone',
 						            type     : 'post',
 						            dataType:'json',//服务器返回json格式数据
 						            data:{ 
@@ -194,59 +236,54 @@
 	            }
 	        });
 		}
-		mui.plusReady(function() {
+		
+		window.addEventListener('listHtml',function(event){
+			//关闭等待框
+//		    plus.nativeUI.closeWaiting();
+//		    //显示当前页面
+//		    mui.currentWebview.show();
 			
-			mui.preload({
-				"id": 'kq_search',
-				"url": 'search.html'
-			});
-			//查询条件也没页面
-			var kq_search = document.getElementById("kq_search_list");
-			kq_search.addEventListener('tap', function(event) {
-				mui.openWindow({
-					id: 'kq_search',
-					show: {
-						aniShow: 'pop-in'
-					},
-					styles: {
-						popGesture: 'hide'
-					},
-					
-					waiting: {
-						autoShow: false
-					}
-					
-				});
-				
-			});
-			//新增页面
+			currentPage=1;
+			//初始化
+			startdate=event.detail.startdate;
+		    enddate=event.detail.enddate;
+		    staffname=event.detail.staffname;
+		    departmentcode=event.detail.departmentcode;
+			
+			initData();
+			
+			
+			
+			
+//			setTimeout(function(){
+//				var array = plus.webview.all();
+//				if(array){
+//					for(var i=0,len=array.length;i<len;i++){
+//					    	console.log(array[i].getURL());
+//				        }
+//				}
+//			},5000);
+			
+		});
+		
+		function  initButtons(){
 			var add = document.getElementById("kq_add");
-			add.addEventListener('tap', function(event) {
+				add.addEventListener('tap', function(event) {
+				if(!editHtml){
+				    editHtml = plus.webview.getWebviewById('kq_edit');
+				}
+				mui.fire(editHtml,'editId',{
+					id:''
+				});
 				mui.openWindow({
-					id: 'kq_add',
-					url:'add.html',
-					show: {
-						aniShow: 'pop-in'
-					},
-					extras:{
-						id:''
-					},
-					createNew:true,
-					styles: {
-						popGesture: 'hide'
-					},
-					
-					waiting: {
-						autoShow: false
-					}
-					
+				    id:'kq_edit'
 				});
 				
-			});
+			}, false);
 			var mainPage = document.getElementById('mainPage');
 					mainPage.addEventListener('tap', function(event) {
 						mui.openWindow({
-							id: 'mainPage',
+							id: 'main',
 							url:'../main.html',
 							show: {
 								aniShow: 'pop-in-left'
@@ -258,9 +295,66 @@
 								autoShow: false
 							}
 						});
+					}, false);
+					
+				
+				//查询条件也没页面
+				
+				var kq_search = document.getElementById("kq_search_list");
+				
+				kq_search.addEventListener('tap', function(event) {
+					if(!searchHtml){
+						searchHtml=plus.webview.getWebviewById('kq_search');
+					}
+					mui.fire(searchHtml,'searchHtml',{
+						
 					});
-			
-			initData();
-		});
+					mui.openWindow({
+						id: 'kq_search',
+						show: {
+							aniShow: 'pop-in'
+						},
+						styles: {
+							popGesture: 'hide'
+							
+						},
+						
+						waiting: {
+							autoShow: false
+						}
+						
+					});
+				
+				}, false);	
+				
+				//分页按钮
+				var lastPageButton = document.getElementById("lastPage");
+				lastPageButton.addEventListener('tap', function(event) {
+					
+					if(currentPage>1){
+						currentPage=currentPage-1;
+//						console.log('上一页'+currentPage);
+						initData('','','','');
+					}else{
+						mui.toast("已经是第一页");
+						currentPage=1;
+					}
+				}, false);	
+				var nextPageButton = document.getElementById("nextPage");
+				nextPageButton.addEventListener('tap', function(event) {
+					
+					if(currentPage<=totalPage){
+						currentPage=currentPage+1;
+//						console.log('下一页'+currentPage);
+						initData('','','','');
+					}else{
+						mui.toast("已经是最后一页");
+						currentPage=totalPage;
+					}
+					
+					
+				}, false);
+				
+		}
 	</script>
 </html>
