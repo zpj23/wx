@@ -12,8 +12,8 @@
 		loginInfo = loginInfo || {};
 		loginInfo.account = loginInfo.account || '';
 		loginInfo.password = loginInfo.password || '';
-		if (loginInfo.account.length < 5) {
-			return callback('账号最短为 5 个字符');
+		if (loginInfo.account.length < 1) {
+			return callback('账号不能空字符');
 		}
 		if (loginInfo.password.length < 1) {
 			return callback('密码不能为空');
