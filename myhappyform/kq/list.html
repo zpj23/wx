@@ -69,6 +69,9 @@
 		        
 		    </ul>-->
 		    </div>
+		    <div>
+		    	
+		    </div>
 		    <div class="mui-content-padded">
 				<ul class="mui-pager">
 					<li class="mui-previous">
@@ -76,6 +79,12 @@
 							上一页
 						</a>
 					</li>
+					<span class="mui-badge mui-badge-inverted">当前第</span>
+					<span class="mui-badge mui-badge-inverted" id="jb_cpage"></span>
+					<span class="mui-badge mui-badge-inverted">页共</span>
+					<span class="mui-badge mui-badge-inverted" id="jb_tpage"></span>
+					<span class="mui-badge mui-badge-inverted">页</span>
+					
 					<li class="mui-next">
 						<a href="#" id="nextPage">
 							下一页
@@ -149,26 +158,51 @@
 //	            	var str=JSON.stringify(data);
 //	            	console.log(str);
 	            	totalPage =data.totalpage;
+	            	document.getElementById("jb_cpage").innerHTML=currentPage;
+	            	document.getElementById("jb_tpage").innerHTML=totalPage;
+	            	
 	            	myList = document.getElementById("myList");
 	            	var listStr='';
 	            	var arr=new Array();
 	            	arr=data.list;
 	            	listStr+='<ul class="mui-table-view mui-table-view-striped mui-table-view-condensed" id="OA_task_1">';
 	            	for(var m=0;m<arr.length;m++){
-						listStr+='<li class="mui-table-view-cell">';
-						listStr+='<div class="mui-slider-right mui-disabled">';
-						listStr+='<a class="mui-btn mui-btn-blue editkq" name="'+arr[m].id+'"  >修改</a>';
-						listStr+='<a class="mui-btn mui-btn-red shanchukq" name="'+arr[m].id+'" >删除</a>';
-						listStr+='</div>';
+	            		var colorStr="red";
+	            		if(arr[m].shenhe=="1"){
+	            			colorStr="green";
+//	            			if(state.isAdmin=="1"){
+//	            				colorStr="black";
+//	            			}else{
+//	            				colorStr="grey";
+//	            			}
+	            			
+	            		}
+	            		
+						listStr+='<li class="mui-table-view-cell" >';
+						if(arr[m].shenhe=="0"){
+							listStr+='<div class="mui-slider-right mui-disabled">';
+							listStr+='<a class="mui-btn mui-btn-blue editkq" name="'+arr[m].id+'"  >修改</a>';
+							listStr+='<a class="mui-btn mui-btn-red shanchukq" name="'+arr[m].id+'" >删除</a>';
+							listStr+='</div>';
+						}else{
+							if(state.isAdmin=="1"){
+	            				listStr+='<div class="mui-slider-right mui-disabled">';
+								listStr+='<a class="mui-btn mui-btn-blue editkq" name="'+arr[m].id+'"  >修改</a>';
+								listStr+='<a class="mui-btn mui-btn-red shanchukq" name="'+arr[m].id+'" >删除</a>';
+								listStr+='</div>';
+	            			}
+						}
+	            		
+						
 						listStr+='<div class="mui-slider-handle">';
 						listStr+='<div class="mui-table">';
 						listStr+='<div class="mui-table-cell mui-col-xs-10">';
-						listStr+='<h4 class="mui-ellipsis">'+arr[m].staffname+'</h4>';
+						listStr+='<h4 class="mui-ellipsis" >'+arr[m].staffname+'</h4>';
 						listStr+='<h5>'+arr[m].sgxm+'_'+arr[m].sgqy+'</h5>';
 						listStr+='<p class="mui-h6 mui-ellipsis">'+arr[m].workcontent+'</p>';
 						listStr+='</div>';
 						listStr+='<div class="mui-table-cell mui-col-xs-3 mui-text-right">';
-						listStr+='<span class="mui-h5">'+arr[m].workdate+'</span>';
+						listStr+='<span class="mui-h5" style="color:'+colorStr+';">'+arr[m].workdate+'</span>';
 						listStr+='</div>';
 						listStr+='</div>';
 						listStr+='</div>';

@@ -19,7 +19,7 @@
 			return callback('密码不能为空');
 		}
 		var authed;
-		console.log(owner.getRequestUrl());
+//		console.log(owner.getRequestUrl());
 		mui.ajax({
 					type:'POST',
 					async:false,
@@ -33,7 +33,7 @@
 							authed=true; 
 						}
 						//mui.toast(str);
-						console.log(str);
+//						console.log(str);
 						if (authed) {
 							return owner.createState(data.data, callback);
 						} else {
