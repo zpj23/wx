@@ -65,7 +65,6 @@
 		state.account = data.username;
 		state.loginname=data.loginname;
 		state.departmentcode=data.departmentcode;
-		//state.token = "token123456789";
 		state.isAdmin=data.isAdmin;
 		state.id=data.id;
 		owner.setState(state);
@@ -73,7 +72,7 @@
 	};
 	owner.getRequestUrl=function(){
 		return "http://www.yzcbjj.com";
-		//return "http://192.168.11.96:8080";
+//		return "http://192.168.11.96:8080";
 	};
 	/**
 	 * 新用户注册

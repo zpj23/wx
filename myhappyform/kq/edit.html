@@ -93,13 +93,14 @@
 		<script src="../js/mui.picker.min.js"></script>
 		<script src="../js/app.js"></script>
 		<script type="text/javascript">
-			var state=app.getState();
+			var state=null;
 			var currentId="";
 			var listHtml=null;
 			var workdate;
 			var departmentname;
 			mui.init();
 			mui.plusReady(function(){
+				
 				//初始化日期		
 				initDateData();
 				//保存按钮
@@ -110,14 +111,13 @@
 				
 			  //获得事件参数
 			  	currentId = event.detail.id;
-			  	
-			   
-				
+			  	state=app.getState();
 				initData();
 				
 			});
 			
 			function initData(){
+				
 				if(currentId!=''&&currentId!=null){
 					mui.ajax({
 		            url      : app.getRequestUrl()+'/jlManualCheckPhoneAction_findInfoByIdByPhone',

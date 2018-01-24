@@ -83,7 +83,7 @@
 						    listHtml = plus.webview.getWebviewById('kq_list');
 						}
 						mui.fire(listHtml,'listHtml',{
-							userid:app.getState().id
+//							userid:app.getState().id
 						});
 						mui.openWindow({
 						    id:'kq_list'
@@ -159,6 +159,7 @@
 			//						});
 									break;
 								case 2:
+//								app.setState({});
 									plus.runtime.quit();
 									break;
 							}
