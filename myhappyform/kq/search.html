@@ -43,7 +43,11 @@
 					    <input type="text" id="departmentname" class="mui-input-clear" placeholder="所属部门">
 					    <input type="hidden" id="departmentcode" value="" />
 					</div>
-					
+					<div class="mui-input-row">
+					        <label>是否审核:</label>
+					    <input type="text" id="shenhe" class="mui-input-clear" placeholder="是否审核" />
+					    <input type="hidden" id="shenhecode" value="" />
+					</div>
 					<div class="mui-button-row">
 						<button type="button" id="searchButton" class="mui-btn mui-btn-primary" >查询</button>
 						<button type="button" id="clearButton" class="mui-btn mui-btn-grey" >清空</button>
@@ -137,7 +141,23 @@
 					}
 					
 				}, false);
-				
+				//审核状态
+				var shenhe=document.getElementById("shenhe");
+				shenhe.addEventListener('tap', function() {
+					 var picker = new mui.PopPicker();
+					 picker.setData([{
+					    value: "1",
+					    text: "是"
+					}, {
+					    value: "0",
+					    text: "否"
+					}]);
+					picker.show(function(rs) {
+						document.getElementById("shenhecode").value=rs[0].value;
+						shenhe.value=rs[0].text;
+					});
+				}, false);
+				//部门名称
 				var departmentname=document.getElementById("departmentname");
 				departmentname.addEventListener('tap', function() {
 					 var picker = new mui.PopPicker();
@@ -189,6 +209,8 @@
 					getCV('staffname').value='';
 					getCV('departmentname').value='';
 					getCV('departmentcode').value='';
+					getCV('shenhe').value='';
+					getCV('shenhecode').value='';
 				});	
 				var searchButton =document.getElementById("searchButton");
 				searchButton.addEventListener('tap', function() {
@@ -200,7 +222,8 @@
 					    enddate:getCV('enddate').value,
 					    staffname:getCV('staffname').value,
 					    departmentname:getCV('departmentname').value,
-					    departmentcode:getCV('departmentcode').value
+					    departmentcode:getCV('departmentcode').value,
+					    shenhe:getCV('shenhecode').value
 					});
 					mui.openWindow({
 					    id:'kq_list'

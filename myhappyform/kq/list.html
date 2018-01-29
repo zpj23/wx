@@ -108,7 +108,7 @@
 	    var enddate="";
 	    var staffname="";
 	    var departmentcode="";
-		
+		var isshenhe="";
 		
 		
 		mui.init();
@@ -141,6 +141,9 @@
 			if(typeof(departmentcode)=="undefined"){
 				departmentcode="";
 			}
+			if(typeof(isshenhe)=="undefined"){
+				isshenhe="";
+			}
 			mui.ajax({
 	            url    : app.getRequestUrl()+'/jlManualCheckPhoneAction_findListInfoByPhone',
 	            type   : 'POST',
@@ -150,6 +153,7 @@
 	            	datemax:enddate,
 	            	staffname:staffname,
 	            	departmentcode:departmentcode,
+	            	isshenhe:isshenhe,
 	            	cpage:currentPage,
 				    loginId:state.id,
 					isAdmin:state.isAdmin
@@ -286,7 +290,7 @@
 		    enddate=event.detail.enddate;
 		    staffname=event.detail.staffname;
 		    departmentcode=event.detail.departmentcode;
-			
+			isshenhe=event.detail.shenhe;
 			initData();
 			
 			
