@@ -110,7 +110,6 @@
 	    var departmentcode="";
 		var isshenhe="";
 		
-		
 		mui.init();
 		mui.plusReady(function(){
 			currentPage=1;
@@ -159,6 +158,12 @@
 					isAdmin:state.isAdmin
 				},
 				async:false,
+				beforeSend: function() {
+			        plus.nativeUI.showWaiting("加载中...", null);
+			    },
+			    complete: function() {
+			        plus.nativeUI.closeWaiting();
+			    },
 	            success: function(data){
 //	            	var str=JSON.stringify(data);
 //	            	console.log(str);
@@ -375,7 +380,7 @@
 					if(currentPage>1){
 						currentPage=currentPage-1;
 //						console.log('上一页'+currentPage);
-						initData('','','','');
+						initData();
 					}else{
 						mui.toast("已经是第一页");
 						currentPage=1;
@@ -384,10 +389,10 @@
 				var nextPageButton = document.getElementById("nextPage");
 				nextPageButton.addEventListener('tap', function(event) {
 					
-					if(currentPage<=totalPage){
+					if(currentPage<totalPage){
 						currentPage=currentPage+1;
 //						console.log('下一页'+currentPage);
-						initData('','','','');
+						initData();
 					}else{
 						mui.toast("已经是最后一页");
 						currentPage=totalPage;

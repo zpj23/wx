@@ -18,14 +18,21 @@
 		if (loginInfo.password.length < 1) {
 			return callback('密码不能为空');
 		}
+		
+		
 		var authed;
-//		console.log(owner.getRequestUrl());
 		mui.ajax({
 					type:'POST',
 					async:false,
 					data:'username='+loginInfo.account+"&password="+loginInfo.password,
 					dataType:'json',
 					url:owner.getRequestUrl()+'/jlLoginAction_loginByPhone',
+					beforeSend: function() {
+				        plus.nativeUI.showWaiting("登陆中...", null);
+				    },
+				    complete: function() {
+				        plus.nativeUI.closeWaiting();
+				    },
 					success:function(data){
 						
 						var str=JSON.stringify(data);
@@ -67,6 +74,8 @@
 		state.departmentcode=data.departmentcode;
 		state.isAdmin=data.isAdmin;
 		state.id=data.id;
+		state.token = "token123456789";
+		state.password=data.password;
 		owner.setState(state);
 		return callback();
 	};
@@ -74,6 +83,7 @@
 		return "http://www.yzcbjj.com";
 //		return "http://192.168.11.96:8080";
 	};
+	
 	/**
 	 * 新用户注册
 	 **/
@@ -111,9 +121,9 @@
 	owner.setState = function(state) {
 		state = state || {};
 		localStorage.setItem('$state', JSON.stringify(state));
-		//var settings = owner.getSettings();
-		//settings.gestures = '';
-		//owner.setSettings(settings);
+		var settings = owner.getSettings();
+		settings.gestures = '';
+		owner.setSettings(settings);
 	};
 
 	var checkEmail = function(email) {
@@ -137,6 +147,8 @@
 	 **/
 	owner.setSettings = function(settings) {
 		settings = settings || {};
+//		var str=JSON.stringify(settings);
+//		console.log(str);
 		localStorage.setItem('$settings', JSON.stringify(settings));
 	}
 

@@ -100,7 +100,6 @@
 			var departmentname;
 			mui.init();
 			mui.plusReady(function(){
-				
 				//初始化日期		
 				initDateData();
 				//保存按钮
@@ -108,7 +107,6 @@
 			});
 			//添加newId自定义事件监听
 			window.addEventListener('editId',function(event){
-				
 			  //获得事件参数
 			  	currentId = event.detail.id;
 			  	state=app.getState();
@@ -128,6 +126,12 @@
 					    loginId:state.id,
 						isAdmin:state.isAdmin
 					},
+					beforeSend: function() {
+				        plus.nativeUI.showWaiting("初始化中...", null);
+				    },
+				    complete: function() {
+				        plus.nativeUI.closeWaiting();
+				    },
 		            success  : function(data){
 		            	
 		            	if(data.msg){
@@ -300,28 +304,33 @@
 				}, false);
 				
 				var saveButton =document.getElementById("saveButton");
-
+  					
 					saveButton.addEventListener('tap', function() {
 						var flag=true;
-						if(getCV('sgxm')==""){
+						if(getCV('sgxm').value==""){
 							mui.toast("施工项目不能为空！");
 							flag=false;
 						}
-						if(getCV('sgqy')==""){
+						if(getCV('sgqy').value==""){
 							mui.toast("施工区域不能为空！");
 							flag=false;
 						}
-						if(getCV('workdate')==""){
+						if(getCV('workdate').value==""){
 							mui.toast("施工日期不能为空！");
 							flag=false;
 						}
-						if(getCV('staffname')==""){
+						if(getCV('staffname').value==""){
 							mui.toast("施工人员不能为空！");
+							flag=false;
+						}
+						if(getCV('workcontent').value==""){
+							mui.toast("施工内容不能为空！");
 							flag=false;
 						}
 						if(!flag){
 							return;
 						}
+//						saveButton.disabled = false;
 						mui.ajax({
 				            url      : app.getRequestUrl()+'/jlManualCheckPhoneAction_saveInfoByPhone',
 				            type     : 'post',
@@ -341,6 +350,12 @@
 							    loginId:state.id,
 								isAdmin:state.isAdmin
 							},
+							beforeSend: function() {
+						        plus.nativeUI.showWaiting("保存中...", null);
+						    },
+						    complete: function() {
+						        plus.nativeUI.closeWaiting();
+						    },
 				            success  : function(data){
 				            	if(data.msg){
 				            		
