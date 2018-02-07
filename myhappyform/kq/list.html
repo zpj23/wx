@@ -46,6 +46,28 @@
 				</div>
 				
 			</div>
+			
+			<div class="mui-content-padded">
+				<ul class="mui-pager">
+					<li class="mui-previous">
+						<a href="#" id="lastPage">
+							上一页
+						</a>
+					</li>
+					<span class="mui-badge mui-badge-inverted">当前第</span>
+					<span class="mui-badge mui-badge-inverted" id="jb_cpage"></span>
+					<span class="mui-badge mui-badge-inverted">页共</span>
+					<span class="mui-badge mui-badge-inverted" id="jb_tpage"></span>
+					<span class="mui-badge mui-badge-inverted">页</span>
+					
+					<li class="mui-next">
+						<a href="#" id="nextPage">
+							下一页
+						</a>
+					</li>
+				</ul>
+			</div>
+			
 			<div class="mui-content-padded" id="myList">
 		    <!--<ul class="mui-table-view mui-table-view-striped mui-table-view-condensed">
 		        <li class="mui-table-view-cell">
@@ -69,29 +91,8 @@
 		        
 		    </ul>-->
 		    </div>
-		    <div>
-		    	
-		    </div>
-		    <div class="mui-content-padded">
-				<ul class="mui-pager">
-					<li class="mui-previous">
-						<a href="#" id="lastPage">
-							上一页
-						</a>
-					</li>
-					<span class="mui-badge mui-badge-inverted">当前第</span>
-					<span class="mui-badge mui-badge-inverted" id="jb_cpage"></span>
-					<span class="mui-badge mui-badge-inverted">页共</span>
-					<span class="mui-badge mui-badge-inverted" id="jb_tpage"></span>
-					<span class="mui-badge mui-badge-inverted">页</span>
-					
-					<li class="mui-next">
-						<a href="#" id="nextPage">
-							下一页
-						</a>
-					</li>
-				</ul>
-			</div>
+		    
+		    
 		</div>
 	</body>
 	<script src="../js/mui.js"></script>
@@ -211,13 +212,14 @@
 						listStr+='<h5>'+arr[m].sgxm+'_'+arr[m].sgqy+'</h5>';
 						listStr+='<p class="mui-h6 mui-ellipsis">'+arr[m].workcontent+'</p>';
 						listStr+='</div>';
-						listStr+='<div class="mui-table-cell mui-col-xs-4 mui-text-right">';
+						listStr+='<div class="mui-table-cell mui-col-xs-4 mui-text-center">';
 						listStr+='<span class="mui-h5" style="color:'+colorStr+';">'+arr[m].workdate+'</span>';
 						listStr+='<br/>';
 						listStr+='<span class="mui-h5" style="color:'+colorStr+';">'+arr[m].departmentname+'</span>';
 						listStr+='<br/>';
 						listStr+='<span class="mui-h5" style="color:'+colorStr+';">'+'&nbsp;&nbsp;&nbsp;&nbsp;'+arr[m].workduringtime+'+'+arr[m].overtime+'</span>';
 						listStr+='</div>';
+						listStr+='<div class="mui-table-cell mui-col-xs-1 mui-text-right"><span class="mui-badge">'+((currentPage-1)*10+m+1)+'</span></div>';
 						listStr+='</div>';
 						listStr+='</div>';
 						listStr+='</li>';
