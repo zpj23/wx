@@ -104,7 +104,7 @@
 		var searchHtml=null;
 		var currentPage=1;
 		var totalPage=0;
-		
+		var mainHtml =null;
 		var startdate="";
 	    var enddate="";
 	    var staffname="";
@@ -192,6 +192,9 @@
 						listStr+='<li class="mui-table-view-cell" >';
 						if(arr[m].shenhe=="0"){
 							listStr+='<div class="mui-slider-right mui-disabled">';
+							if(state.isAdmin=="1"){
+								listStr+='<a class="mui-btn mui-btn-green shenhekq" name="'+arr[m].id+'" >审核</a>';
+							}
 							listStr+='<a class="mui-btn mui-btn-blue editkq" name="'+arr[m].id+'"  >修改</a>';
 							listStr+='<a class="mui-btn mui-btn-red shanchukq" name="'+arr[m].id+'" >删除</a>';
 							listStr+='</div>';
@@ -227,6 +230,33 @@
 	            	}
 	            	listStr+='</ul>';
 	            	myList.innerHTML=listStr;
+	            	
+	            	mui('#OA_task_1').on('tap', '.shenhekq', function(event) {
+						var elem = this;
+						var cid = elem.name;
+						var li = elem.parentNode.parentNode;
+						mui.ajax({
+				            url      : app.getRequestUrl()+'/jlManualCheckPhoneAction_doshenhe',
+				            type     : 'post',
+				            dataType:'json',//服务器返回json格式数据
+				            data:{ 
+							    id:cid,
+							    loginId:state.id,
+								isAdmin:state.isAdmin
+							},
+				            success  : function(data){
+				            	if(data.msg){
+				            		mui.toast("审核成功");
+				            		initData();
+				            	}else{
+				            		mui.toast("审核失败");
+				            	}
+				            },
+				            error    : function(xhr,type,errorThrown){
+				                mui.toast(type);
+				            }
+				        });
+					});
 	            	mui('#OA_task_1').on('tap', '.editkq', function(event) {
 						var elem = this;
 						var cid = elem.name;
@@ -332,6 +362,11 @@
 			}, false);
 			var mainPage = document.getElementById('mainPage');
 					mainPage.addEventListener('tap', function(event) {
+						if(!mainHtml){
+							mainHtml= plus.webview.getWebviewById("main");
+						}
+						mui.fire(mainHtml,'show',{
+						});
 						mui.openWindow({
 							id: 'main',
 							url:'../main.html',
