@@ -81,7 +81,7 @@
 	};
 	owner.getRequestUrl=function(){
 		return "http://www.yzcbjj.com";
-//		return "http://192.168.11.96:8080";
+//		return "http://192.168.11.108:8080";
 	};
 	
 	/**
