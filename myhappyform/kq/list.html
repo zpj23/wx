@@ -196,6 +196,8 @@
 							listStr+='<div class="mui-slider-right mui-disabled">';
 							if(state.isAdmin=="1"){
 								listStr+='<a class="mui-btn mui-btn-green shenhekq" name="'+arr[m].id+'" >审核</a>';
+							}else{
+								listStr+='<a class="mui-btn mui-btn-green copykq" name="'+arr[m].id+'"  >复制</a>';
 							}
 							listStr+='<a class="mui-btn mui-btn-blue editkq" name="'+arr[m].id+'"  >修改</a>';
 							listStr+='<a class="mui-btn mui-btn-red shanchukq" name="'+arr[m].id+'" >删除</a>';
@@ -206,6 +208,10 @@
 								listStr+='<a class="mui-btn mui-btn-blue editkq" name="'+arr[m].id+'"  >修改</a>';
 								listStr+='<a class="mui-btn mui-btn-red shanchukq" name="'+arr[m].id+'" >删除</a>';
 								listStr+='</div>';
+	            			}else{
+	            				listStr+='<div class="mui-slider-right mui-disabled">';
+	            				listStr+='<a class="mui-btn mui-btn-green copykq" name="'+arr[m].id+'"  >复制</a>';
+	            				listStr+='</div>';
 	            			}
 						}
 	            		
@@ -232,6 +238,33 @@
 	            	}
 	            	listStr+='</ul>';
 	            	myList.innerHTML=listStr;
+	            	
+	            	mui('#OA_task_1').on('tap', '.copykq', function(event) {
+						var elem = this;
+						var cid = elem.name;
+						var li = elem.parentNode.parentNode;
+						mui.ajax({
+				            url      : app.getRequestUrl()+'/jlManualCheckPhoneAction_docopy',
+				            type     : 'post',
+				            dataType:'json',//服务器返回json格式数据
+				            data:{ 
+							    id:cid,
+							    loginId:state.id,
+								isAdmin:state.isAdmin
+							},
+				            success  : function(data){
+				            	if(data.msg){
+				            		mui.toast("复制成功");
+				            		initData();
+				            	}else{
+				            		mui.toast("复制失败");
+				            	}
+				            },
+				            error    : function(xhr,type,errorThrown){
+				                mui.toast(type);
+				            }
+				        });
+					});
 	            	
 	            	mui('#OA_task_1').on('tap', '.shenhekq', function(event) {
 						var elem = this;
