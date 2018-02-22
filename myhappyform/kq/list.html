@@ -212,12 +212,12 @@
 						
 						listStr+='<div class="mui-slider-handle">';
 						listStr+='<div class="mui-table">';
-						listStr+='<div class="mui-table-cell mui-col-xs-10">';
+						listStr+='<div class="mui-table-cell mui-col-xs-9">';
 						listStr+='<h4 class="mui-ellipsis" >'+arr[m].staffname+'</h4>';
 						listStr+='<h5>'+arr[m].sgxm+'_'+arr[m].sgqy+'</h5>';
 						listStr+='<p class="mui-h6 mui-ellipsis">'+arr[m].workcontent+'</p>';
 						listStr+='</div>';
-						listStr+='<div class="mui-table-cell mui-col-xs-4 mui-text-center">';
+						listStr+='<div class="mui-table-cell mui-col-xs-5 mui-text-center">';
 						listStr+='<span class="mui-h5" style="color:'+colorStr+';">'+arr[m].workdate+'</span>';
 						listStr+='<br/>';
 						listStr+='<span class="mui-h5" style="color:'+colorStr+';">'+arr[m].departmentname+'</span>';
@@ -348,6 +348,9 @@
 			
 		});
 		
+//		window.addEventListener('listHtml',function(event){
+//		});	
+			
 		function  initButtons(){
 			var add = document.getElementById("kq_add");
 				add.addEventListener('tap', function(event) {
