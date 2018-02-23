@@ -16,7 +16,8 @@
       "kq/search.html",
       "kq/add.html",
       "main.html",
-      "kq/edit.html"
+      "kq/edit.html",
+      "kq/view.html"
     ],
     "resources": [
       "kq/search.html"

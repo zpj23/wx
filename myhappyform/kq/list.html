@@ -101,6 +101,7 @@
 		var state=null;
 		var myList=null;
 		var editHtml=null; 
+		var viewHtml=null;
 		var searchHtml=null;
 		var currentPage=1;
 		var pagerow=15;
@@ -125,6 +126,11 @@
 					"id": 'kq_search',
 					"url": 'search.html'
 			});	
+			viewHtml=mui.preload({
+					"id": 'kq_view',
+					"url": 'view.html'
+			});	
+			
 		});
 		//初始化数据
 		function initData(){
@@ -211,6 +217,7 @@
 	            			}else{
 	            				listStr+='<div class="mui-slider-right mui-disabled">';
 	            				listStr+='<a class="mui-btn mui-btn-green copykq" name="'+arr[m].id+'"  >复制</a>';
+	            				listStr+='<a class="mui-btn mui-btn-blue viewkq" name="'+arr[m].id+'"  >查看</a>';
 	            				listStr+='</div>';
 	            			}
 						}
@@ -238,7 +245,7 @@
 	            	}
 	            	listStr+='</ul>';
 	            	myList.innerHTML=listStr;
-	            	
+	            	//复制当前记录
 	            	mui('#OA_task_1').on('tap', '.copykq', function(event) {
 						var elem = this;
 						var cid = elem.name;
@@ -265,7 +272,7 @@
 				            }
 				        });
 					});
-	            	
+	            	//审核考勤信息
 	            	mui('#OA_task_1').on('tap', '.shenhekq', function(event) {
 						var elem = this;
 						var cid = elem.name;
@@ -292,6 +299,27 @@
 				            }
 				        });
 					});
+					
+					//查看考勤信息
+					mui('#OA_task_1').on('tap', '.viewkq', function(event) {
+						var elem = this;
+						var cid = elem.name;
+//						var str=JSON.stringify(cid);
+//						console.log(str);
+						
+
+						if(!viewHtml){
+						    viewHtml = plus.webview.getWebviewById('kq_view');
+						}
+						mui.fire(viewHtml,'viewId',{
+							id:cid
+						});
+						mui.openWindow({
+						    id:'kq_view'
+						});
+						
+					});
+					//编辑考勤信息
 	            	mui('#OA_task_1').on('tap', '.editkq', function(event) {
 						var elem = this;
 						var cid = elem.name;
@@ -310,6 +338,7 @@
 						});
 						
 					});
+					//删除考勤信息
 	            	var btnArray = ['确认', '取消'];
 	            	mui('#OA_task_1').on('tap', '.shanchukq', function(event) {
 						var elem = this;
