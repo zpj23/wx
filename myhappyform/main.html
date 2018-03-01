@@ -55,6 +55,12 @@
 		                    <div class="mui-media-body">more</div></a></li>
 		        </ul> 
 		</div>
+		<div class="mui-content">
+		    <div class="mui-progressbar" id="bar">
+		        <span></span>
+		    </div>
+		</div>
+
 		<script src="js/mui.min.js"></script>
 		<script src="js/app.js"></script>
 		<script>
@@ -111,28 +117,74 @@
 						    id:'kq_list'
 						});
 						
-//						$.openWindow({
-//							id: 'kq_list_main',
-//							url:'kq/listMain.html', 
-//							show: {
-//								aniShow: 'pop-in'
-//							},
-//							extras:{
-//								userid:app.getState().id
-//							},
-//							createNew:true,
-//							styles: {
-//								popGesture: 'hide'
-//							},
-//							waiting: {
-//								autoShow: false
-//							}
-//						});
 					});
-//					var settingPage = $.preload({
-//						"id": 'setting',
-//						"url": 'setting.html'
-//					});
+					//app更新
+					var downLoadInfo=null;
+					var updateButton=doc.getElementById("downloadapp");
+						updateButton.addEventListener('tap',function(event){
+							var ver=plus.runtime.version;
+							$.ajax({
+					            url      : app.getRequestUrl()+'/jlLoginAction_checkUpdateByPhone',
+					            type     : 'post',
+					            dataType:'json',//服务器返回json格式数据
+					            data:{ 
+					            	ver:ver,
+								    loginId:state.id,
+									isAdmin:state.isAdmin
+								},
+					            success  : function(data){
+					            	if(data.msg){
+					            		//$.toast("有新版本，请更新");
+					            		$.toast(data.url);
+					            		downLoadInfo=data;
+					            		createDownload();
+					            	}
+					            },
+					            error    : function(xhr,type,errorThrown){
+					                $.toast(type);
+					            }
+					        });
+						
+					});
+					
+					//初始化下载对象
+				    var dtask = null;
+				    function createDownload(){
+				        //判断文件是否已经下载
+						plus.io.resolveLocalFileSystemURL('_downloads/'+downLoadInfo.filename,function(entry){
+				            if(entry.isFile){
+				                $.toast('已经下载');
+				                $.alert(entry.fullPath);
+				            }
+				        },function(e){dBase();});
+				    }
+				    function dBase(){
+				        if(dtask){
+				            $.toast('下载任务已经存在');
+				            return;
+				        }
+				        var tempurl=app.getRequestUrl()+"/"+downLoadInfo.url;
+				        dtask = plus.downloader.createDownload(tempurl,{method:'GET'},function(d,status){
+				            $.toast(d.filename);
+				        });
+				        dtask.addEventListener("statechanged",function(task,status){
+				            if(!dtask){return;}
+				            switch(task.state){
+				                case 1: $.toast('开始下载...');break;//开始
+				                case 2: $.toast('链接到服务器...');break;//链接到服务器
+				                case 3:
+				                    var progressVal = (task.downloadedSize/task.totalSize)*100;
+				                        $('#bar').progressbar({progress:progressVal}).show();
+				                    break;
+				                case 4: $.toast('下载完成');break;
+				            }
+				        });
+				        dtask.start();
+				    }
+
+					
+					
+					
 					//设置
 					var settingButton = doc.getElementById('setting');
 					//settingButton.style.display = settings.autoLogin ? 'block' : 'none';

@@ -70,7 +70,7 @@
 		"Webview": {},
 		"NativeUI": {},
 		"Navigator": {},
-		"NativeObj": {},"OAuth":{},"Device":{}
+		"NativeObj": {},"OAuth":{},"Device":{},"Downloader":{}
 	},
 	"plus": {
 		"splashscreen": {

@@ -76,10 +76,16 @@
 				<div class="mui-card">
 					<div class="mui-card-content" style="padding: 15px;">
 						<label>施工内容:</label>
-						<textarea id="workcontent" style="background-color: whitesmoke;" rows="9"  placeholder=""></textarea>
+						<textarea id="workcontent" style="background-color: whitesmoke;" rows="5"  placeholder=""></textarea>
 					</div>
 				</div>	
-				
+				<div class="mui-content-padded"></div>
+				<div class="mui-card">
+					<div class="mui-card-content" style="padding: 15px;">
+						<label>备注:</label>
+						<textarea id="remark" style="background-color: whitesmoke;" rows="5"  placeholder=""></textarea>
+					</div>
+				</div>
 				
 			    <div class="mui-button-row">
 			    	<input type="hidden" id="id" value="" />
@@ -150,7 +156,7 @@
 					    	getCV('workcontent').value=cinfo.workcontent;
 					    	getCV('departmentname').value=cinfo.departmentname;
 					    	getCV('departmentcode').value=cinfo.departmentcode;
-					    	
+					    	getCV('remark').value=cinfo.remark;
 							//部门
 							initDepartmentData();
 					    	
@@ -175,6 +181,7 @@
 			    	getCV('workcontent').value='';
 			    	getCV('departmentname').value='';
 			    	getCV('departmentcode').value='';
+			    	getCV('remark').value='';
 			    	initDepartmentData();
 				}
 			}
@@ -344,7 +351,7 @@
 							    workduringtime:getCV('workduringtime').value,
 							    overtime:getCV('overtime').value,
 							    workcontent:getCV('workcontent').value,
-							    remark:'',
+							    remark:getCV('remark').value,
 							    departmentname:getCV('departmentname').value,
 							    departmentcode:getCV('departmentcode').value,
 							    loginId:state.id,
