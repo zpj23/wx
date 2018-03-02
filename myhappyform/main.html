@@ -56,7 +56,7 @@
 		        </ul> 
 		</div>
 		<div class="mui-content">
-		    <div class="mui-progressbar" id="bar">
+		    <div class="mui-progressbar mui-hidden"  id="bar">
 		        <span></span>
 		    </div>
 		</div>
@@ -66,6 +66,7 @@
 		<script>
 			var listHtml=null;
 			var state=null;
+			var downLoadInfo=null;
 			(function($, doc) {
 				
 				$.init();
@@ -98,7 +99,16 @@
 				            }
 				        });
 				}
-				
+				//操作进度条
+//				function operatejdt(flag){
+//					if(flag){
+//						$('#bar').progressbar({progress:0}).show();
+//						document.getElementById("bar").classList.add('mui-hidden');
+//					}else{
+////						$('#bar').progressbar({}).hide();
+//						document.getElementById("bar").classList.remove('mui-hidden');
+//					}
+//				}
 				
 				$.plusReady(function() { 
 					listHtml=$.preload({
@@ -119,7 +129,7 @@
 						
 					});
 					//app更新
-					var downLoadInfo=null;
+					
 					var updateButton=doc.getElementById("downloadapp");
 						updateButton.addEventListener('tap',function(event){
 							var ver=plus.runtime.version;
@@ -134,10 +144,36 @@
 								},
 					            success  : function(data){
 					            	if(data.msg){
-					            		//$.toast("有新版本，请更新");
-					            		$.toast(data.url);
+//					            		$.toast("有新版本，请尽早更新，当前版本仍然可用");
 					            		downLoadInfo=data;
-					            		createDownload();
+					            		console.log(downLoadInfo.filename);
+					            		var btnArray = ['否', '是']; //弹框消息确认是否开始下载
+					                    mui.confirm('有新的版本，请及时更新,当前版本仍然可用，是否开始下载新版本？', '版本提示', btnArray, function(e) {
+					                        if(e.index == 1) { //开始下载
+						                        createDownload();
+					                        } else { //不打开
+					                        }
+					                    });
+					            		
+					            	}else{
+					            		$.toast("当前已是最新版本");
+					            		plus.io.requestFileSystem(plus.io.PUBLIC_DOWNLOADS,function(fs){
+								        	fs.root.getDirectory('_downloads/', {create: false}, function(dirEntry) {
+								                console.log("进入删除方法");
+								                dirEntry.removeRecursively(function() {
+								                    plus.nativeUI.toast("缓存清空成功！");
+								                    downloadflag=false;
+								                    console.log('Directory successufully removed.');
+								                }, function(e){
+								                    plus.nativeUI.toast("缓存清空失败！"+e.message);
+								                    console.log("cuowu"+e.message)
+								                });
+								            }, function(e){
+								                    plus.nativeUI.toast("缓存清空成功失败！"+e.message);
+								                    //console.log("cuowu"+e.message)
+								                }); 
+								        });
+					            		
 					            	}
 					            },
 					            error    : function(xhr,type,errorThrown){
@@ -149,23 +185,60 @@
 					
 					//初始化下载对象
 				    var dtask = null;
+				    var downloadflag=false;
 				    function createDownload(){
+//				    	if(downloadflag){
+//				    		plus.io.requestFileSystem(plus.io.PUBLIC_DOWNLOADS,function(fs){
+//					        	fs.root.getDirectory('_downloads/', {create: false}, function(dirEntry) {
+//					                console.log("进入删除方法");
+//					                dirEntry.removeRecursively(function() {
+//					                    console.log("进入删除方法")
+//					                    plus.nativeUI.toast("删除成功！");
+//					                    downloadflag=false;
+//					                    console.log('Directory successufully removed.');
+//					                }, function(e){
+//					                    plus.nativeUI.toast("删除失败！"+e.message);
+//					                    console.log("cuowu"+e.message)
+//					                });
+//					            }, function(e){
+//					                    plus.nativeUI.toast("删除失败！"+e.message);
+//					                    //console.log("cuowu"+e.message)
+//					                }); 
+//					            });
+//				    	}
 				        //判断文件是否已经下载
 						plus.io.resolveLocalFileSystemURL('_downloads/'+downLoadInfo.filename,function(entry){
 				            if(entry.isFile){
-				                $.toast('已经下载');
-				                $.alert(entry.fullPath);
+				                var btnArray = ['否', '是']; //弹框消息确认是否打开文件
+			                    mui.confirm("已经下载到"+entry.fullPath+'。是否安装新版本？', '安装信息', btnArray, function(e) {
+			                        if(e.index == 1) { //打开附件
+				                        plus.runtime.openFile('_downloads/'+downLoadInfo.filename, {}, function(e) {
+				                        	plus.nativeUI.alert("无法打开此文件：" + e.emssage);
+					                    });
+			                        } else { //不打开
+			                        }
+			                    });
 				            }
 				        },function(e){dBase();});
 				    }
 				    function dBase(){
 				        if(dtask){
-				            $.toast('下载任务已经存在');
+				        	if(downloadflag){
+				        		
+				        	}else{
+				        		$.toast('正在下载');
+				        	}
 				            return;
 				        }
 				        var tempurl=app.getRequestUrl()+"/"+downLoadInfo.url;
-				        dtask = plus.downloader.createDownload(tempurl,{method:'GET'},function(d,status){
-				            $.toast(d.filename);
+				        dtask = plus.downloader.createDownload(
+				        	tempurl,
+				        	{
+				        		method:'GET',
+				        		filename:'_downloads/'+downLoadInfo.filename
+				        	},
+				        	function(d,status){
+				            	$.toast(d.filename);
 				        });
 				        dtask.addEventListener("statechanged",function(task,status){
 				            if(!dtask){return;}
@@ -176,7 +249,19 @@
 				                    var progressVal = (task.downloadedSize/task.totalSize)*100;
 				                        $('#bar').progressbar({progress:progressVal}).show();
 				                    break;
-				                case 4: $.toast('下载完成');break;
+				                case 4: 
+				                	$.toast('下载完成');
+				                	downloadflag=true;
+				                	var btnArray = ['否', '是']; //弹框消息确认是否打开文件
+				                    mui.confirm('是否安装新版本？', '下载成功', btnArray, function(e) {
+				                        if(e.index == 1) { //打开文件
+					                        plus.runtime.openFile( dtask.filename, {}, function(e) {
+					                        	plus.nativeUI.alert("无法打开此文件：" + e.emssage);
+					                    	});
+				                        } else { //不打开
+				                        }
+				                    });
+				                	break;
 				            }
 				        });
 				        dtask.start();
