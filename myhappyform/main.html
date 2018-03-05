@@ -157,23 +157,6 @@
 					            		
 					            	}else{
 					            		$.toast("当前已是最新版本");
-					            		plus.io.requestFileSystem(plus.io.PUBLIC_DOWNLOADS,function(fs){
-								        	fs.root.getDirectory('_downloads/', {create: false}, function(dirEntry) {
-								                console.log("进入删除方法");
-								                dirEntry.removeRecursively(function() {
-								                    plus.nativeUI.toast("缓存清空成功！");
-								                    downloadflag=false;
-								                    console.log('Directory successufully removed.');
-								                }, function(e){
-								                    plus.nativeUI.toast("缓存清空失败！"+e.message);
-								                    console.log("cuowu"+e.message)
-								                });
-								            }, function(e){
-								                    plus.nativeUI.toast("缓存清空成功失败！"+e.message);
-								                    //console.log("cuowu"+e.message)
-								                }); 
-								        });
-					            		
 					            	}
 					            },
 					            error    : function(xhr,type,errorThrown){
@@ -187,25 +170,6 @@
 				    var dtask = null;
 				    var downloadflag=false;
 				    function createDownload(){
-//				    	if(downloadflag){
-//				    		plus.io.requestFileSystem(plus.io.PUBLIC_DOWNLOADS,function(fs){
-//					        	fs.root.getDirectory('_downloads/', {create: false}, function(dirEntry) {
-//					                console.log("进入删除方法");
-//					                dirEntry.removeRecursively(function() {
-//					                    console.log("进入删除方法")
-//					                    plus.nativeUI.toast("删除成功！");
-//					                    downloadflag=false;
-//					                    console.log('Directory successufully removed.');
-//					                }, function(e){
-//					                    plus.nativeUI.toast("删除失败！"+e.message);
-//					                    console.log("cuowu"+e.message)
-//					                });
-//					            }, function(e){
-//					                    plus.nativeUI.toast("删除失败！"+e.message);
-//					                    //console.log("cuowu"+e.message)
-//					                }); 
-//					            });
-//				    	}
 				        //判断文件是否已经下载
 						plus.io.resolveLocalFileSystemURL('_downloads/'+downLoadInfo.filename,function(entry){
 				            if(entry.isFile){
@@ -216,6 +180,23 @@
 				                        	plus.nativeUI.alert("无法打开此文件：" + e.emssage);
 					                    });
 			                        } else { //不打开
+			                        	plus.io.requestFileSystem(plus.io.PUBLIC_DOWNLOADS,function(fs){
+								        	fs.root.getDirectory('_downloads/', {create: false}, function(dirEntry) {
+								                console.log("进入删除方法");
+								                dirEntry.removeRecursively(function() {
+								                    plus.nativeUI.toast("缓存清空成功！");
+								                    downloadflag=false;
+//								                    console.log('Directory successufully removed.');
+								                }, function(e){
+//								                    plus.nativeUI.toast("缓存清空失败！"+e.message);
+//								                    console.log("cuowu"+e.message)
+								                });
+								            }, function(e){
+//								                    plus.nativeUI.toast("缓存清空成功失败！"+e.message);
+								                    //console.log("cuowu"+e.message)
+								                }); 
+								        });
+						                        	
 			                        }
 			                    });
 				            }
