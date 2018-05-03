@@ -1,0 +1,188 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="../css/mui.min.css" rel="stylesheet" />
+		<link rel="stylesheet" type="text/css" href="../css/mui.picker.min.css" />
+	</head>
+	
+	<body>
+		<header class="mui-bar mui-bar-nav">
+		    <a class="mui-icon mui-icon-left-nav mui-pull-left" id="backList2"></a>
+		    <h1 class="mui-title">查询条件</h1>
+		</header>
+		<div class="mui-content">
+			<div class="mui-content-padded">
+				<div class="mui-input-row mui-search">
+					<input type="search" class="mui-input-clear" placeholder="" id="kq_search" />
+				</div>
+			</div>	
+			
+			<div class="mui-card">
+				<form class="mui-input-group">
+					<div class="mui-input-row">
+					        <label>开始日期:</label>
+					  <input type="text"  id="startdate" data-options='{"type":"date"}' class="mui-input-clear"  placeholder="开始日期" /> 
+					</div>
+					
+					<div class="mui-input-row">
+						<label>结束日期:</label>
+						<input type="text"  id="enddate" data-options='{"type":"date"}' class="mui-input-clear"  placeholder="结束日期" /> 
+					
+					</div>
+					
+					<div class="mui-input-row">
+					        <label>维修用户:</label>
+					    <input type="text" id="staffname" class="mui-input-clear" placeholder="维修用户">
+					</div>
+					
+					<div class="mui-input-row">
+					        <label>是否付款:</label>
+					    <input type="text" id="shenhe" class="mui-input-clear" placeholder="是否付款" />
+					    <input type="hidden" id="shenhecode" value="" />
+					</div>
+					<div class="mui-button-row">
+						<button type="button" id="searchButton" class="mui-btn mui-btn-primary" >查询</button>
+						<button type="button" id="clearButton" class="mui-btn mui-btn-grey" >清空</button>
+					</div>
+				</form>
+			</div>
+			
+			
+		</div>	
+		<script src="../js/mui.min.js"></script>
+		<script src="../js/mui.picker.min.js"></script>
+		<script src="../js/app.js"></script>
+		<script type="text/javascript">
+			var state=app.getState();
+			var listHtml=null;
+			mui.init();
+			mui.plusReady(function(){
+				initButtons();
+			});
+			window.addEventListener('searchHtml',function(event){
+			});
+			function initButtons(){
+				var startdate=document.getElementById("startdate");
+				startdate.addEventListener('tap', function() {
+					var _self = this;
+					if(_self.picker) {
+						_self.picker.show(function (rs) {
+							startdate.value=rs.text;
+							_self.picker.dispose();
+							_self.picker = null;
+						});
+					} else {
+						var optionsJson = this.getAttribute('data-options') || '{}';
+						var options = JSON.parse(optionsJson);
+						var id = this.getAttribute('id');
+						/*
+						 * 首次显示时实例化组件
+						 * 示例为了简洁，将 options 放在了按钮的 dom 上
+						 * 也可以直接通过代码声明 optinos 用于实例化 DtPicker
+						 */
+						_self.picker = new mui.DtPicker(options);
+						_self.picker.show(function(rs) {
+							startdate.value=rs.text;
+							_self.picker.dispose();
+							_self.picker = null;
+						});
+					}
+					
+				}, false);
+				
+				var enddate=document.getElementById("enddate");
+				enddate.addEventListener('tap', function() {
+					var _self = this;
+					if(_self.picker) {
+						_self.picker.show(function (rs) {
+							enddate.value=rs.text;
+							_self.picker.dispose();
+							_self.picker = null;
+						});
+					} else {
+						var optionsJson = this.getAttribute('data-options') || '{}';
+						var options = JSON.parse(optionsJson);
+						var id = this.getAttribute('id');
+						/*
+						 * 首次显示时实例化组件
+						 * 示例为了简洁，将 options 放在了按钮的 dom 上
+						 * 也可以直接通过代码声明 optinos 用于实例化 DtPicker
+						 */
+						_self.picker = new mui.DtPicker(options);
+						_self.picker.show(function(rs) {
+							enddate.value=rs.text;
+							_self.picker.dispose();
+							_self.picker = null;
+						});
+					}
+					
+				}, false);
+				//付款状态
+				var shenhe=document.getElementById("shenhe");
+				shenhe.addEventListener('tap', function() {
+					 var picker = new mui.PopPicker();
+					 picker.setData([{
+					    value: "1",
+					    text: "欠账"
+					}, {
+					    value: "0",
+					    text: "已付款"
+					}]);
+					picker.show(function(rs) {
+						document.getElementById("shenhecode").value=rs[0].value;
+						shenhe.value=rs[0].text;
+					});
+				}, false);
+				
+				var backbutton=document.getElementById("backList2");
+				backbutton.addEventListener('tap', function(){
+					if(!listHtml){
+					    listHtml = plus.webview.getWebviewById('kq_list');
+					}
+					mui.fire(listHtml,'listHtml',{
+						//userid:app.getState().id
+					});
+					mui.openWindow({
+					    id:'kq_list'
+					});
+				}, false);
+				var clearButton =document.getElementById("clearButton");
+				clearButton.addEventListener('tap', function() {
+					getCV('startdate').value='';
+					getCV('enddate').value='';
+					getCV('staffname').value='';
+					getCV('shenhe').value='';
+					getCV('shenhecode').value='';
+				});	
+				var searchButton =document.getElementById("searchButton");
+				searchButton.addEventListener('tap', function() {
+					if(!listHtml){
+					    listHtml = plus.webview.getWebviewById('kq_list');
+					}
+					mui.fire(listHtml,'listHtml',{
+						startdate:getCV('startdate').value,
+					    enddate:getCV('enddate').value,
+					    staffname:getCV('staffname').value,
+					    shenhe:getCV('shenhecode').value
+					});
+					mui.openWindow({
+					    id:'kq_list'
+					});
+					
+					
+				}, false);
+				
+			};
+			
+			
+			function getCV(id){
+				return document.getElementById(id);
+			}
+		</script>
+	</body>
+
+</html>

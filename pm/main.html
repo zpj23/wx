@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title></title>
+		<link href="css/mui.min.css" rel="stylesheet" />
+
+		<style>
+			ul {
+				font-size: 14px;
+				color: #8f8f94;
+			}
+			.mui-btn {
+				padding: 10px;
+			}
+			
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav" style="padding-right: 15px;">
+			<h1 class="mui-title">主页</h1>
+			<button id='setting' class=" mui-pull-right mui-btn-link">退出</button>
+		</header>
+		<div class="mui-content">
+				<ul class="mui-table-view mui-grid-view mui-grid-9">
+		            <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3"><a href="#" id="user_manager">
+		                    <span class="mui-icon mui-icon-home" id="shenhecount"></span>
+		                    <div class="mui-media-body">维修日志</div></a></li>
+		            <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3"><a href="#">
+		                    <span class="mui-icon mui-icon-email"></span>
+		                    <div class="mui-media-body">商品管理</div></a></li>
+		            <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3"><a href="#">
+		                    <span class="mui-icon mui-icon-chatbubble"></span>
+		                    <div class="mui-media-body">供应商管理</div></a></li>
+		            <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3"><a href="#">
+		                    <span class="mui-icon mui-icon-location"></span>
+		                    <div class="mui-media-body">入库管理</div></a></li>
+		            <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3"><a href="#">
+		                    <span class="mui-icon mui-icon-search"></span>
+		                    <div class="mui-media-body">库存管理</div></a></li>
+		            <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3"><a href="#">
+		                    <span class="mui-icon mui-icon-phone"></span>
+		                    <div class="mui-media-body">出库管理</div></a></li>
+		            <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3"><a href="#" id="downloadapp">
+		                    <span class="mui-icon mui-icon-gear"></span>
+		                    <div class="mui-media-body">更新app</div></a></li>
+		            <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3"><a href="#">
+		                    <span class="mui-icon mui-icon-info"></span>
+		                    <div class="mui-media-body">about</div></a></li>
+		           <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3"><a href="#">
+		                    <span class="mui-icon mui-icon-more"></span>
+		                    <div class="mui-media-body">more</div></a></li>
+		        </ul> 
+		</div>
+		<div class="mui-content">
+		    <div class="mui-progressbar mui-hidden"  id="bar">
+		        <span></span>
+		    </div>
+		</div>
+
+		<script src="js/mui.min.js"></script>
+		<script src="js/app.js"></script>
+		<script>
+			var listHtml=null;
+			var state=null;
+			var downLoadInfo=null;
+			(function($, doc) {
+				
+				$.init();
+				var settings = app.getSettings();
+				//
+				window.addEventListener('show', function() {
+					state = app.getState();
+//					initNum();
+				}, false);
+				
+				function initNum(){
+					$.ajax({
+				            url      : app.getRequestUrl()+'/jlManualCheckPhoneAction_getShNum',
+				            type     : 'post',
+				            dataType:'json',//服务器返回json格式数据
+				            data:{ 
+							    loginId:state.id,
+								isAdmin:state.isAdmin
+							},
+				            success  : function(data){
+				            	if(data.msg){
+				            		if(data.data!="0"){
+				            			doc.getElementById('shenhecount').innerHTML='<span class="mui-badge">'+data.data+'</span>';
+				            		}
+				            		
+				            	}
+				            },
+				            error    : function(xhr,type,errorThrown){
+				                $.toast(type);
+				            }
+				        });
+				}
+				//操作进度条
+//				function operatejdt(flag){
+//					if(flag){
+//						$('#bar').progressbar({progress:0}).show();
+//						document.getElementById("bar").classList.add('mui-hidden');
+//					}else{
+////						$('#bar').progressbar({}).hide();
+//						document.getElementById("bar").classList.remove('mui-hidden');
+//					}
+//				}
+				
+				$.plusReady(function() { 
+					listHtml=$.preload({
+							id: 'kq_list',
+							url: 'kq/list.html'
+					});
+					var usermanageButton = doc.getElementById('user_manager');
+					usermanageButton.addEventListener('tap', function(event) {
+						if(!listHtml){
+						    listHtml = plus.webview.getWebviewById('kq_list');
+						}
+						mui.fire(listHtml,'listHtml',{
+//							userid:app.getState().id
+						});
+						mui.openWindow({
+						    id:'kq_list'
+						});
+						
+					});
+					//app更新
+					
+					var updateButton=doc.getElementById("downloadapp");
+						updateButton.addEventListener('tap',function(event){
+							var ver=plus.runtime.version;
+//							$.ajax({
+//					            url      : app.getRequestUrl()+'/jlLoginAction_checkUpdateByPhone',
+//					            type     : 'post',
+//					            dataType:'json',//服务器返回json格式数据
+//					            data:{ 
+//					            	ver:ver,
+//								    loginId:state.id,
+//									isAdmin:state.isAdmin
+//								},
+//					            success  : function(data){
+//					            	if(data.msg){
+////					            		$.toast("有新版本，请尽早更新，当前版本仍然可用");
+//					            		downLoadInfo=data;
+//					            		console.log(downLoadInfo.filename);
+//					            		var btnArray = ['否', '是']; //弹框消息确认是否开始下载
+//					                    mui.confirm('有新的版本，请及时更新,当前版本仍然可用，是否开始下载新版本？', '版本提示', btnArray, function(e) {
+//					                        if(e.index == 1) { //开始下载
+//						                        createDownload();
+//					                        } else { //不打开
+//					                        }
+//					                    });
+//					            		
+//					            	}else{
+//					            		$.toast("当前已是最新版本");
+//					            	}
+//					            },
+//					            error    : function(xhr,type,errorThrown){
+//					                $.toast(type);
+//					            }
+//					        });
+						
+					});
+					
+					//初始化下载对象
+				    var dtask = null;
+				    var downloadflag=false;
+				    function createDownload(){
+				        //判断文件是否已经下载
+						plus.io.resolveLocalFileSystemURL('_downloads/'+downLoadInfo.filename,function(entry){
+				            if(entry.isFile){
+				                var btnArray = ['否', '是']; //弹框消息确认是否打开文件
+			                    mui.confirm("已经下载到"+entry.fullPath+'。是否安装新版本？', '安装信息', btnArray, function(e) {
+			                        if(e.index == 1) { //打开附件
+				                        plus.runtime.openFile('_downloads/'+downLoadInfo.filename, {}, function(e) {
+				                        	plus.nativeUI.alert("无法打开此文件：" + e.emssage);
+					                    });
+			                        } else { //不打开
+			                        	plus.io.requestFileSystem(plus.io.PUBLIC_DOWNLOADS,function(fs){
+								        	fs.root.getDirectory('_downloads/', {create: false}, function(dirEntry) {
+								                console.log("进入删除方法");
+								                dirEntry.removeRecursively(function() {
+								                    plus.nativeUI.toast("缓存清空成功！");
+								                    downloadflag=false;
+//								                    console.log('Directory successufully removed.');
+								                }, function(e){
+//								                    plus.nativeUI.toast("缓存清空失败！"+e.message);
+//								                    console.log("cuowu"+e.message)
+								                });
+								            }, function(e){
+//								                    plus.nativeUI.toast("缓存清空成功失败！"+e.message);
+								                    //console.log("cuowu"+e.message)
+								                }); 
+								        });
+						                        	
+			                        }
+			                    });
+				            }
+				        },function(e){dBase();});
+				    }
+				    function dBase(){
+				        if(dtask){
+				        	if(downloadflag){
+				        		
+				        	}else{
+				        		$.toast('正在下载');
+				        	}
+				            return;
+				        }
+				        var tempurl=app.getRequestUrl()+"/"+downLoadInfo.url;
+				        dtask = plus.downloader.createDownload(
+				        	tempurl,
+				        	{
+				        		method:'GET',
+				        		filename:'_downloads/'+downLoadInfo.filename
+				        	},
+				        	function(d,status){
+				            	$.toast(d.filename);
+				        });
+				        dtask.addEventListener("statechanged",function(task,status){
+				            if(!dtask){return;}
+				            switch(task.state){
+				                case 1: $.toast('开始下载...');break;//开始
+				                case 2: $.toast('链接到服务器...');break;//链接到服务器
+				                case 3:
+				                    var progressVal = (task.downloadedSize/task.totalSize)*100;
+				                        $('#bar').progressbar({progress:progressVal}).show();
+				                    break;
+				                case 4: 
+				                	$.toast('下载完成');
+				                	downloadflag=true;
+				                	var btnArray = ['否', '是']; //弹框消息确认是否打开文件
+				                    mui.confirm('是否安装新版本？', '下载成功', btnArray, function(e) {
+				                        if(e.index == 1) { //打开文件
+					                        plus.runtime.openFile( dtask.filename, {}, function(e) {
+					                        	plus.nativeUI.alert("无法打开此文件：" + e.emssage);
+					                    	});
+				                        } else { //不打开
+				                        }
+				                    });
+				                	break;
+				            }
+				        });
+				        dtask.start();
+				    }
+
+					
+					
+					
+					//设置
+					var settingButton = doc.getElementById('setting');
+					//settingButton.style.display = settings.autoLogin ? 'block' : 'none';
+					settingButton.addEventListener('tap', function(event) {
+						if (mui.os.ios) {
+							app.setState({});
+							mui.openWindow({
+								url: 'login.html',
+								id: 'login',
+								show: {
+									aniShow: 'pop-in'
+								},
+								waiting: {
+									autoShow: false
+								}
+							});
+							return;
+						}
+						var btnArray = [{
+							title: "注销当前账号"
+						}, {
+							title: "直接关闭应用"
+						}];
+						plus.nativeUI.actionSheet({
+							cancel: "取消",
+							buttons: btnArray
+						}, function(event) {
+							var index = event.index;
+							switch (index) {
+								case 1:
+									//注销账号
+									app.setState({});
+									/*
+									 * 注意：
+									 * 1、因本示例应用启动页就是登录页面，因此注册成功后，直接显示登录页即可；
+									 * 2、如果真实案例中，启动页不是登录页，则需修改，使用mui.openWindow打开真实的登录页面
+									 */
+									plus.webview.getLaunchWebview().show("pop-in");
+									//若启动页不是登录页，则需通过如下方式打开登录页
+			//						mui.openWindow({
+			//							url: 'login.html',
+			//							id: 'login',
+			//							show: {
+			//								aniShow: 'pop-in'
+			//							}
+			//						});
+									break;
+								case 2:
+//								app.setState({});
+									plus.runtime.quit();
+									break;
+							}
+						});
+					}, false);
+					
+					//--
+					$.oldBack = mui.back;
+					var backButtonPress = 0;
+					$.back = function(event) {
+						backButtonPress++;
+						if (backButtonPress > 1) {
+							plus.runtime.quit();
+						} else {
+							plus.nativeUI.toast('再按一次退出应用');
+						}
+						setTimeout(function() {
+							backButtonPress = 0;
+						}, 1000);
+						return false;
+					};
+				});
+			}(mui, document));
+		</script>
+	</body>
+
+</html>

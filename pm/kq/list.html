@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>Hello MUI</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+		<!--标准mui.css-->
+		<link rel="stylesheet" href="../css/mui.min.css">
+		<!--App自定义的css-->
+		<link rel="stylesheet" type="text/css" href="../css/app.css"/>
+		<style>
+			.mui-table h4,.mui-table h5,.mui-table .mui-h5,.mui-table .mui-h6,.mui-table p{
+		        margin-top: 0;
+		    }
+		    .mui-table h4{
+		        line-height: 21px;
+		        font-weight: 500;
+		    }
+		
+		    .mui-table .oa-icon{
+		        position: absolute;
+		        right:0;
+		        bottom: 0;
+		    }
+		    .mui-table .oa-icon-star-filled{
+		        color:#f14e41;
+		    }
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+		    <!--<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left" ></a>-->
+		    <button id='mainPage' class=" mui-pull-left mui-btn-link">主页</button>
+		    <h1 class="mui-title">数据列表</h1>
+		    <button id='kq_add' class=" mui-pull-right mui-btn-link">新增</button>
+		</header>
+		<div class="mui-content">
+			<div class="mui-content-padded">
+				<div class="mui-input-row mui-search" >
+					<input type="search" class="mui-input-clear"  readonly="readonly" placeholder="" id="kq_search_list" />
+				</div>
+				
+			</div>
+			
+			<div class="mui-content-padded">
+				<ul class="mui-pager">
+					<li class="mui-previous">
+						<a href="#" id="lastPage">
+							上一页
+						</a>
+					</li>
+					<span class="mui-badge mui-badge-inverted">当前第</span>
+					<span class="mui-badge mui-badge-inverted" id="jb_cpage"></span>
+					<span class="mui-badge mui-badge-inverted">页共</span>
+					<span class="mui-badge mui-badge-inverted" id="jb_tpage"></span>
+					<span class="mui-badge mui-badge-inverted">页</span>
+					
+					<li class="mui-next">
+						<a href="#" id="nextPage">
+							下一页
+						</a>
+					</li>
+				</ul>
+			</div>
+			
+			<div class="mui-content-padded" id="myList">
+		    <!--<ul class="mui-table-view mui-table-view-striped mui-table-view-condensed">
+		        <li class="mui-table-view-cell">
+		        	<div class="mui-slider-right mui-disabled">
+						<a class="mui-btn mui-btn-blue">修改</a>
+						<a class="mui-btn mui-btn-red">删除</a>
+					</div>
+					<div class="mui-slider-handle">
+			            <div class="mui-table">
+			                <div class="mui-table-cell mui-col-xs-10">
+			                    <h4 class="mui-ellipsis">信息化推进办公室张彦合同付款信息化</h4>
+			                    <h5>申请人：李四</h5>
+			                    <p class="mui-h6 mui-ellipsis">Hi，李明明，申请交行信息卡，100元等你拿，李明明，申请交行信息卡，100元等你拿，</p>
+			                </div>
+			                <div class="mui-table-cell mui-col-xs-2 mui-text-right">
+			                    <span class="mui-h5">12:25</span>
+			                </div>
+			            </div>
+		            </div>
+		        </li>
+		        
+		    </ul>-->
+		    </div>
+		    
+		    
+		</div>
+	</body>
+	<script src="../js/mui.js"></script>
+	<script src="../js/app.js"></script>
+	<script>
+		var state=null;
+		var myList=null;
+		var editHtml=null; 
+		var viewHtml=null;
+		var searchHtml=null;
+		var currentPage=1;
+		var pagerow=15;
+		var totalPage=0;
+		var mainHtml =null;
+		var startdate="";
+	    var enddate="";
+	    var staffname="";
+		var isshenhe="";
+		
+		mui.init();
+		mui.plusReady(function(){
+			currentPage=1;
+			//初始化按钮
+			initButtons();
+			editHtml=mui.preload({
+					id: 'kq_edit',
+					url: 'edit.html'
+				});
+			searchHtml=mui.preload({
+					"id": 'kq_search',
+					"url": 'search.html'
+			});	
+			viewHtml=mui.preload({
+					"id": 'kq_view',
+					"url": 'view.html'
+			});	
+			
+		});
+		//初始化数据
+		function initData(){
+			
+//			console.log("初始化list数据"+currentPage);
+			if(typeof(startdate)=="undefined"){
+				startdate="";
+			}
+			if(typeof(enddate)=="undefined"){
+				enddate="";
+			}
+			if(typeof(staffname)=="undefined"){
+				staffname="";
+			}
+			if(typeof(isshenhe)=="undefined"){
+				isshenhe="";
+			}
+			mui.ajax({
+	            url    : app.getRequestUrl()+'/jlManualCheckPhoneAction_findListInfoByPhone',
+	            type   : 'POST',
+	            dataType:'json',//服务器返回json格式数据
+	            data:{
+	            	datemin:startdate,
+	            	datemax:enddate,
+	            	username:staffname,
+	            	ispay:isshenhe,
+	            	cpage:currentPage,
+	            	pagerow:pagerow,
+				    loginId:state.id,
+					isAdmin:state.isAdmin
+				},
+				async:false,
+				beforeSend: function() {
+			        plus.nativeUI.showWaiting("加载中...", null);
+			    },
+			    complete: function() {
+			        plus.nativeUI.closeWaiting();
+			    },
+	            success: function(data){
+//	            	var str=JSON.stringify(data);
+//	            	console.log(str);
+	            	totalPage =data.totalpage;
+	            	document.getElementById("jb_cpage").innerHTML=currentPage;
+	            	document.getElementById("jb_tpage").innerHTML=totalPage;
+	            	
+	            	myList = document.getElementById("myList");
+	            	var listStr='';
+	            	var arr=new Array();
+	            	arr=data.list;
+	            	listStr+='<ul class="mui-table-view mui-table-view-striped mui-table-view-condensed" id="OA_task_1">';
+	            	for(var m=0;m<arr.length;m++){
+	            		var colorStr="red";
+	            		if(arr[m].isPay=="1"){
+	            			colorStr="green";
+	            		}
+						listStr+='<li class="mui-table-view-cell" >';
+						listStr+='<div class="mui-slider-right mui-disabled">';
+						listStr+='<a class="mui-btn mui-btn-blue editkq" name="'+arr[m].id+'"  >修改</a>';
+						listStr+='<a class="mui-btn mui-btn-red shanchukq" name="'+arr[m].id+'" >删除</a>';
+						listStr+='</div>';
+						listStr+='<div class="mui-slider-handle">';
+						listStr+='<div class="mui-table">';
+						listStr+='<div class="mui-table-cell mui-col-xs-9">';
+						listStr+='<h4 class="mui-ellipsis" >'+arr[m].username+'</h4>';
+						listStr+='<h5>'+arr[m].remark+'</h5>';
+						listStr+='<p class="mui-h6 mui-ellipsis">'+arr[m].remark+'</p>';
+						listStr+='</div>';
+						listStr+='<div class="mui-table-cell mui-col-xs-5 mui-text-center">';
+						listStr+='<span class="mui-h5" style="color:'+colorStr+';">'+arr[m].registertime+'</span>';
+						listStr+='</div>';
+						listStr+='<div class="mui-table-cell mui-col-xs-1 mui-text-right"><span class="mui-badge">'+((currentPage-1)*pagerow+m+1)+'</span></div>';
+						listStr+='</div>';
+						listStr+='</div>';
+						listStr+='</li>';
+						
+	            	}
+	            	listStr+='</ul>';
+	            	myList.innerHTML=listStr;
+	            	//复制当前记录
+//	            	mui('#OA_task_1').on('tap', '.copykq', function(event) {
+//						var elem = this;
+//						var cid = elem.name;
+//						var li = elem.parentNode.parentNode;
+//						mui.ajax({
+//				            url      : app.getRequestUrl()+'/jlManualCheckPhoneAction_docopy',
+//				            type     : 'post',
+//				            dataType:'json',//服务器返回json格式数据
+//				            data:{ 
+//							    id:cid,
+//							    loginId:state.id,
+//								isAdmin:state.isAdmin
+//							},
+//				            success  : function(data){
+//				            	if(data.msg){
+//				            		mui.toast("复制成功");
+//				            		initData();
+//				            	}else{
+//				            		mui.toast("复制失败");
+//				            	}
+//				            },
+//				            error    : function(xhr,type,errorThrown){
+//				                mui.toast(type);
+//				            }
+//				        });
+//					});
+	            	//审核考勤信息
+//	            	mui('#OA_task_1').on('tap', '.shenhekq', function(event) {
+//						var elem = this;
+//						var cid = elem.name;
+//						var li = elem.parentNode.parentNode;
+//						mui.ajax({
+//				            url      : app.getRequestUrl()+'/jlManualCheckPhoneAction_doshenhe',
+//				            type     : 'post',
+//				            dataType:'json',//服务器返回json格式数据
+//				            data:{ 
+//							    id:cid,
+//							    loginId:state.id,
+//								isAdmin:state.isAdmin
+//							},
+//				            success  : function(data){
+//				            	if(data.msg){
+//				            		mui.toast("审核成功");
+//				            		initData();
+//				            	}else{
+//				            		mui.toast("审核失败");
+//				            	}
+//				            },
+//				            error    : function(xhr,type,errorThrown){
+//				                mui.toast(type);
+//				            }
+//				        });
+//					});
+					
+					//查看考勤信息
+//					mui('#OA_task_1').on('tap', '.viewkq', function(event) {
+//						var elem = this;
+//						var cid = elem.name;
+////						var str=JSON.stringify(cid);
+////						console.log(str);
+//						
+//
+//						if(!viewHtml){
+//						    viewHtml = plus.webview.getWebviewById('kq_view');
+//						}
+//						mui.fire(viewHtml,'viewId',{
+//							id:cid
+//						});
+//						mui.openWindow({
+//						    id:'kq_view'
+//						});
+//						
+//					});
+					//编辑考勤信息
+	            	mui('#OA_task_1').on('tap', '.editkq', function(event) {
+						var elem = this;
+						var cid = elem.name;
+//						var str=JSON.stringify(cid);
+//						console.log(str);
+						if(!editHtml){
+						    editHtml = plus.webview.getWebviewById('kq_edit');
+						}
+						mui.fire(editHtml,'editId',{
+							id:cid
+						});
+						mui.openWindow({
+						    id:'kq_edit'
+						});
+						
+					});
+					//删除考勤信息
+	            	var btnArray = ['确认', '取消'];
+	            	mui('#OA_task_1').on('tap', '.shanchukq', function(event) {
+						var elem = this;
+						var li = elem.parentNode.parentNode;
+						mui.confirm('确认删除该条记录？', '警告', btnArray, function(e) {
+							if (e.index == 0) {
+								var cid = elem.name;
+								mui.ajax({
+						            url      : app.getRequestUrl()+'/jlManualCheckPhoneAction_delInfoByIdByPhone',
+						            type     : 'post',
+						            dataType:'json',//服务器返回json格式数据
+						            data:{ 
+									    delId:cid,
+									    loginId:state.id,
+										isAdmin:state.isAdmin
+									},
+						            success  : function(data){
+						            	if(data.msg){
+						            		li.parentNode.removeChild(li);
+						            	}else{
+						            		mui.toast("删除失败");
+						            	}
+						            },
+						            error    : function(xhr,type,errorThrown){
+						                mui.toast(type);
+						            }
+						        });
+								
+							} else {
+								setTimeout(function() {
+									mui.swipeoutClose(li);
+								}, 0);
+							}
+						});
+					});
+	            },
+	            error    : function(xhr,type,errorThrown){
+	                mui.toast(type);
+	            }
+	        });
+		}
+		
+		window.addEventListener('listHtml',function(event){
+			//关闭等待框
+//		    plus.nativeUI.closeWaiting();
+//		    //显示当前页面
+//		    mui.currentWebview.show();
+			state=app.getState();
+			currentPage=1;
+			//初始化
+			startdate=event.detail.startdate;
+		    enddate=event.detail.enddate;
+		    staffname=event.detail.staffname;
+			isshenhe=event.detail.shenhe;
+			initData();
+		});
+		
+//		window.addEventListener('listHtml',function(event){
+//		});	
+			
+		function  initButtons(){
+			var add = document.getElementById("kq_add");
+				add.addEventListener('tap', function(event) {
+				if(!editHtml){
+				    editHtml = plus.webview.getWebviewById('kq_edit');
+				}
+				mui.fire(editHtml,'editId',{
+					id:''
+				});
+				mui.openWindow({
+				    id:'kq_edit'
+				});
+				
+			}, false);
+			var mainPage = document.getElementById('mainPage');
+					mainPage.addEventListener('tap', function(event) {
+						if(!mainHtml){
+							mainHtml= plus.webview.getWebviewById("main");
+						}
+						mui.fire(mainHtml,'show',{
+						});
+						mui.openWindow({
+							id: 'main',
+							url:'../main.html',
+							show: {
+								aniShow: 'pop-in-left'
+							},
+							styles: {
+								popGesture: 'hide'
+							},
+							waiting: {
+								autoShow: false
+							}
+						});
+					}, false);
+					
+				
+				//查询条件也没页面
+				
+				var kq_search = document.getElementById("kq_search_list");
+				
+				kq_search.addEventListener('tap', function(event) {
+					if(!searchHtml){
+						searchHtml=plus.webview.getWebviewById('kq_search');
+					}
+					mui.fire(searchHtml,'searchHtml',{
+						
+					});
+					mui.openWindow({
+						id: 'kq_search',
+						show: {
+							aniShow: 'pop-in'
+						},
+						styles: {
+							popGesture: 'hide'
+							
+						},
+						
+						waiting: {
+							autoShow: false
+						}
+						
+					});
+				
+				}, false);	
+				
+				//分页按钮
+				var lastPageButton = document.getElementById("lastPage");
+				lastPageButton.addEventListener('tap', function(event) {
+					
+					if(currentPage>1){
+						currentPage=currentPage-1;
+//						console.log('上一页'+currentPage);
+						initData();
+					}else{
+						mui.toast("已经是第一页");
+						currentPage=1;
+					}
+				}, false);	
+				var nextPageButton = document.getElementById("nextPage");
+				nextPageButton.addEventListener('tap', function(event) {
+					
+					if(currentPage<totalPage){
+						currentPage=currentPage+1;
+//						console.log('下一页'+currentPage);
+						initData();
+					}else{
+						mui.toast("已经是最后一页");
+						currentPage=totalPage;
+					}
+					
+					
+				}, false);
+				
+		}
+	</script>
+</html>
