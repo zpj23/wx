@@ -75,7 +75,7 @@
 			var state=null;
 			var currentId="";
 			var listHtml=null;
-			var workdate;
+			var registertime;
 			var departmentname;
 			mui.init();
 			mui.plusReady(function(){
@@ -147,13 +147,13 @@
 				}
 			}
 			function initDateData(){
-				workdate=document.getElementById("workdate");
-				workdate.addEventListener('tap', function() {
+				registertime=document.getElementById("registertime");
+				registertime.addEventListener('tap', function() {
 						var _self = this;
 						if(_self.picker) {
 							_self.picker.show(function (rs) {
 //								result.innerText = '选择结果: ' + rs.text;
-								workdate.value=rs.text;
+								registertime.value=rs.text;
 								_self.picker.dispose();
 								_self.picker = null;
 							});
@@ -180,7 +180,7 @@
 								//result.innerText = '选择结果: ' + rs.text;
 								//workdate.innerHTML=rs.text;
 							//	mui(workdate).val=rs.text;
-								workdate.value=rs.text;
+								registertime.value=rs.text;
 								/* 
 								 * 返回 false 可以阻止选择框的关闭
 								 * return false;

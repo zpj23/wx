@@ -199,7 +199,8 @@
 					"js/app.js"
 				],
 				"refer": [
-					"setting.html"
+					"setting.html",
+					"kq/list.html"
 				],
 				"priority": 1
 			},
@@ -262,6 +263,15 @@
 					"forget_password.html",
 					"main.html",
 					"reg.html"
+				],
+				"priority": 0
+			},
+			"kq/list.html": {
+				"resources": [],
+				"refer": [
+					"kq/view.html",
+					"kq/search.html",
+					"kq/edit.html"
 				],
 				"priority": 0
 			}

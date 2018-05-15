@@ -26,7 +26,7 @@
 					async:false,
 					data:'username='+loginInfo.account+"&password="+loginInfo.password,
 					dataType:'json',
-					url:owner.getRequestUrl()+'/jlLoginAction_loginByPhone',
+					url:owner.getRequestUrl()+'/vue/login/checkLogin',
 					beforeSend: function() {
 				        plus.nativeUI.showWaiting("登陆中...", null);
 				    },
@@ -69,9 +69,9 @@
 
 	owner.createState = function(data, callback) {
 		var state = owner.getState();
-		state.account = data.username;
-		state.loginname=data.loginname;
-		state.departmentcode=data.departmentcode;
+		state.account = data.name;
+		state.loginname=data.loginName;
+		//state.departmentcode=data.departmentcode;
 		state.isAdmin=data.isAdmin;
 		state.id=data.id;
 		state.token = "token123456789";
