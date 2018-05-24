@@ -148,7 +148,7 @@
 				isshenhe="";
 			}
 			mui.ajax({
-	            url    : app.getRequestUrl()+'/jlManualCheckPhoneAction_findListInfoByPhone',
+	            url    : app.getRequestUrl()+'/vue/maintain/findList',
 	            type   : 'POST',
 	            dataType:'json',//服务器返回json格式数据
 	            data:{
@@ -171,7 +171,7 @@
 	            success: function(data){
 //	            	var str=JSON.stringify(data);
 //	            	console.log(str);
-	            	totalPage =data.totalpage;
+	            	totalPage =data.totalPage;
 	            	document.getElementById("jb_cpage").innerHTML=currentPage;
 	            	document.getElementById("jb_tpage").innerHTML=totalPage;
 	            	
@@ -183,6 +183,7 @@
 	            	for(var m=0;m<arr.length;m++){
 	            		var colorStr="red";
 	            		if(arr[m].isPay=="1"){
+	            			//已付款
 	            			colorStr="green";
 	            		}
 						listStr+='<li class="mui-table-view-cell" >';
@@ -195,10 +196,10 @@
 						listStr+='<div class="mui-table-cell mui-col-xs-9">';
 						listStr+='<h4 class="mui-ellipsis" >'+arr[m].username+'</h4>';
 						listStr+='<h5>'+arr[m].remark+'</h5>';
-						listStr+='<p class="mui-h6 mui-ellipsis">'+arr[m].remark+'</p>';
+						listStr+='<p class="mui-h6 mui-ellipsis">'+arr[m].jine+'元</p>';
 						listStr+='</div>';
 						listStr+='<div class="mui-table-cell mui-col-xs-5 mui-text-center">';
-						listStr+='<span class="mui-h5" style="color:'+colorStr+';">'+arr[m].registertime+'</span>';
+						listStr+='<span class="mui-h5" style="color:'+colorStr+';">'+(arr[m].registertime).substring(0,10)+'</span>';
 						listStr+='</div>';
 						listStr+='<div class="mui-table-cell mui-col-xs-1 mui-text-right"><span class="mui-badge">'+((currentPage-1)*pagerow+m+1)+'</span></div>';
 						listStr+='</div>';
@@ -308,7 +309,7 @@
 							if (e.index == 0) {
 								var cid = elem.name;
 								mui.ajax({
-						            url      : app.getRequestUrl()+'/jlManualCheckPhoneAction_delInfoByIdByPhone',
+						            url      : app.getRequestUrl()+'/vue/maintain/delInfoById',
 						            type     : 'post',
 						            dataType:'json',//服务器返回json格式数据
 						            data:{ 
