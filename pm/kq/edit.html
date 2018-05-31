@@ -56,6 +56,17 @@
 					<div class="mui-card-content" style="padding: 15px;">
 						<label>内容:</label>
 						<textarea id="remark" style="background-color: whitesmoke;" rows="5"  placeholder=""></textarea>
+						
+					</div>
+				</div>	
+				<div class="mui-content-padded"></div>
+				<div class="mui-card">
+					<div class="mui-card-content" style="padding: 15px;">
+						<div class="mui-input-row">
+							<label>是否付款:</label>
+							<input type="text"  id="isPayName"  class="mui-input-clear"  placeholder="是否付款" readonly="readonly" />
+							<input type="hidden" id="isPayCode" />
+						</div>
 					</div>
 				</div>	
 				<div class="mui-content-padded"></div>
@@ -76,13 +87,14 @@
 			var currentId="";
 			var listHtml=null;
 			var registertime;
-			var departmentname;
+			var isPayName;
 			mui.init();
 			mui.plusReady(function(){
 				//初始化日期		
 				initDateData();
 				//保存按钮
 				initSaveButtonData();
+				
 			});
 			//添加newId自定义事件监听
 			window.addEventListener('editId',function(event){
@@ -124,8 +136,16 @@
 					    	getCV('registertime').value=year+"-"+month+"-"+day;
 					    	getCV('jine').value=cinfo.jine;
 					    	getCV('remark').value=cinfo.remark;
-							//部门
-//							initDepartmentData();
+					    	
+					    	getCV('isPayCode').value=cinfo.isPayCode;
+					    	if(cinfo.isPay=="1"){
+					    		getCV('isPayName').value='已付款';
+					    	}else if(cinfo.isPay=="0"){
+					    		getCV('isPayName').value='未付款';
+					    	}
+					    	
+							//初始化下拉框
+							initPayData();
 					    	
 		            	}else{
 		            		mui.toast("初始化失败");
@@ -143,7 +163,10 @@
 			    	getCV('registertime').value='';
 			    	getCV('jine').value='';
 			    	getCV('remark').value='';
-//			    	initDepartmentData();
+			    	getCV('isPayName').value='';
+					getCV('isPayCode').value='';
+			    	//初始化下拉框
+					initPayData();
 				}
 			}
 			function initDateData(){
@@ -198,52 +221,37 @@
 						
 					}, false);
 			}
-//			function initDepartmentData(){
-//				departmentname=document.getElementById("departmentname");
-//				departmentname.addEventListener('tap', function() {
-//					var _self = this;
-//					if(_self.picker) {
-//						_self.picker.show(function (rs) {
-//							departmentname.value=rs[0].text;
-//							document.getElementById("departmentcode").value=rs[0].value;
-//							_self.picker.dispose();
-//							_self.picker = null;
-//						});
-//					} else {
-//						_self.picker = new mui.PopPicker();
-//						_self.picker.setData([{
-//							    value: "HTGD",
-//							    text: "海通工地"
-//							}, {
-//							    value: "HXGD",
-//							    text: "海新工地"
-//							}, {
-//							    value: "ZSGD",
-//							    text: "招商工地"
-//							}, {
-//							    value: "YZCBJJ",
-//							    text: "远舟船舶家俱"
-//							}, {
-//							    value: "ZS",
-//							    text: "舟山"
-//							}, {
-//							    value: "DJZG",
-//							    text: "大津重工"
-//							}, {
-//							    value: "ZH",
-//							    text: "启东振华"
-//							}]
-//						);
-//						var dc=getCV('departmentcode').value;
-//						_self.picker.pickers[0].setSelectedValue(dc, 2000);
-//						_self.picker.show(function(rs) {
-//							departmentname.value=rs[0].text;
-//							document.getElementById("departmentcode").value=rs[0].value;
-//						});
-//					}		
-//					
-//				}, false);
-//			}
+			function initPayData(){
+				isPayName=document.getElementById("isPayName");
+				isPayName.addEventListener('tap', function() {
+					var _self = this;
+					if(_self.picker) {
+						_self.picker.show(function (rs) {
+							isPayName.value=rs[0].text;
+							document.getElementById("isPayCode").value=rs[0].value;
+							_self.picker.dispose();
+							_self.picker = null;
+						});
+					} else {
+						_self.picker = new mui.PopPicker();
+						_self.picker.setData([{
+							    value: "0",
+							    text: "未付款"
+							}, {
+							    value: "1",
+							    text: "已付款"
+							}]
+						);
+						var dc=getCV('isPayCode').value;
+						_self.picker.pickers[0].setSelectedValue(dc, 2000);
+						_self.picker.show(function(rs) {
+							isPayName.value=rs[0].text;
+							document.getElementById("isPayCode").value=rs[0].value;
+						});
+					}		
+					
+				}, false);
+			}
 			function initSaveButtonData(){
 				var cancelbutton=document.getElementById("cancelButton");
 				cancelbutton.addEventListener('tap', function(){
@@ -301,6 +309,7 @@
 							    username:getCV('username').value,
 							    jine:getCV('jine').value,
 							    remark:getCV('remark').value,
+							    isPayCode:getCV('isPayCode').value,
 							    loginId:state.id,
 								isAdmin:state.isAdmin
 							},

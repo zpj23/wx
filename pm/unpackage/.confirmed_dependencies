@@ -1,19 +1,19 @@
 {
-	"kq/list.html": {
-		"refer": [
-			"kq/view.html",
-			"kq/search.html",
-			"kq/edit.html"
-		]
-	},
-	"main.html": {
-		"refer": [
-			"kq/list.html"
-		]
-	},
-	"login.html": {
-		"refer": [
-			"main.html"
-		]
-	}
+  "kq/list.html": {
+    "refer": [
+      "kq/view.html",
+      "kq/search.html",
+      "kq/edit.html"
+    ]
+  },
+  "main.html": {
+    "refer": [
+      "kq/list.html"
+    ]
+  },
+  "login.html": {
+    "refer": [
+      "main.html"
+    ]
+  }
 }
