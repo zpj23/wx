@@ -169,7 +169,8 @@
 				],
 				"refer": [
 					"setting.html",
-					"kq/list.html"
+					"kq/list.html",
+					"fj/list.html"
 				],
 				"priority": 1
 			},

@@ -1,0 +1,71 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>供应商列表</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="../css/mui.min.css" rel="stylesheet" />
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">供应商列表</h1>
+			<button id='addButton' class=" mui-pull-right mui-btn-link">新增</button>
+		</header>
+		<div class="mui-content">
+			<ul class="mui-table-view">
+				 <li class="mui-table-view-cell">Item 1</li>
+		         <li class="mui-table-view-cell">Item 2</li>
+		         <li class="mui-table-view-cell">Item 3</li>
+			</ul>
+		</div>
+		<script src="../js/mui.min.js"></script>
+		<script type="text/javascript">
+			var supplier_add_html=null;//新增和编辑页面
+			var currentPage=1;
+			
+			mui.init();
+			//初始化加载
+			mui.plusReady(function(){
+				editHtml=mui.preload({
+					id: 'supplier_add',
+					url: 'edit.html'
+				});
+				
+				
+				initButtons();
+			
+			});
+			//初始化加载以后每次进页面加载监听
+			window.addEventListener('supplierList',function(event){
+				state=app.getState();
+				currentPage=1;
+				startdate=event.detail.startdate;
+			    enddate=event.detail.enddate;
+			    staffname=event.detail.staffname;
+				isshenhe=event.detail.shenhe;
+				initData();
+				
+			});
+			//初始化按钮
+			function initButtons(){
+				var add = document.getElementById("addButton");
+				add.addEventListener('tap', function(event) {
+					if(!supplier_add_html){
+					    supplier_add_html = plus.webview.getWebviewById('supplier_add');
+					}
+					mui.fire(supplier_add_html,'supplierId',{
+						id:''
+					});
+					mui.openWindow({
+					    id:'supplier_add'
+					});
+					
+				}, false);
+			}
+		</script>
+	</body>
+
+</html>

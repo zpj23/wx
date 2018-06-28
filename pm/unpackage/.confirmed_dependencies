@@ -4,16 +4,20 @@
       "kq/view.html",
       "kq/search.html",
       "kq/edit.html"
-    ]
+    ],
+    "resources": []
   },
   "main.html": {
     "refer": [
-      "kq/list.html"
-    ]
+      "kq/list.html",
+      "fj/list.html"
+    ],
+    "resources": []
   },
   "login.html": {
     "refer": [
       "main.html"
-    ]
+    ],
+    "resources": []
   }
 }

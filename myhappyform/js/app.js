@@ -19,7 +19,8 @@
 			return callback('密码不能为空');
 		}
 		
-		
+//		console.log('username='+loginInfo.account+"&password="+loginInfo.password);
+//		console.log(owner.getRequestUrl()+'/jlLoginAction_loginByPhone');
 		var authed;
 		mui.ajax({
 					type:'POST',
@@ -48,6 +49,7 @@
 						}
 					},
 					error:function(xhr,type,errorThrown){
+						console.log("请求失败");
 						console.log(type);
 						console.log(xhr);
 						console.log(errorThrown);
@@ -80,8 +82,8 @@
 		return callback();
 	};
 	owner.getRequestUrl=function(){
-		return "http://www.yzcbjj.com";
-//		return "http://192.168.11.108:8080";
+//		return "http://www.yzcbjj.com";
+		return "http://192.168.11.96:8090";
 	};
 	
 	/**

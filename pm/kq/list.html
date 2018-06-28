@@ -179,6 +179,7 @@
 	            	var listStr='';
 	            	var arr=new Array();
 	            	arr=data.list;
+//	            	console.log(data);
 	            	listStr+='<ul class="mui-table-view mui-table-view-striped mui-table-view-condensed" id="OA_task_1">';
 	            	for(var m=0;m<arr.length;m++){
 	            		var colorStr="red";
@@ -209,80 +210,6 @@
 	            	}
 	            	listStr+='</ul>';
 	            	myList.innerHTML=listStr;
-	            	//复制当前记录
-//	            	mui('#OA_task_1').on('tap', '.copykq', function(event) {
-//						var elem = this;
-//						var cid = elem.name;
-//						var li = elem.parentNode.parentNode;
-//						mui.ajax({
-//				            url      : app.getRequestUrl()+'/jlManualCheckPhoneAction_docopy',
-//				            type     : 'post',
-//				            dataType:'json',//服务器返回json格式数据
-//				            data:{ 
-//							    id:cid,
-//							    loginId:state.id,
-//								isAdmin:state.isAdmin
-//							},
-//				            success  : function(data){
-//				            	if(data.msg){
-//				            		mui.toast("复制成功");
-//				            		initData();
-//				            	}else{
-//				            		mui.toast("复制失败");
-//				            	}
-//				            },
-//				            error    : function(xhr,type,errorThrown){
-//				                mui.toast(type);
-//				            }
-//				        });
-//					});
-	            	//审核考勤信息
-//	            	mui('#OA_task_1').on('tap', '.shenhekq', function(event) {
-//						var elem = this;
-//						var cid = elem.name;
-//						var li = elem.parentNode.parentNode;
-//						mui.ajax({
-//				            url      : app.getRequestUrl()+'/jlManualCheckPhoneAction_doshenhe',
-//				            type     : 'post',
-//				            dataType:'json',//服务器返回json格式数据
-//				            data:{ 
-//							    id:cid,
-//							    loginId:state.id,
-//								isAdmin:state.isAdmin
-//							},
-//				            success  : function(data){
-//				            	if(data.msg){
-//				            		mui.toast("审核成功");
-//				            		initData();
-//				            	}else{
-//				            		mui.toast("审核失败");
-//				            	}
-//				            },
-//				            error    : function(xhr,type,errorThrown){
-//				                mui.toast(type);
-//				            }
-//				        });
-//					});
-					
-					//查看考勤信息
-//					mui('#OA_task_1').on('tap', '.viewkq', function(event) {
-//						var elem = this;
-//						var cid = elem.name;
-////						var str=JSON.stringify(cid);
-////						console.log(str);
-//						
-//
-//						if(!viewHtml){
-//						    viewHtml = plus.webview.getWebviewById('kq_view');
-//						}
-//						mui.fire(viewHtml,'viewId',{
-//							id:cid
-//						});
-//						mui.openWindow({
-//						    id:'kq_view'
-//						});
-//						
-//					});
 					//编辑考勤信息
 	            	mui('#OA_task_1').on('tap', '.editkq', function(event) {
 						var elem = this;

@@ -80,8 +80,8 @@
 		return callback();
 	};
 	owner.getRequestUrl=function(){
-//		return "http://192.168.11.96:8080";
-		return "http://47.94.87.191:8080";
+		return "http://192.168.11.96:8080";
+//		return "http://47.94.87.191:8080";
 	};
 	
 	/**

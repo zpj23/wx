@@ -65,8 +65,10 @@
 		<script src="js/app.js"></script>
 		<script>
 			var listHtml=null;
+			var supplierListHtml=null;
 			var state=null;
 			var downLoadInfo=null;
+			var uploadHtml=null;
 			(function($, doc) {
 				
 				$.init();
@@ -115,6 +117,15 @@
 							id: 'kq_list',
 							url: 'kq/list.html'
 					});
+					uploadHtml=$.preload({
+							id: 'upload_list',
+							url: 'fj/list.html'
+					});
+					supplierListHtml=$.preload({
+							id: 'supplier_list',
+							url: 'supplier/list.html'
+					});
+					
 					var usermanageButton = doc.getElementById('user_manager');
 					usermanageButton.addEventListener('tap', function(event) {
 						if(!listHtml){
@@ -132,38 +143,15 @@
 					
 					var updateButton=doc.getElementById("downloadapp");
 						updateButton.addEventListener('tap',function(event){
-							var ver=plus.runtime.version;
-//							$.ajax({
-//					            url      : app.getRequestUrl()+'/jlLoginAction_checkUpdateByPhone',
-//					            type     : 'post',
-//					            dataType:'json',//服务器返回json格式数据
-//					            data:{ 
-//					            	ver:ver,
-//								    loginId:state.id,
-//									isAdmin:state.isAdmin
-//								},
-//					            success  : function(data){
-//					            	if(data.msg){
-////					            		$.toast("有新版本，请尽早更新，当前版本仍然可用");
-//					            		downLoadInfo=data;
-//					            		console.log(downLoadInfo.filename);
-//					            		var btnArray = ['否', '是']; //弹框消息确认是否开始下载
-//					                    mui.confirm('有新的版本，请及时更新,当前版本仍然可用，是否开始下载新版本？', '版本提示', btnArray, function(e) {
-//					                        if(e.index == 1) { //开始下载
-//						                        createDownload();
-//					                        } else { //不打开
-//					                        }
-//					                    });
-//					            		
-//					            	}else{
-//					            		$.toast("当前已是最新版本");
-//					            	}
-//					            },
-//					            error    : function(xhr,type,errorThrown){
-//					                $.toast(type);
-//					            }
-//					        });
-						
+						if(!uploadHtml){
+						    uploadHtml = plus.webview.getWebviewById('upload_list');
+						}
+						mui.fire(uploadHtml,'uploadHtml',{
+//							userid:app.getState().id
+						});
+						mui.openWindow({
+						    id:'upload_list'
+						});
 					});
 					
 					//初始化下载对象

@@ -1,0 +1,217 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>新增页面</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="../css/mui.min.css" rel="stylesheet" />
+		<link rel="stylesheet" type="text/css" href="../css/mui.picker.min.css" />
+		
+	</head>
+	
+	<body>
+		<header class="mui-bar mui-bar-nav">
+		    <a class="mui-icon mui-icon-left-nav mui-pull-left" id="backList1"></a>
+		    <h1 class="mui-title">新增数据</h1>
+		</header>
+		<div class="mui-content">
+			<form class="mui-input-group ">
+				<div class="mui-content-padded"></div>
+				<div class="mui-card">
+					<div class="mui-card-content">
+					    <div class="mui-input-row">
+					        <label>供应商:</label>
+					   	<input type="text"  id="name"  class="mui-input-clear"  placeholder="供应商" /> 
+					    </div>
+						<div class="mui-input-row">
+					        <label>地址:</label>
+					    	<input type="text" id="address" class="mui-input-clear" placeholder="地址">
+					    </div>
+					    <div class="mui-input-row">
+					        <label>联系人:</label>
+					    	<input type="text" id="contactname" class="mui-input-clear" placeholder="联系人">
+					    </div>
+					    <div class="mui-input-row">
+					        <label>联系电话:</label>
+					    	<input type="text" id="phone" class="mui-input-clear" placeholder="联系电话">
+					    </div>
+					</div>
+				</div>
+				<div class="mui-content-padded"></div>
+				<div class="mui-card">
+					<div class="mui-card-content" style="padding: 15px;">
+						<label>备注:</label>
+						<textarea id="remark" style="background-color: whitesmoke;" rows="5"  placeholder=""></textarea>
+						
+					</div>
+				</div>	
+			    <div class="mui-button-row">
+			    	<input type="hidden" id="id" value="" />
+			        <button type="button" id="saveButton" class="mui-btn mui-btn-primary" >确认</button>
+			        <button type="button" class="mui-btn mui-btn-danger " id="cancelButton">取消</button>
+			    </div>
+			</form>
+			
+		</div>
+		<script src="../js/mui.js"></script>
+		<script src="../js/mui.picker.min.js"></script>
+		<script src="../js/app.js"></script>
+		<script type="text/javascript">
+			var state=null;
+			var currentId="";
+			var listHtml=null;
+			var registertime;
+			var isPayName;
+			mui.init();
+			mui.plusReady(function(){
+				//保存按钮初始化
+				initButtonData();
+				
+			});
+			//添加newId自定义事件监听
+			window.addEventListener('supplierId',function(event){
+			  //获得事件参数
+			  	currentId = event.detail.id;
+			  	state=app.getState();
+				initData();
+				
+			});
+			
+			function initData(){
+				
+				if(currentId!=''&&currentId!=null){
+					mui.ajax({
+		            url      : app.getRequestUrl()+'/vue/supplier/findById',
+		            type     : 'post',
+		            dataType:'json',//服务器返回json格式数据
+		            data:{ 
+					    id:currentId,
+					    loginId:state.id,
+						isAdmin:state.isAdmin
+					},
+					beforeSend: function() {
+				        plus.nativeUI.showWaiting("初始化中...", null);
+				    },
+				    complete: function() {
+				        plus.nativeUI.closeWaiting();
+				    },
+		            success  : function(data){
+		            	
+		            	if(data.msg){
+		            		getCV('id').value=currentId;
+		            		var cinfo=data.data;
+					    	getCV('name').value=cinfo.name;
+					    	getCV('address').value=cinfo.address;
+					    	getCV('contactname').value=cinfo.contactname;
+					    	getCV('remark').value=cinfo.remark;
+					    	getCV('phone').value=cinfo.phone;
+					    	
+		            	}else{
+		            		mui.toast("初始化失败");
+		            	}
+		            	
+							
+		            },
+		            error    : function(xhr,type,errorThrown){
+		                mui.toast(type);
+		            }
+		        	});
+				}else{
+					getCV('name').value='';
+            		getCV('address').value='';
+			    	getCV('contactname').value='';
+			    	getCV('phone').value='';
+			    	getCV('remark').value='';
+				}
+			}
+			
+			function initButtonData(){
+				var cancelbutton=document.getElementById("cancelButton");
+				cancelbutton.addEventListener('tap', function(){
+					if(!listHtml){
+					    listHtml = plus.webview.getWebviewById('supplier_list');
+					}
+					mui.fire(listHtml,'supplier_list',{
+						//userid:app.getState().id
+					});
+					mui.openWindow({
+					    id:'supplier_list'
+					});
+				}, false);
+				var backbutton=document.getElementById("backList1");
+				backbutton.addEventListener('tap', function(){
+//					console.log(">>>>>>新增返回列表");
+					if(!listHtml){
+					    listHtml = plus.webview.getWebviewById('supplier_list');
+					}
+					mui.fire(listHtml,'supplierList',{
+						//userid:app.getState().id
+					});
+					mui.openWindow({
+					    id:'supplier_list'
+					});
+				}, false);
+				
+				var saveButton =document.getElementById("saveButton");
+  					
+					saveButton.addEventListener('tap', function() {
+						var flag=true;
+						if(getCV('name').value==""){
+							mui.toast("供应商！");
+							flag=false;
+						}
+						if(!flag){
+							return;
+						}
+						mui.ajax({
+				            url      : app.getRequestUrl()+'/vue/supplier/saveInfo',
+				            type     : 'post',
+				            dataType:'json',//服务器返回json格式数据
+				            data:{
+				            	id:getCV('id').value+'',
+							    name:getCV('name').value,
+							    address:getCV('address').value,
+							    contactname:getCV('contactname').value,
+							    remark:getCV('remark').value,
+							    phone:getCV('phone').value,
+							    loginId:state.id,
+								isAdmin:state.isAdmin
+							},
+							beforeSend: function() {
+						        plus.nativeUI.showWaiting("保存中...", null);
+						    },
+						    complete: function() {
+						        plus.nativeUI.closeWaiting();
+						    },
+				            success  : function(data){
+				            	if(data.msg){
+				            		
+				            		if(!listHtml){
+									    listHtml = plus.webview.getWebviewById('supplier_list');
+									}
+									mui.fire(listHtml,'supplierList',{
+										//userid:app.getState().id
+									});
+									mui.openWindow({
+									    id:'supplier_list'
+									});
+				            		
+				            	}else{
+				            		mui.toast("保存失败");
+				            	}
+									
+				            },
+				            error    : function(xhr,type,errorThrown){
+				                mui.toast(type);
+				            }
+				        });
+					}, false);
+			}
+			function getCV(id){
+				return document.getElementById(id);
+			}
+		</script>
+	</body>
+
+</html>
