@@ -129,28 +129,21 @@
 			function initButtonData(){
 				var cancelbutton=document.getElementById("cancelButton");
 				cancelbutton.addEventListener('tap', function(){
-					if(!listHtml){
-					    listHtml = plus.webview.getWebviewById('supplier_list');
-					}
-					mui.fire(listHtml,'supplier_list',{
-						//userid:app.getState().id
-					});
-					mui.openWindow({
-					    id:'supplier_list'
-					});
+					
 				}, false);
 				var backbutton=document.getElementById("backList1");
 				backbutton.addEventListener('tap', function(){
 //					console.log(">>>>>>新增返回列表");
-					if(!listHtml){
-					    listHtml = plus.webview.getWebviewById('supplier_list');
-					}
-					mui.fire(listHtml,'supplierList',{
-						//userid:app.getState().id
-					});
-					mui.openWindow({
-					    id:'supplier_list'
-					});
+					jumpListPage();
+//					if(!listHtml){
+//					    listHtml = plus.webview.getWebviewById('supplier_list');
+//					}
+//					mui.fire(listHtml,'supplierList',{
+//						//userid:app.getState().id
+//					});
+//					mui.openWindow({
+//					    id:'supplier_list'
+//					});
 				}, false);
 				
 				var saveButton =document.getElementById("saveButton");
@@ -186,17 +179,16 @@
 						    },
 				            success  : function(data){
 				            	if(data.msg){
-				            		
-				            		if(!listHtml){
-									    listHtml = plus.webview.getWebviewById('supplier_list');
-									}
-									mui.fire(listHtml,'supplierList',{
-										//userid:app.getState().id
-									});
-									mui.openWindow({
-									    id:'supplier_list'
-									});
-				            		
+				            		jumpListPage();
+//				            		if(!listHtml){
+//									    listHtml = plus.webview.getWebviewById('supplier_list');
+//									}
+//									mui.fire(listHtml,'supplierList',{
+//										//userid:app.getState().id
+//									});
+//									mui.openWindow({
+//									    id:'supplier_list'
+//									});
 				            	}else{
 				            		mui.toast("保存失败");
 				            	}
@@ -210,6 +202,18 @@
 			}
 			function getCV(id){
 				return document.getElementById(id);
+			}
+			
+			function jumpListPage(){
+				if(!listHtml){
+				    listHtml = plus.webview.getWebviewById('supplier_list');
+				}
+				mui.fire(listHtml,'supplier_list',{
+					//userid:app.getState().id
+				});
+				mui.openWindow({
+				    id:'supplier_list'
+				});
 			}
 		</script>
 	</body>

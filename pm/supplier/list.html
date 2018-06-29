@@ -14,12 +14,12 @@
 			<h1 class="mui-title">供应商列表</h1>
 			<button id='addButton' class=" mui-pull-right mui-btn-link">新增</button>
 		</header>
-		<div class="mui-content">
-			<ul class="mui-table-view">
+		<div class="mui-content" id="myList">
+			<!--<ul class="mui-table-view">
 				 <li class="mui-table-view-cell">Item 1</li>
 		         <li class="mui-table-view-cell">Item 2</li>
 		         <li class="mui-table-view-cell">Item 3</li>
-			</ul>
+			</ul>-->
 		</div>
 		<script src="../js/mui.min.js"></script>
 		<script type="text/javascript">
@@ -33,19 +33,20 @@
 					id: 'supplier_add',
 					url: 'edit.html'
 				});
-				
-				
 				initButtons();
-			
+				
+				
 			});
 			//初始化加载以后每次进页面加载监听
 			window.addEventListener('supplierList',function(event){
 				state=app.getState();
 				currentPage=1;
-				startdate=event.detail.startdate;
-			    enddate=event.detail.enddate;
-			    staffname=event.detail.staffname;
-				isshenhe=event.detail.shenhe;
+//				startdate=event.detail.startdate;
+//			    enddate=event.detail.enddate;
+//			    staffname=event.detail.staffname;
+//				isshenhe=event.detail.shenhe;
+				
+				
 				initData();
 				
 			});
@@ -64,6 +65,139 @@
 					});
 					
 				}, false);
+			}
+			
+			function  initData(){
+//				if(typeof(startdate)=="undefined"){
+//					startdate="";
+//				}
+//				if(typeof(enddate)=="undefined"){
+//					enddate="";
+//				}
+//				if(typeof(staffname)=="undefined"){
+//					staffname="";
+//				}
+//				if(typeof(isshenhe)=="undefined"){
+//					isshenhe="";
+//				}
+				mui.ajax({
+		            url    : app.getRequestUrl()+'/vue/maintain/findList',
+		            type   : 'POST',
+		            dataType:'json',//服务器返回json格式数据
+		            data:{
+		            	username:name,
+		            	cpage:currentPage,
+		            	pagerow:pagerow,
+					    loginId:state.id,
+						isAdmin:state.isAdmin
+					},
+					async:false,
+					beforeSend: function() {
+				        plus.nativeUI.showWaiting("加载中...", null);
+				    },
+				    complete: function() {
+				        plus.nativeUI.closeWaiting();
+				    },
+		            success: function(data){
+	//	            	var str=JSON.stringify(data);
+	//	            	console.log(str);
+		            	totalPage =data.totalPage;
+		            	document.getElementById("jb_cpage").innerHTML=currentPage;
+		            	document.getElementById("jb_tpage").innerHTML=totalPage;
+		            	
+		            	myList = document.getElementById("myList");
+		            	var listStr='';
+		            	var arr=new Array();
+		            	arr=data.list;
+	//	            	console.log(data);
+		            	listStr+='<ul class="mui-table-view mui-table-view-striped mui-table-view-condensed" id="OA_task_1">';
+		            	for(var m=0;m<arr.length;m++){
+		            		var colorStr="red";
+		            		if(arr[m].isPay=="1"){
+		            			//已付款
+		            			colorStr="green";
+		            		}
+							listStr+='<li class="mui-table-view-cell" >';
+							listStr+='<div class="mui-slider-right mui-disabled">';
+							listStr+='<a class="mui-btn mui-btn-blue editkq" name="'+arr[m].id+'"  >修改</a>';
+							listStr+='<a class="mui-btn mui-btn-red shanchukq" name="'+arr[m].id+'" >删除</a>';
+							listStr+='</div>';
+							listStr+='<div class="mui-slider-handle">';
+							listStr+='<div class="mui-table">';
+							listStr+='<div class="mui-table-cell mui-col-xs-9">';
+							listStr+='<h4 class="mui-ellipsis" >'+arr[m].username+'</h4>';
+							listStr+='<h5>'+arr[m].remark+'</h5>';
+							listStr+='<p class="mui-h6 mui-ellipsis">'+arr[m].jine+'元</p>';
+							listStr+='</div>';
+							listStr+='<div class="mui-table-cell mui-col-xs-5 mui-text-center">';
+							listStr+='<span class="mui-h5" style="color:'+colorStr+';">'+(arr[m].registertime).substring(0,10)+'</span>';
+							listStr+='</div>';
+							listStr+='<div class="mui-table-cell mui-col-xs-1 mui-text-right"><span class="mui-badge">'+((currentPage-1)*pagerow+m+1)+'</span></div>';
+							listStr+='</div>';
+							listStr+='</div>';
+							listStr+='</li>';
+							
+		            	}
+		            	listStr+='</ul>';
+		            	myList.innerHTML=listStr;
+						//编辑考勤信息
+		            	mui('#OA_task_1').on('tap', '.editkq', function(event) {
+							var elem = this;
+							var cid = elem.name;
+	//						var str=JSON.stringify(cid);
+	//						console.log(str);
+							if(!editHtml){
+							    editHtml = plus.webview.getWebviewById('kq_edit');
+							}
+							mui.fire(editHtml,'editId',{
+								id:cid
+							});
+							mui.openWindow({
+							    id:'kq_edit'
+							});
+							
+						});
+						//删除考勤信息
+		            	var btnArray = ['确认', '取消'];
+		            	mui('#OA_task_1').on('tap', '.shanchukq', function(event) {
+							var elem = this;
+							var li = elem.parentNode.parentNode;
+							mui.confirm('确认删除该条记录？', '警告', btnArray, function(e) {
+								if (e.index == 0) {
+									var cid = elem.name;
+									mui.ajax({
+							            url      : app.getRequestUrl()+'/vue/maintain/delInfoById',
+							            type     : 'post',
+							            dataType:'json',//服务器返回json格式数据
+							            data:{ 
+										    delId:cid,
+										    loginId:state.id,
+											isAdmin:state.isAdmin
+										},
+							            success  : function(data){
+							            	if(data.msg){
+							            		li.parentNode.removeChild(li);
+							            	}else{
+							            		mui.toast("删除失败");
+							            	}
+							            },
+							            error    : function(xhr,type,errorThrown){
+							                mui.toast(type);
+							            }
+							        });
+									
+								} else {
+									setTimeout(function() {
+										mui.swipeoutClose(li);
+									}, 0);
+								}
+							});
+						});
+		            },
+		            error    : function(xhr,type,errorThrown){
+		                mui.toast(type);
+		            }
+		        });
 			}
 		</script>
 	</body>
