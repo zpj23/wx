@@ -6,6 +6,26 @@
 		<title>供应商列表</title>
 		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
 		<link href="../css/mui.min.css" rel="stylesheet" />
+		<!--App自定义的css-->
+		<link rel="stylesheet" type="text/css" href="../css/app.css"/>
+		<style>
+			.mui-table h4,.mui-table h5,.mui-table .mui-h5,.mui-table .mui-h6,.mui-table p{
+		        margin-top: 0;
+		    }
+		    .mui-table h4{
+		        line-height: 21px;
+		        font-weight: 500;
+		    }
+		
+		    .mui-table .oa-icon{
+		        position: absolute;
+		        right:0;
+		        bottom: 0;
+		    }
+		    .mui-table .oa-icon-star-filled{
+		        color:#f14e41;
+		    }
+		</style>
 	</head>
 
 	<body>
@@ -21,11 +41,34 @@
 		         <li class="mui-table-view-cell">Item 3</li>
 			</ul>-->
 		</div>
+		<div class="mui-content-padded">
+				<ul class="mui-pager">
+					<li class="mui-previous">
+						<a href="#" id="lastPage">
+							上一页
+						</a>
+					</li>
+					<span class="mui-badge mui-badge-inverted">当前第</span>
+					<span class="mui-badge mui-badge-inverted" id="jb_cpage"></span>
+					<span class="mui-badge mui-badge-inverted">页共</span>
+					<span class="mui-badge mui-badge-inverted" id="jb_tpage"></span>
+					<span class="mui-badge mui-badge-inverted">页</span>
+					
+					<li class="mui-next">
+						<a href="#" id="nextPage">
+							下一页
+						</a>
+					</li>
+				</ul>
+			</div>
+		
 		<script src="../js/mui.min.js"></script>
+		<script src="../js/app.js"></script>
 		<script type="text/javascript">
 			var supplier_add_html=null;//新增和编辑页面
 			var currentPage=1;
-			
+			var pagerow=15;
+			var totalPage=0;
 			mui.init();
 			//初始化加载
 			mui.plusReady(function(){
@@ -81,7 +124,7 @@
 //					isshenhe="";
 //				}
 				mui.ajax({
-		            url    : app.getRequestUrl()+'/vue/maintain/findList',
+		            url    : app.getRequestUrl()+'/vue/supplier/findList',
 		            type   : 'POST',
 		            dataType:'json',//服务器返回json格式数据
 		            data:{
@@ -112,11 +155,6 @@
 	//	            	console.log(data);
 		            	listStr+='<ul class="mui-table-view mui-table-view-striped mui-table-view-condensed" id="OA_task_1">';
 		            	for(var m=0;m<arr.length;m++){
-		            		var colorStr="red";
-		            		if(arr[m].isPay=="1"){
-		            			//已付款
-		            			colorStr="green";
-		            		}
 							listStr+='<li class="mui-table-view-cell" >';
 							listStr+='<div class="mui-slider-right mui-disabled">';
 							listStr+='<a class="mui-btn mui-btn-blue editkq" name="'+arr[m].id+'"  >修改</a>';
@@ -125,12 +163,7 @@
 							listStr+='<div class="mui-slider-handle">';
 							listStr+='<div class="mui-table">';
 							listStr+='<div class="mui-table-cell mui-col-xs-9">';
-							listStr+='<h4 class="mui-ellipsis" >'+arr[m].username+'</h4>';
-							listStr+='<h5>'+arr[m].remark+'</h5>';
-							listStr+='<p class="mui-h6 mui-ellipsis">'+arr[m].jine+'元</p>';
-							listStr+='</div>';
-							listStr+='<div class="mui-table-cell mui-col-xs-5 mui-text-center">';
-							listStr+='<span class="mui-h5" style="color:'+colorStr+';">'+(arr[m].registertime).substring(0,10)+'</span>';
+							listStr+='<h4 class="mui-ellipsis" >'+arr[m].name+'</h4>';
 							listStr+='</div>';
 							listStr+='<div class="mui-table-cell mui-col-xs-1 mui-text-right"><span class="mui-badge">'+((currentPage-1)*pagerow+m+1)+'</span></div>';
 							listStr+='</div>';
@@ -140,20 +173,20 @@
 		            	}
 		            	listStr+='</ul>';
 		            	myList.innerHTML=listStr;
-						//编辑考勤信息
+						//编辑信息
 		            	mui('#OA_task_1').on('tap', '.editkq', function(event) {
 							var elem = this;
 							var cid = elem.name;
 	//						var str=JSON.stringify(cid);
 	//						console.log(str);
 							if(!editHtml){
-							    editHtml = plus.webview.getWebviewById('kq_edit');
+							    editHtml = plus.webview.getWebviewById('supplier_add');
 							}
-							mui.fire(editHtml,'editId',{
+							mui.fire(editHtml,'supplierId',{
 								id:cid
 							});
 							mui.openWindow({
-							    id:'kq_edit'
+							    id:'supplier_add'
 							});
 							
 						});
@@ -166,7 +199,7 @@
 								if (e.index == 0) {
 									var cid = elem.name;
 									mui.ajax({
-							            url      : app.getRequestUrl()+'/vue/maintain/delInfoById',
+							            url      : app.getRequestUrl()+'/vue/supplier/delInfoById',
 							            type     : 'post',
 							            dataType:'json',//服务器返回json格式数据
 							            data:{ 
@@ -199,6 +232,34 @@
 		            }
 		        });
 			}
+			
+			//分页按钮
+				var lastPageButton = document.getElementById("lastPage");
+				lastPageButton.addEventListener('tap', function(event) {
+					
+					if(currentPage>1){
+						currentPage=currentPage-1;
+//						console.log('上一页'+currentPage);
+						initData();
+					}else{
+						mui.toast("已经是第一页");
+						currentPage=1;
+					}
+				}, false);	
+				var nextPageButton = document.getElementById("nextPage");
+				nextPageButton.addEventListener('tap', function(event) {
+					
+					if(currentPage<totalPage){
+						currentPage=currentPage+1;
+//						console.log('下一页'+currentPage);
+						initData();
+					}else{
+						mui.toast("已经是最后一页");
+						currentPage=totalPage;
+					}
+					
+					
+				}, false);
 		</script>
 	</body>
 

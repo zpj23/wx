@@ -32,8 +32,8 @@
 		            <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3"><a href="#">
 		                    <span class="mui-icon mui-icon-email"></span>
 		                    <div class="mui-media-body">商品管理</div></a></li>
-		            <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3"><a href="#">
-		                    <span class="mui-icon mui-icon-chatbubble"></span>
+		            <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3"><a href="#" id="supplier_manage">
+		                    <span class="mui-icon mui-icon-chatbubble" ></span>
 		                    <div class="mui-media-body">供应商管理</div></a></li>
 		            <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3"><a href="#">
 		                    <span class="mui-icon mui-icon-location"></span>
@@ -129,7 +129,7 @@
 					var usermanageButton = doc.getElementById('user_manager');
 					usermanageButton.addEventListener('tap', function(event) {
 						if(!listHtml){
-						    listHtml = plus.webview.getWebviewById('kq_list');
+						    listHtml = plus.webview.getWebviewById('supplier_list');
 						}
 						mui.fire(listHtml,'listHtml',{
 //							userid:app.getState().id
@@ -139,6 +139,21 @@
 						});
 						
 					});
+					//供应商管理
+					var supplierManage=document.getElementById('supplier_manage');
+					supplierManage.addEventListener('tap', function(event) {
+						if(!supplierListHtml){
+						    supplierListHtml = plus.webview.getWebviewById('supplier_list');
+						}
+						mui.fire(supplierListHtml,'supplierList',{
+//							userid:app.getState().id
+						});
+						mui.openWindow({
+						    id:'supplier_list'
+						});
+						
+					});
+					
 					//app更新
 					
 					var updateButton=doc.getElementById("downloadapp");
