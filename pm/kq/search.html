@@ -38,7 +38,10 @@
 					        <label>维修用户:</label>
 					    <input type="text" id="staffname" class="mui-input-clear" placeholder="维修用户">
 					</div>
-					
+					<div class="mui-input-row">
+					        <label>内容:</label>
+					    <input type="text" id="remark" class="mui-input-clear" placeholder="内容">
+					</div>
 					<div class="mui-input-row">
 					        <label>是否付款:</label>
 					    <input type="text" id="shenhe" class="mui-input-clear" placeholder="是否付款" />
@@ -157,6 +160,7 @@
 					getCV('staffname').value='';
 					getCV('shenhe').value='';
 					getCV('shenhecode').value='';
+					getCV('remark').value='';
 				});	
 				var searchButton =document.getElementById("searchButton");
 				searchButton.addEventListener('tap', function() {
@@ -167,7 +171,8 @@
 						startdate:getCV('startdate').value,
 					    enddate:getCV('enddate').value,
 					    staffname:getCV('staffname').value,
-					    shenhe:getCV('shenhecode').value
+					    shenhe:getCV('shenhecode').value,
+					    remark:getCV('remark').value
 					});
 					mui.openWindow({
 					    id:'kq_list'
