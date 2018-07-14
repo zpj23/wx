@@ -171,7 +171,8 @@
 					"setting.html",
 					"kq/list.html",
 					"fj/list.html",
-					"supplier/list.html"
+					"supplier/list.html",
+					"goods/list.html"
 				],
 				"priority": 1
 			},
@@ -250,6 +251,13 @@
 				"resources": [],
 				"refer": [
 					"supplier/edit.html"
+				],
+				"priority": 0
+			},
+			"goods/list.html": {
+				"resources": [],
+				"refer": [
+					"goods/edit.html"
 				],
 				"priority": 0
 			}

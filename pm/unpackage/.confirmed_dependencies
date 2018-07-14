@@ -11,7 +11,8 @@
 		"refer": [
 			"kq/list.html",
 			"fj/list.html",
-			"supplier/list.html"
+			"supplier/list.html",
+			"goods/list.html"
 		],
 		"resources": []
 	},
@@ -24,6 +25,11 @@
 	"supplier/list.html": {
 		"refer": [
 			"supplier/edit.html"
+		]
+	},
+	"goods/list.html": {
+		"refer": [
+			"goods/edit.html"
 		]
 	}
 }

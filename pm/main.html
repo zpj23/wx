@@ -29,7 +29,7 @@
 		            <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3"><a href="#" id="user_manager">
 		                    <span class="mui-icon mui-icon-home" id="shenhecount"></span>
 		                    <div class="mui-media-body">维修日志</div></a></li>
-		            <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3"><a href="#">
+		            <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3"><a href="#" id="goods_manage">
 		                    <span class="mui-icon mui-icon-email"></span>
 		                    <div class="mui-media-body">商品管理</div></a></li>
 		            <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3"><a href="#" id="supplier_manage">
@@ -66,6 +66,7 @@
 		<script>
 			var listHtml=null;
 			var supplierListHtml=null;
+			var goodsHtml=null;
 			var state=null;
 			var downLoadInfo=null;
 			var uploadHtml=null;
@@ -125,7 +126,11 @@
 							id: 'supplier_list',
 							url: 'supplier/list.html'
 					});
-					
+					goodsHtml=$.preload({
+							id: 'goods_list',
+							url: 'goods/list.html'
+					});
+					//维修管理
 					var usermanageButton = doc.getElementById('user_manager');
 					usermanageButton.addEventListener('tap', function(event) {
 						if(!listHtml){
@@ -136,6 +141,21 @@
 						});
 						mui.openWindow({
 						    id:'kq_list'
+						});
+						
+					});
+					//商品管理
+					goods_manage
+					var goodsManage=document.getElementById('goods_manage');
+					goodsManage.addEventListener('tap', function(event) {
+						if(!goodsHtml){
+						    goodsHtml = plus.webview.getWebviewById('goods_list');
+						}
+						mui.fire(goodsHtml,'goodsList',{
+//							userid:app.getState().id
+						});
+						mui.openWindow({
+						    id:'goods_list'
 						});
 						
 					});
