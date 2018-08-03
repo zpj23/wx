@@ -1,0 +1,272 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="../css/mui.min.css" rel="stylesheet" />
+		<link rel="stylesheet" type="text/css" href="../css/mui.picker.min.css" />
+		
+	</head>
+	
+	<body>
+		<header class="mui-bar mui-bar-nav">
+		    <a class="mui-icon mui-icon-left-nav mui-pull-left" id="backList1"></a>
+		    <h1 class="mui-title" >新增字典</h1>
+		</header>
+		<div class="mui-content">
+			<form class="mui-input-group ">
+				<div class="mui-content-padded"></div>
+				<div class="mui-card">
+					<div class="mui-card-content" style="padding: 15px;">
+						<div class="mui-input-row">
+							<label>上级名称:</label>
+							<input type="text"  id="pName"  class="mui-input-clear"  placeholder="上级名称" readonly="readonly" />
+							<input type="hidden" id="pCode" />
+						</div>
+					</div>
+				</div>	
+				<div class="mui-content-padded"></div>
+			    <div class="mui-card">
+					<div class="mui-card-content">
+					    <div class="mui-input-row">
+					        <label>名称:</label>
+					    	<input type="text" id="name" class="mui-input-clear" placeholder="名称">
+					    </div>
+			    	</div>
+			    	<div class="mui-card-content">
+					    <div class="mui-input-row">
+					        <label>编码:</label>
+					    	<input type="text" id="code" class="mui-input-clear" placeholder="编码">
+					    </div>
+			    	</div>
+				</div>
+				
+				
+			    <div class="mui-button-row">
+			    	<input type="hidden" id="id" value="" />
+			        <button type="button" id="saveButton" class="mui-btn mui-btn-primary" >确认</button>
+			        <button type="button" class="mui-btn mui-btn-danger " id="cancelButton">取消</button>
+			    </div>
+			</form>
+			
+		</div>
+		<script src="../js/mui.js"></script>
+		<script src="../js/mui.picker.min.js"></script>
+		<script src="../js/app.js"></script>
+		<script type="text/javascript">
+			var state=null;
+			var currentId="";
+			var listHtml=null;
+			var cityPicker3;
+			var level;
+			var pName;
+			var pCode;
+			var cCode;
+			var cName;
+			var beforeCode="";
+			mui.init();
+			mui.plusReady(function(){
+				//保存按钮
+				initSaveButtonData();
+				level="1";
+				pCode="";
+				queryTypeInfo();
+				state=app.getState();
+			});
+			//添加newId自定义事件监听
+			window.addEventListener('dicAdd',function(event){
+			  //获得事件参数
+			  	currentId = event.detail.id;
+				level=event.detail.level;
+				pName=event.detail.pName;
+				pCode=event.detail.pCode;
+				cCode=event.detail.code;
+				beforeCode="";
+				if(cCode!=""){
+					beforeCode=cCode;
+				}
+				cName=event.detail.name;
+			  	state=app.getState();
+				//initData();
+				queryTypeInfo();
+			});
+			function queryTypeInfo(){
+				
+				mui.ajax({
+				            url      : app.getRequestUrl()+'/vue/dictionary/initThreeType',
+				            type     : 'post',
+				            dataType:'json',//服务器返回json格式数据
+				            data:{
+							},
+							beforeSend: function() {
+						        //plus.nativeUI.showWaiting("初始化...", null);
+						    },
+						    complete: function() {
+						        //plus.nativeUI.closeWaiting();
+						    },
+				            success  : function(data){
+				            	
+				            	if(data.code){
+				            		var firstArr=data.data.first;
+				            		var secondArr=data.data.second;
+				            		var thirdArr=data.data.third;
+				            		cityPicker3 = new mui.PopPicker({
+										layer: 1
+									});
+									if(level=="1"){
+										//cityPicker3.setData(firstArr);
+										cityPicker3.setData([{
+											value: 'DPSP',
+											text: '店铺商品'
+										}]);
+									}else if(level=="2"){
+										cityPicker3.setData(firstArr);
+									}else if(level=="3"){
+										cityPicker3.setData(secondArr);
+									}
+									
+									var showCityPickerButton = getCV('pName');
+									
+									showCityPickerButton.addEventListener('tap', function(event) {
+										cityPicker3.show(function(items) {
+											showCityPickerButton.value = _getParam(items[0], 'text');
+											getCV('pCode').value=_getParam(items[0], 'value');
+											//返回 false 可以阻止选择框的关闭
+											//return false;
+										});
+									}, false);
+									initData();
+				            	}	
+								
+				            },
+				            error    : function(xhr,type,errorThrown){
+				                mui.toast(type);
+				            }
+				        });
+				
+			}
+			function _getParam(obj, param) {
+				return obj[param] || '';
+			}
+			function initData(){
+				console.log(pCode);
+		    	if(pCode!=""){
+		    		//编辑
+		    		if(level=="1"){
+		    			cityPicker3.pickers[0].setSelectedValue("DPSP", 2000);
+		    			getCV('pCode').value="DPSP";
+		    			getCV('pName').value="店铺商品";
+		    		}else if(level=="2"){
+		    			cityPicker3.pickers[0].setSelectedValue(pCode, 2000);
+		    			getCV('pCode').value=pCode;
+		    			getCV('pName').value=pName;
+		    		}else if(level=="3"){
+		    			cityPicker3.pickers[0].setSelectedValue(pCode, 2000);
+		    			getCV('pCode').value=pCode;
+		    			getCV('pName').value=pName;
+		    		}
+		    	}else{
+		    		//新增
+		    		if(level=="1"){
+		    			cityPicker3.pickers[0].setSelectedValue("DPSP", 2000);
+		    			getCV('pCode').value="DPSP";
+		    			getCV('pName').value="店铺商品";
+		    		}else if(level=="2"){
+		    			cityPicker3.pickers[0].setSelectedValue("", 2000);
+		    			getCV('pCode').value="";
+		    			getCV('pName').value="";
+		    		}else if(level=="3"){
+		    			cityPicker3.pickers[0].setSelectedValue("", 2000);
+		    			getCV('pCode').value="";
+		    			getCV('pName').value="";
+		    		}
+		    	}
+			}
+			
+			function initSaveButtonData(){
+				var cancelbutton=document.getElementById("cancelButton");
+				cancelbutton.addEventListener('tap', function(){
+					jumpPage();
+				}, false);
+				var backbutton=document.getElementById("backList1");
+				backbutton.addEventListener('tap', function(){
+					jumpPage();
+				}, false);
+				
+				var saveButton =document.getElementById("saveButton");
+  					
+					saveButton.addEventListener('tap', function() {
+						var flag=true;
+						if(getCV('pCode').value==""){
+							mui.toast("上级编码不能为空！");
+							flag=false;
+						}
+						if(getCV('code').value==""){
+							mui.toast("编码不能为空！");
+							flag=false;
+						}
+						if(getCV('name').value==""){
+							mui.toast("名称不能为空！");
+							flag=false;
+						}
+						if(!flag){
+							return;
+						}
+						console.log(state);
+						mui.ajax({
+				            url      : app.getRequestUrl()+'/vue/dictionary/saveInfo',
+				            type     : 'post',
+				            dataType:'json',//服务器返回json格式数据
+				            data:{
+				            	pCode:getCV('pCode').value,
+							    pName:getCV('pName').value,
+							    code:getCV('code').value,
+							    name:getCV('name').value,
+							    bCode:beforeCode,
+							    loginId:state.id,
+								isAdmin:state.isAdmin
+							},
+							beforeSend: function() {
+						        plus.nativeUI.showWaiting("保存中...", null);
+						    },
+						    complete: function() {
+						        plus.nativeUI.closeWaiting();
+						    },
+				            success  : function(data){
+				            	if(data.code){
+				            		jumpPage();
+				            	}else{
+				            		mui.toast("保存失败");
+				            	}
+									
+				            },
+				            error    : function(xhr,type,errorThrown){
+				                mui.toast(type);
+				            }
+				        });
+					}, false);
+			}
+			function getCV(id){
+				return document.getElementById(id);
+			}
+			var old_back = mui.back;
+			mui.back = function(){
+		    	jumpPage();
+			}
+			function jumpPage(){
+				if(!listHtml){
+				    listHtml = plus.webview.getWebviewById('dictionary_list');
+				}
+				mui.fire(listHtml,'dictionaryList',{
+					mode:'edit'
+				});
+				mui.openWindow({
+				    id:'dictionary_list'
+				});
+			}
+		</script>
+	</body>
+
+</html>

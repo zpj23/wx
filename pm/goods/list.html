@@ -34,34 +34,57 @@
 			<h1 class="mui-title">商品列表</h1>
 			<button id='addButton' class=" mui-pull-right mui-btn-link">新增</button>
 		</header>
-		<div class="mui-content" id="myList">
-			<!--<ul class="mui-table-view">
-				 <li class="mui-table-view-cell">Item 1</li>
-		         <li class="mui-table-view-cell">Item 2</li>
-		         <li class="mui-table-view-cell">Item 3</li>
-			</ul>-->
-		</div>
-		<div class="mui-content-padded">
+		
+		<div class="mui-content">
+			<div class="mui-content-padded">
+			<div class="mui-input-row mui-search" >
+				<input type="search" class="mui-input-clear"  readonly="readonly" placeholder="" id="goods_search_list" />
+			</div>
+			</div>
+			<div class="mui-content-padded">
 				<ul class="mui-pager">
 					<li class="mui-previous">
-						<a href="#" id="lastPage">
+						<a href="#" id="lastPage_up" >
 							上一页
 						</a>
 					</li>
 					<span class="mui-badge mui-badge-inverted">当前第</span>
-					<span class="mui-badge mui-badge-inverted" id="jb_cpage"></span>
+					<span class="mui-badge mui-badge-inverted" id="jb_cpage_up"></span>
 					<span class="mui-badge mui-badge-inverted">页共</span>
-					<span class="mui-badge mui-badge-inverted" id="jb_tpage"></span>
+					<span class="mui-badge mui-badge-inverted" id="jb_tpage_up"></span>
 					<span class="mui-badge mui-badge-inverted">页</span>
 					
 					<li class="mui-next">
-						<a href="#" id="nextPage">
+						<a href="#" id="nextPage_up">
+							下一页
+						</a>
+					</li>
+				</ul>
+		</div>
+		<div class="mui-content-padded">
+			<div  id="myList"></div>
+		</div>	
+		<div class="mui-content-padded">
+				<ul class="mui-pager">
+					<li class="mui-previous">
+						<a href="#" id="lastPage_down" >
+							上一页
+						</a>
+					</li>
+					<span class="mui-badge mui-badge-inverted">当前第</span>
+					<span class="mui-badge mui-badge-inverted" id="jb_cpage_down"></span>
+					<span class="mui-badge mui-badge-inverted">页共</span>
+					<span class="mui-badge mui-badge-inverted" id="jb_tpage_down"></span>
+					<span class="mui-badge mui-badge-inverted">页</span>
+					
+					<li class="mui-next">
+						<a href="#" id="nextPage_down">
 							下一页
 						</a>
 					</li>
 				</ul>
 			</div>
-		
+		</div>
 		<script src="../js/mui.min.js"></script>
 		<script src="../js/app.js"></script>
 		<script type="text/javascript">
@@ -70,6 +93,10 @@
 			var pagerow=15;
 			var totalPage=0;
 			var mainHtml =null;
+			var searchHtml=null;
+			var search_goodsName='';
+			var search_supplierId='';
+			var search_goodsType='';
 			mui.init();
 			//初始化加载
 			mui.plusReady(function(){
@@ -77,20 +104,40 @@
 					id: 'goods_add',
 					url: 'edit.html'
 				});
+				searchHtml=mui.preload({
+					"id": 'goods_search',
+					"url": 'search.html'
+				});	
 				initButtons();
-				
+				state=app.getState();
 				
 			});
 			//初始化加载以后每次进页面加载监听
 			window.addEventListener('goodsList',function(event){
 				state=app.getState();
-				currentPage=1;
-//				startdate=event.detail.startdate;
-//			    enddate=event.detail.enddate;
-//			    staffname=event.detail.staffname;
-//				isshenhe=event.detail.shenhe;
-				
-				
+				if(event.detail.mode=="main"){
+					//主页跳转过来的
+					currentPage=1;
+					search_goodsName='';
+					search_supplierId='';
+					search_goodsType='';
+				}else if(event.detail.mode=="edit"){
+					//所有查询条件都保留，不变更。
+				}else if(event.detail.mode=="search"){
+					currentPage=1;
+					search_goodsName=event.detail.name;
+					if(typeof(search_goodsName)=="undefined"){
+						search_goodsName="";
+					}
+					search_supplierId=event.detail.supplierId;
+					if(typeof(search_supplierId)=="undefined"){
+						search_supplierId='';
+					}
+					search_goodsType=event.detail.goodsType;
+					if(typeof(search_goodsType)=="undefined"){
+						search_goodsType='';
+					}
+				}
 				initData();
 				
 			});
@@ -112,24 +159,14 @@
 			}
 			
 			function  initData(){
-//				if(typeof(startdate)=="undefined"){
-//					startdate="";
-//				}
-//				if(typeof(enddate)=="undefined"){
-//					enddate="";
-//				}
-//				if(typeof(staffname)=="undefined"){
-//					staffname="";
-//				}
-//				if(typeof(isshenhe)=="undefined"){
-//					isshenhe="";
-//				}
 				mui.ajax({
 		            url    : app.getRequestUrl()+'/vue/goods/findList',
 		            type   : 'POST',
 		            dataType:'json',//服务器返回json格式数据
 		            data:{
-		            	username:name,
+		            	goodsName:search_goodsName,
+		            	supplierId:search_supplierId,
+		            	goodsType:search_goodsType,
 		            	cpage:currentPage,
 		            	pagerow:pagerow,
 					    loginId:state.id,
@@ -143,11 +180,11 @@
 				        plus.nativeUI.closeWaiting();
 				    },
 		            success: function(data){
-	//	            	var str=JSON.stringify(data);
-	//	            	console.log(str);
 		            	totalPage =data.totalPage;
-		            	document.getElementById("jb_cpage").innerHTML=currentPage;
-		            	document.getElementById("jb_tpage").innerHTML=totalPage;
+		            	document.getElementById("jb_cpage_up").innerHTML=currentPage;
+		            	document.getElementById("jb_tpage_up").innerHTML=totalPage;
+		            	document.getElementById("jb_cpage_down").innerHTML=currentPage;
+		            	document.getElementById("jb_tpage_down").innerHTML=totalPage;
 		            	
 		            	myList = document.getElementById("myList");
 		            	var listStr='';
@@ -169,7 +206,7 @@
 							listStr+='<p class="mui-h6 mui-ellipsis">'+arr[m].supplierName+'</p>';
 							listStr+='</div>';
 							listStr+='<div class="mui-table-cell mui-col-xs-5 mui-text-center">';
-							listStr+='<span class="mui-h5" >'+arr[m].goodsType+'</span>';
+							listStr+='<span class="mui-h5" >'+'</span>';
 							listStr+='</div>';
 							listStr+='<div class="mui-table-cell mui-col-xs-1 mui-text-right"><span class="mui-badge">'+((currentPage-1)*pagerow+m+1)+'</span></div>';
 							listStr+='</div>';
@@ -205,7 +242,7 @@
 								if (e.index == 0) {
 									var cid = elem.name;
 									mui.ajax({
-							            url      : app.getRequestUrl()+'/vue/goods/delInfoById',
+							            url      : app.getRequestUrl()+'/vue/goods/delById',
 							            type     : 'post',
 							            dataType:'json',//服务器返回json格式数据
 							            data:{ 
@@ -239,8 +276,8 @@
 		        });
 			}
 			
-			//分页按钮
-				var lastPageButton = document.getElementById("lastPage");
+			//上部分页按钮
+				var lastPageButton = document.getElementById("lastPage_up");
 				lastPageButton.addEventListener('tap', function(event) {
 					
 					if(currentPage>1){
@@ -252,8 +289,35 @@
 						currentPage=1;
 					}
 				}, false);	
-				var nextPageButton = document.getElementById("nextPage");
+				var nextPageButton = document.getElementById("nextPage_up");
 				nextPageButton.addEventListener('tap', function(event) {
+					
+					if(currentPage<totalPage){
+						currentPage=currentPage+1;
+//						console.log('下一页'+currentPage);
+						initData();
+					}else{
+						mui.toast("已经是最后一页");
+						currentPage=totalPage;
+					}
+					
+					
+				}, false);
+				//下部分页
+				var lastPageButton_down = document.getElementById("lastPage_down");
+				lastPageButton_down.addEventListener('tap', function(event) {
+					
+					if(currentPage>1){
+						currentPage=currentPage-1;
+//						console.log('上一页'+currentPage);
+						initData();
+					}else{
+						mui.toast("已经是第一页");
+						currentPage=1;
+					}
+				}, false);	
+				var nextPageButton_down = document.getElementById("nextPage_down");
+				nextPageButton_down.addEventListener('tap', function(event) {
 					
 					if(currentPage<totalPage){
 						currentPage=currentPage+1;
@@ -288,6 +352,55 @@
 							}
 						});
 					}, false);
+					
+				var goods_search = document.getElementById("goods_search_list");
+				
+				goods_search.addEventListener('tap', function(event) {
+					if(!searchHtml){
+						searchHtml=plus.webview.getWebviewById('goods_search');
+					}
+					mui.fire(searchHtml,'goodsSearch',{
+						
+					});
+					mui.openWindow({
+						id: 'goods_search',
+						show: {
+							aniShow: 'pop-in'
+						},
+						styles: {
+							popGesture: 'hide'
+							
+						},
+						
+						waiting: {
+							autoShow: false
+						}
+						
+					});
+				
+				}, false);	
+				
+				var old_back = mui.back;
+				mui.back = function(){
+				    	if(!mainHtml){
+							mainHtml= plus.webview.getWebviewById("main");
+						}
+						mui.fire(mainHtml,'show',{
+						});
+						mui.openWindow({
+							id: 'main',
+							url:'../main.html',
+							show: {
+								aniShow: 'pop-in-left'
+							},
+							styles: {
+								popGesture: 'hide'
+							},
+							waiting: {
+								autoShow: false
+							}
+						});
+				}
 		</script>
 	</body>
 

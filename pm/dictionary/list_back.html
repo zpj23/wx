@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>Hello MUI</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<!--标准mui.css-->
+		<link rel="stylesheet" href="../css/mui.min.css">
+		<!--App自定义的css-->
+		<link rel="stylesheet" type="text/css" href="../css/app.css"/>
+		<style>
+			
+			.title{
+				margin: 20px 15px 10px;
+				color: #6d6d72;
+				font-size: 15px;
+			}
+			
+			.oa-contact-cell.mui-table .mui-table-cell {
+				padding: 11px 0;
+				vertical-align: middle;
+			}
+			
+			.oa-contact-cell {
+				position: relative;
+				margin: -11px 0;
+			}
+	
+			.oa-contact-avatar {
+				width: 75px;
+			}
+			.oa-contact-avatar img {
+				border-radius: 50%;
+			}
+			.oa-contact-content {
+				width: 100%;
+			}
+			.oa-contact-name {
+				margin-right: 20px;
+			}
+			.oa-contact-name, oa-contact-position {
+				float: left;
+			}
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">店铺商品字典</h1>
+			<button id='dadd' class=" mui-pull-right mui-btn-link">新增</button>
+		</header>
+		<nav class="mui-bar mui-bar-tab" id="navTab">
+			<a class="mui-tab-item mui-active" href="#firstlevel" id="fl">
+				<span class="mui-icon mui-icon-redo"></span>
+				<span class="mui-tab-label">第一级</span>
+			</a>
+			<a class="mui-tab-item" href="#secondlevel" id="sl">
+				<span class="mui-icon mui-icon-redo"></span>
+				<span class="mui-tab-label">第二级</span>
+			</a>
+			<a class="mui-tab-item" href="#thirdlevel" id="tl">
+				<span class="mui-icon mui-icon-redo"></span>
+				<span class="mui-tab-label">第三级</span>
+			</a>
+		</nav>
+		<div class="mui-content" >
+			<div id="firstlevel" class="mui-control-content mui-active">
+			</div>
+			<div id="secondlevel" class="mui-control-content">
+			</div>
+			<div id="thirdlevel" class="mui-control-content">
+			</div>
+		</div>
+	</body>
+	<script src="../js/mui.min.js"></script>
+	<script src="../js/app.js"></script>
+	<script>
+		var state=null;
+		var dictionaryEditHtml=null;
+		var tabIndex=1;
+		mui.init({
+			swipeBack:true //启用右滑关闭功能
+		});
+		mui.plusReady(function(){
+			state=app.getState();
+			initButtonData();
+		});
+		
+		window.addEventListener('dictionaryList',function(event){
+			initTab();
+		});
+		function initButtonData(){
+			var dadd=getCV('dadd');
+			dadd.addEventListener('tap',function(event){
+				
+				if(!dictionaryEditHtml){
+				    dictionaryEditHtml = plus.webview.getWebviewById('dic_add');
+				}
+				mui.fire(dictionaryEditHtml,'dicAdd',{
+					id:'',
+					level:tabIndex,
+					pName:'',
+					pCode:'',
+					code:'',
+					name:''
+				});
+				mui.openWindow({
+				    id:'dic_add',
+				    url:'edit.html'
+				});
+			});
+			
+			document.getElementById('fl').addEventListener('tap',function(event){
+				tabIndex=1;
+			});
+			document.getElementById('sl').addEventListener('tap',function(event){
+				tabIndex=2;
+			});
+			document.getElementById('tl').addEventListener('tap',function(event){
+				tabIndex=3;
+			});
+		}
+		function initTab(){
+			mui.ajax({
+				            url      : app.getRequestUrl()+'/vue/dictionary/initThreeType',
+				            type     : 'post',
+				            dataType:'json',//服务器返回json格式数据
+				            data:{
+							},
+							beforeSend: function() {
+						        //plus.nativeUI.showWaiting("初始化中...", null);
+						    },
+						    complete: function() {
+						        //plus.nativeUI.closeWaiting();
+						    },
+				            success  : function(data){
+				            	if(data.code){
+				            		var firstArr=data.data.first;
+				            		var secondArr=data.data.second;
+				            		var thirdArr=data.data.third;
+				            		
+				            		var fhtml='<ul class="mui-table-view mui-table-view-striped mui-table-view-condensed" id="firstUL">';
+				            		for(var i=0;i<firstArr.length;i++){
+				            			fhtml+='<li class="mui-table-view-cell" >';
+										fhtml+='<div class="mui-slider-right mui-disabled">';
+										fhtml+='<a class="mui-btn mui-btn-blue editDic" name="first_'+i+'"  >修改</a>';
+										fhtml+='<a class="mui-btn mui-btn-red delDic" name="first_'+i+'" >删除</a>';
+										fhtml+='</div>';
+										fhtml+='<div class="mui-slider-handle">';
+										fhtml+='<div class="mui-table">';
+										fhtml+='<div class="mui-table-cell mui-col-xs-9">';
+										fhtml+='<h4 class="mui-ellipsis" >'+firstArr[i].text+'</h4>';
+										fhtml+='<p class="mui-h6 mui-ellipsis">'+firstArr[i].value+'</p>';
+										fhtml+='</div>';
+										fhtml+='<div class="mui-table-cell mui-col-xs-1 mui-text-right"><span class="mui-badge">'+(i+1)+'</span></div>';
+										fhtml+='</div>';
+										fhtml+='</div>';
+										fhtml+='</li>';
+				            			
+				            		}
+				            		fhtml+='</ul>';
+				            		
+				            		var shtml='<ul class="mui-table-view mui-table-view-striped mui-table-view-condensed" id="secondUL">';
+				            		for(var i=0;i<secondArr.length;i++){
+				            			shtml+='<li class="mui-table-view-cell" >';
+										shtml+='<div class="mui-slider-right mui-disabled">';
+										shtml+='<a class="mui-btn mui-btn-blue editDic" name="second_'+i+'"  >修改</a>';
+										shtml+='<a class="mui-btn mui-btn-red delDic" name="second_'+i+'" >删除</a>';
+										shtml+='</div>';
+										shtml+='<div class="mui-slider-handle">';
+										shtml+='<div class="mui-table">';
+										shtml+='<div class="mui-table-cell mui-col-xs-9">';
+										shtml+='<h4 class="mui-ellipsis" >'+secondArr[i].text+'</h4>';
+										shtml+='<p class="mui-h6 mui-ellipsis">'+secondArr[i].value+'</p>';
+										shtml+='</div>';
+										shtml+='<div class="mui-table-cell mui-col-xs-1 mui-text-right"><span class="mui-badge">'+(i+1)+'</span></div>';
+										shtml+='</div>';
+										shtml+='</div>';
+										shtml+='</li>';
+				            		}
+				            		shtml+='</ul>';
+				            		
+				            		var thtml='<ul class="mui-table-view mui-table-view-striped mui-table-view-condensed" id="thirdUL">';
+				            		for(var i=0;i<thirdArr.length;i++){
+				            			thtml+='<li class="mui-table-view-cell" >';
+										thtml+='<div class="mui-slider-right mui-disabled">';
+										thtml+='<a class="mui-btn mui-btn-blue editDic" name="third_'+i+'"  >修改</a>';
+										thtml+='<a class="mui-btn mui-btn-red delDic" name="third_'+i+'" >删除</a>';
+										thtml+='</div>';
+										thtml+='<div class="mui-slider-handle">';
+										thtml+='<div class="mui-table">';
+										thtml+='<div class="mui-table-cell mui-col-xs-9">';
+										thtml+='<h4 class="mui-ellipsis" >'+thirdArr[i].text+'</h4>';
+										thtml+='<p class="mui-h6 mui-ellipsis">'+thirdArr[i].value+'</p>';
+										thtml+='</div>';
+										thtml+='<div class="mui-table-cell mui-col-xs-1 mui-text-right"><span class="mui-badge">'+(i+1)+'</span></div>';
+										thtml+='</div>';
+										thtml+='</div>';
+										thtml+='</li>';
+				            		}
+				            		thtml+='</ul>';
+				            		
+				            		
+				            		getCV("firstlevel").innerHTML=fhtml;
+				            		getCV("secondlevel").innerHTML=shtml;
+				            		getCV("thirdlevel").innerHTML=thtml;
+				            		
+				            		//编辑信息
+					            	mui('#firstUL').on('tap', '.editDic', function(event) {
+										var elem = this;
+										var cid = elem.name;
+										var index=parseInt(cid.split("_")[1]);
+										
+										if(!dictionaryEditHtml){
+										    dictionaryEditHtml = plus.webview.getWebviewById('dic_add');
+										}
+										mui.fire(dictionaryEditHtml,'dicAdd',{
+											id:cid,
+											level:tabIndex,
+											pName:firstArr[index].ptext,
+											pCode:firstArr[index].pvalue,
+											code:firstArr[index].value,
+											name:firstArr[index].text
+										});
+										mui.openWindow({
+										    id:'dic_add',
+										    url:'edit.html'
+										});
+										
+									});
+									//删除信息
+					            	var btnArray = ['确认', '取消'];
+					            	mui('#firstUL').on('tap', '.delDic', function(event) {
+										var elem = this;
+										var li = elem.parentNode.parentNode;
+										mui.confirm('确认删除该条记录？', '警告', btnArray, function(e) {
+											if (e.index == 0) {
+												var cid = elem.name;
+												var index=parseInt(cid.split("_")[1]);
+												mui.ajax({
+										            url      : app.getRequestUrl()+'/vue/dictionary/delByCode',
+										            type     : 'post',
+										            dataType:'json',//服务器返回json格式数据
+										            data:{ 
+													    code:firstArr[index].value,
+													    loginId:state.id,
+														isAdmin:state.isAdmin
+													},
+										            success  : function(data){
+										            	if(data.code){
+										            		li.parentNode.removeChild(li);
+										            	}else{
+										            		mui.toast("删除失败");
+										            	}
+										            },
+										            error    : function(xhr,type,errorThrown){
+										                mui.toast(type);
+										            }
+										        });
+												
+											} else {
+												setTimeout(function() {
+													mui.swipeoutClose(li);
+												}, 0);
+											}
+										});
+									});
+				            		
+				            		
+				            		
+				            		
+				            	}else{
+				            		mui.toast("");
+				            	}
+									
+				            },
+				            error    : function(xhr,type,errorThrown){
+				                mui.toast(type);
+				            }
+				        });
+		}
+		function getCV(id){
+				return document.getElementById(id);
+			}
+		
+		
+		var old_back = mui.back;
+		mui.back = function(){
+		    	if(!mainHtml){
+					mainHtml= plus.webview.getWebviewById("main");
+				}
+				mui.fire(mainHtml,'show',{
+				});
+				mui.openWindow({
+					id: 'main',
+					url:'../main.html',
+					show: {
+						aniShow: 'pop-in-left'
+					},
+					styles: {
+						popGesture: 'hide'
+					},
+					waiting: {
+						autoShow: false
+					}
+				});
+		}
+	</script>
+</html>

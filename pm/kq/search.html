@@ -66,7 +66,7 @@
 			mui.plusReady(function(){
 				initButtons();
 			});
-			window.addEventListener('searchHtml',function(event){
+			window.addEventListener('kqSearch',function(event){
 			});
 			function initButtons(){
 				var startdate=document.getElementById("startdate");
@@ -146,8 +146,8 @@
 					if(!listHtml){
 					    listHtml = plus.webview.getWebviewById('kq_list');
 					}
-					mui.fire(listHtml,'listHtml',{
-						//userid:app.getState().id
+					mui.fire(listHtml,'kqList',{
+						mode:'search'
 					});
 					mui.openWindow({
 					    id:'kq_list'
@@ -167,7 +167,8 @@
 					if(!listHtml){
 					    listHtml = plus.webview.getWebviewById('kq_list');
 					}
-					mui.fire(listHtml,'listHtml',{
+					mui.fire(listHtml,'kqList',{
+						mode:'search',
 						startdate:getCV('startdate').value,
 					    enddate:getCV('enddate').value,
 					    staffname:getCV('staffname').value,
@@ -183,7 +184,23 @@
 				
 			};
 			
-			
+			var old_back = mui.back;
+			mui.back = function(){
+		    	if(!listHtml){
+				    listHtml = plus.webview.getWebviewById('kq_list');
+				}
+				mui.fire(listHtml,'kqList',{
+					mode:'search',
+					startdate:getCV('startdate').value,
+				    enddate:getCV('enddate').value,
+				    staffname:getCV('staffname').value,
+				    shenhe:getCV('shenhecode').value,
+				    remark:getCV('remark').value
+				});
+				mui.openWindow({
+				    id:'kq_list'
+				});
+			}
 			function getCV(id){
 				return document.getElementById(id);
 			}

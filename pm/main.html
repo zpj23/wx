@@ -35,18 +35,18 @@
 		            <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3"><a href="#" id="supplier_manage">
 		                    <span class="mui-icon mui-icon-chatbubble" ></span>
 		                    <div class="mui-media-body">供应商管理</div></a></li>
-		            <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3"><a href="#">
+		            <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3"><a href="#" id="dictionary_manage" >
 		                    <span class="mui-icon mui-icon-location"></span>
-		                    <div class="mui-media-body">入库管理</div></a></li>
+		                    <div class="mui-media-body">商品展示</div></a></li>
 		            <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3"><a href="#">
 		                    <span class="mui-icon mui-icon-search"></span>
-		                    <div class="mui-media-body">库存管理</div></a></li>
+		                    <div class="mui-media-body">入库管理</div></a></li>
 		            <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3"><a href="#">
 		                    <span class="mui-icon mui-icon-phone"></span>
 		                    <div class="mui-media-body">出库管理</div></a></li>
 		            <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3"><a href="#" id="downloadapp">
 		                    <span class="mui-icon mui-icon-gear"></span>
-		                    <div class="mui-media-body">更新app</div></a></li>
+		                    <div class="mui-media-body">库存管理</div></a></li>
 		            <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3"><a href="#">
 		                    <span class="mui-icon mui-icon-info"></span>
 		                    <div class="mui-media-body">about</div></a></li>
@@ -67,6 +67,7 @@
 			var listHtml=null;
 			var supplierListHtml=null;
 			var goodsHtml=null;
+			var dictionaryHtml=null;
 			var state=null;
 			var downLoadInfo=null;
 			var uploadHtml=null;
@@ -118,10 +119,10 @@
 							id: 'kq_list',
 							url: 'kq/list.html'
 					});
-					uploadHtml=$.preload({
-							id: 'upload_list',
-							url: 'fj/list.html'
-					});
+//					uploadHtml=$.preload({
+//							id: 'upload_list',
+//							url: 'fj/list.html'
+//					});
 					supplierListHtml=$.preload({
 							id: 'supplier_list',
 							url: 'supplier/list.html'
@@ -130,36 +131,39 @@
 							id: 'goods_list',
 							url: 'goods/list.html'
 					});
+					dictionaryHtml=$.preload({
+						id:'dictionary_list',
+						url:'dictionary/list.html'
+					});
 					//维修管理
 					var usermanageButton = doc.getElementById('user_manager');
 					usermanageButton.addEventListener('tap', function(event) {
 						if(!listHtml){
-						    listHtml = plus.webview.getWebviewById('supplier_list');
+						    listHtml = plus.webview.getWebviewById('kq_list');
 						}
-						mui.fire(listHtml,'listHtml',{
-//							userid:app.getState().id
+						mui.fire(listHtml,'kqList',{
+							mode:'main'
 						});
 						mui.openWindow({
 						    id:'kq_list'
 						});
 						
 					});
-					//商品管理
-					goods_manage
+//					//商品管理
 					var goodsManage=document.getElementById('goods_manage');
 					goodsManage.addEventListener('tap', function(event) {
 						if(!goodsHtml){
 						    goodsHtml = plus.webview.getWebviewById('goods_list');
 						}
 						mui.fire(goodsHtml,'goodsList',{
-//							userid:app.getState().id
+							mode:'main'
 						});
 						mui.openWindow({
 						    id:'goods_list'
 						});
 						
 					});
-					//供应商管理
+//					//供应商管理
 					var supplierManage=document.getElementById('supplier_manage');
 					supplierManage.addEventListener('tap', function(event) {
 						if(!supplierListHtml){
@@ -173,103 +177,117 @@
 						});
 						
 					});
-					
-					//app更新
-					
-					var updateButton=doc.getElementById("downloadapp");
-						updateButton.addEventListener('tap',function(event){
-						if(!uploadHtml){
-						    uploadHtml = plus.webview.getWebviewById('upload_list');
+//					
+					var dictionary_manage=document.getElementById('dictionary_manage');
+					dictionary_manage.addEventListener('tap', function(event) {
+						if(!dictionaryHtml){
+						    dictionaryHtml = plus.webview.getWebviewById('dictionary_list');
 						}
-						mui.fire(uploadHtml,'uploadHtml',{
-//							userid:app.getState().id
+						mui.fire(dictionaryHtml,'dictionaryList',{
+							mode:'main'
 						});
 						mui.openWindow({
-						    id:'upload_list'
+						    id:'dictionary_list'
 						});
+						
 					});
+//					
+//					//app更新
+//					
+//					var updateButton=doc.getElementById("downloadapp");
+//						updateButton.addEventListener('tap',function(event){
+//						if(!uploadHtml){
+//						    uploadHtml = plus.webview.getWebviewById('upload_list');
+//						}
+//						mui.fire(uploadHtml,'uploadHtml',{
+////							userid:app.getState().id
+//						});
+//						mui.openWindow({
+//						    id:'upload_list'
+//						});
+//					});
 					
 					//初始化下载对象
-				    var dtask = null;
-				    var downloadflag=false;
-				    function createDownload(){
-				        //判断文件是否已经下载
-						plus.io.resolveLocalFileSystemURL('_downloads/'+downLoadInfo.filename,function(entry){
-				            if(entry.isFile){
-				                var btnArray = ['否', '是']; //弹框消息确认是否打开文件
-			                    mui.confirm("已经下载到"+entry.fullPath+'。是否安装新版本？', '安装信息', btnArray, function(e) {
-			                        if(e.index == 1) { //打开附件
-				                        plus.runtime.openFile('_downloads/'+downLoadInfo.filename, {}, function(e) {
-				                        	plus.nativeUI.alert("无法打开此文件：" + e.emssage);
-					                    });
-			                        } else { //不打开
-			                        	plus.io.requestFileSystem(plus.io.PUBLIC_DOWNLOADS,function(fs){
-								        	fs.root.getDirectory('_downloads/', {create: false}, function(dirEntry) {
-								                console.log("进入删除方法");
-								                dirEntry.removeRecursively(function() {
-								                    plus.nativeUI.toast("缓存清空成功！");
-								                    downloadflag=false;
-//								                    console.log('Directory successufully removed.');
-								                }, function(e){
-//								                    plus.nativeUI.toast("缓存清空失败！"+e.message);
-//								                    console.log("cuowu"+e.message)
-								                });
-								            }, function(e){
-//								                    plus.nativeUI.toast("缓存清空成功失败！"+e.message);
-								                    //console.log("cuowu"+e.message)
-								                }); 
-								        });
-						                        	
-			                        }
-			                    });
-				            }
-				        },function(e){dBase();});
-				    }
-				    function dBase(){
-				        if(dtask){
-				        	if(downloadflag){
-				        		
-				        	}else{
-				        		$.toast('正在下载');
-				        	}
-				            return;
-				        }
-				        var tempurl=app.getRequestUrl()+"/"+downLoadInfo.url;
-				        dtask = plus.downloader.createDownload(
-				        	tempurl,
-				        	{
-				        		method:'GET',
-				        		filename:'_downloads/'+downLoadInfo.filename
-				        	},
-				        	function(d,status){
-				            	$.toast(d.filename);
-				        });
-				        dtask.addEventListener("statechanged",function(task,status){
-				            if(!dtask){return;}
-				            switch(task.state){
-				                case 1: $.toast('开始下载...');break;//开始
-				                case 2: $.toast('链接到服务器...');break;//链接到服务器
-				                case 3:
-				                    var progressVal = (task.downloadedSize/task.totalSize)*100;
-				                        $('#bar').progressbar({progress:progressVal}).show();
-				                    break;
-				                case 4: 
-				                	$.toast('下载完成');
-				                	downloadflag=true;
-				                	var btnArray = ['否', '是']; //弹框消息确认是否打开文件
-				                    mui.confirm('是否安装新版本？', '下载成功', btnArray, function(e) {
-				                        if(e.index == 1) { //打开文件
-					                        plus.runtime.openFile( dtask.filename, {}, function(e) {
-					                        	plus.nativeUI.alert("无法打开此文件：" + e.emssage);
-					                    	});
-				                        } else { //不打开
-				                        }
-				                    });
-				                	break;
-				            }
-				        });
-				        dtask.start();
-				    }
+//				    var dtask = null;
+//				    var downloadflag=false;
+//				    function createDownload(){
+//				        //判断文件是否已经下载
+//						plus.io.resolveLocalFileSystemURL('_downloads/'+downLoadInfo.filename,function(entry){
+//				            if(entry.isFile){
+//				                var btnArray = ['否', '是']; //弹框消息确认是否打开文件
+//			                    mui.confirm("已经下载到"+entry.fullPath+'。是否安装新版本？', '安装信息', btnArray, function(e) {
+//			                        if(e.index == 1) { //打开附件
+//				                        plus.runtime.openFile('_downloads/'+downLoadInfo.filename, {}, function(e) {
+//				                        	plus.nativeUI.alert("无法打开此文件：" + e.emssage);
+//					                    });
+//			                        } else { //不打开
+//			                        	plus.io.requestFileSystem(plus.io.PUBLIC_DOWNLOADS,function(fs){
+//								        	fs.root.getDirectory('_downloads/', {create: false}, function(dirEntry) {
+//								                console.log("进入删除方法");
+//								                dirEntry.removeRecursively(function() {
+//								                    plus.nativeUI.toast("缓存清空成功！");
+//								                    downloadflag=false;
+////								                    console.log('Directory successufully removed.');
+//								                }, function(e){
+////								                    plus.nativeUI.toast("缓存清空失败！"+e.message);
+////								                    console.log("cuowu"+e.message)
+//								                });
+//								            }, function(e){
+////								                    plus.nativeUI.toast("缓存清空成功失败！"+e.message);
+//								                    //console.log("cuowu"+e.message)
+//								                }); 
+//								        });
+//						                        	
+//			                        }
+//			                    });
+//				            }
+//				        },function(e){dBase();});
+//				    }
+//				    function dBase(){
+//				        if(dtask){
+//				        	if(downloadflag){
+//				        		
+//				        	}else{
+//				        		$.toast('正在下载');
+//				        	}
+//				            return;
+//				        }
+//				        var tempurl=app.getRequestUrl()+"/"+downLoadInfo.url;
+//				        dtask = plus.downloader.createDownload(
+//				        	tempurl,
+//				        	{
+//				        		method:'GET',
+//				        		filename:'_downloads/'+downLoadInfo.filename
+//				        	},
+//				        	function(d,status){
+//				            	$.toast(d.filename);
+//				        });
+//				        dtask.addEventListener("statechanged",function(task,status){
+//				            if(!dtask){return;}
+//				            switch(task.state){
+//				                case 1: $.toast('开始下载...');break;//开始
+//				                case 2: $.toast('链接到服务器...');break;//链接到服务器
+//				                case 3:
+//				                    var progressVal = (task.downloadedSize/task.totalSize)*100;
+//				                        $('#bar').progressbar({progress:progressVal}).show();
+//				                    break;
+//				                case 4: 
+//				                	$.toast('下载完成');
+//				                	downloadflag=true;
+//				                	var btnArray = ['否', '是']; //弹框消息确认是否打开文件
+//				                    mui.confirm('是否安装新版本？', '下载成功', btnArray, function(e) {
+//				                        if(e.index == 1) { //打开文件
+//					                        plus.runtime.openFile( dtask.filename, {}, function(e) {
+//					                        	plus.nativeUI.alert("无法打开此文件：" + e.emssage);
+//					                    	});
+//				                        } else { //不打开
+//				                        }
+//				                    });
+//				                	break;
+//				            }
+//				        });
+//				        dtask.start();
+//				    }
 
 					
 					

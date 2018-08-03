@@ -132,23 +132,6 @@
 		});
 		//初始化数据
 		function initData(){
-			
-//			console.log("初始化list数据"+currentPage);
-			if(typeof(startdate)=="undefined"){
-				startdate="";
-			}
-			if(typeof(enddate)=="undefined"){
-				enddate="";
-			}
-			if(typeof(staffname)=="undefined"){
-				staffname="";
-			}
-			if(typeof(isshenhe)=="undefined"){
-				isshenhe="";
-			}
-			if(typeof(remarkContent)=="undefined"){
-				remarkContent="";
-			}
 			mui.ajax({
 	            url    : app.getRequestUrl()+'/vue/maintain/findList',
 	            type   : 'POST',
@@ -276,19 +259,44 @@
 	        });
 		}
 		
-		window.addEventListener('listHtml',function(event){
-			//关闭等待框
-//		    plus.nativeUI.closeWaiting();
-//		    //显示当前页面
-//		    mui.currentWebview.show();
+		window.addEventListener('kqList',function(event){
 			state=app.getState();
-			currentPage=1;
 			//初始化
-			startdate=event.detail.startdate;
-		    enddate=event.detail.enddate;
-		    staffname=event.detail.staffname;
-			isshenhe=event.detail.shenhe;
-			remarkContent=event.detail.remark;
+			if(event.detail.mode=="main"){
+					//主页跳转过来的
+					currentPage=1;
+					startdate='';
+					enddate='';
+					staffname='';
+					isshenhe='';
+					remarkContent='';
+			}else if(event.detail.mode=="edit"){
+				//所有查询条件都保留，不变更。
+			}else if(event.detail.mode=="search"){
+				currentPage=1;
+				startdate=event.detail.startdate;
+				if(typeof(startdate)=="undefined"){
+					startdate="";
+				}
+				enddate=event.detail.enddate;
+				if(typeof(enddate)=="undefined"){
+					enddate='';
+				}
+				staffname=event.detail.staffname;
+				if(typeof(staffname)=="undefined"){
+					staffname='';
+				}
+				
+				isshenhe=event.detail.shenhe;
+				if(typeof(isshenhe)=="undefined"){
+					isshenhe='';
+				}
+				remarkContent=event.detail.remark;
+				if(typeof(remarkContent)=="undefined"){
+					remarkContent='';
+				}
+			}
+			
 			initData();
 		});
 		
@@ -340,7 +348,7 @@
 					if(!searchHtml){
 						searchHtml=plus.webview.getWebviewById('kq_search');
 					}
-					mui.fire(searchHtml,'searchHtml',{
+					mui.fire(searchHtml,'kqSearch',{
 						
 					});
 					mui.openWindow({
@@ -416,6 +424,27 @@
 					
 				}, false);
 				
+		}
+		var old_back = mui.back;
+		mui.back = function(){
+	    	if(!mainHtml){
+				mainHtml= plus.webview.getWebviewById("main");
+			}
+			mui.fire(mainHtml,'show',{
+			});
+			mui.openWindow({
+				id: 'main',
+				url:'../main.html',
+				show: {
+					aniShow: 'pop-in-left'
+				},
+				styles: {
+					popGesture: 'hide'
+				},
+				waiting: {
+					autoShow: false
+				}
+			});
 		}
 	</script>
 </html>

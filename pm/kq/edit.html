@@ -137,7 +137,7 @@
 					    	getCV('jine').value=cinfo.jine;
 					    	getCV('remark').value=cinfo.remark;
 					    	
-					    	getCV('isPayCode').value=cinfo.isPayCode;
+					    	getCV('isPayCode').value=cinfo.isPay;
 					    	if(cinfo.isPay=="1"){
 					    		getCV('isPayName').value='已付款';
 					    	}else if(cinfo.isPay=="0"){
@@ -225,7 +225,11 @@
 				isPayName=document.getElementById("isPayName");
 				isPayName.addEventListener('tap', function() {
 					var _self = this;
+					var dc=getCV('isPayCode').value;
 					if(_self.picker) {
+						if(dc!=''){
+							_self.picker.pickers[0].setSelectedValue(dc, 2000);
+						}
 						_self.picker.show(function (rs) {
 							isPayName.value=rs[0].text;
 							document.getElementById("isPayCode").value=rs[0].value;
@@ -242,11 +246,13 @@
 							    text: "已付款"
 							}]
 						);
-						var dc=getCV('isPayCode').value;
-						_self.picker.pickers[0].setSelectedValue(dc, 2000);
+						if(dc!=''){
+							_self.picker.pickers[0].setSelectedValue(dc, 2000);
+						}
 						_self.picker.show(function(rs) {
 							isPayName.value=rs[0].text;
 							document.getElementById("isPayCode").value=rs[0].value;
+							
 						});
 					}		
 					
@@ -258,8 +264,8 @@
 					if(!listHtml){
 					    listHtml = plus.webview.getWebviewById('kq_list');
 					}
-					mui.fire(listHtml,'listHtml',{
-						//userid:app.getState().id
+					mui.fire(listHtml,'kqList',{
+						mode:'edit'
 					});
 					mui.openWindow({
 					    id:'kq_list'
@@ -271,8 +277,8 @@
 					if(!listHtml){
 					    listHtml = plus.webview.getWebviewById('kq_list');
 					}
-					mui.fire(listHtml,'listHtml',{
-						//userid:app.getState().id
+					mui.fire(listHtml,'kqList',{
+						mode:'edit'
 					});
 					mui.openWindow({
 					    id:'kq_list'
@@ -325,8 +331,8 @@
 				            		if(!listHtml){
 									    listHtml = plus.webview.getWebviewById('kq_list');
 									}
-									mui.fire(listHtml,'listHtml',{
-										//userid:app.getState().id
+									mui.fire(listHtml,'kqList',{
+										mode:'edit'
 									});
 									mui.openWindow({
 									    id:'kq_list'
@@ -360,6 +366,18 @@
 			}
 			function getCV(id){
 				return document.getElementById(id);
+			}
+			var old_back = mui.back;
+			mui.back = function(){
+		    	if(!listHtml){
+				    listHtml = plus.webview.getWebviewById('kq_list');
+				}
+				mui.fire(listHtml,'kqList',{
+					mode:'edit'
+				});
+				mui.openWindow({
+				    id:'kq_list'
+				});
 			}
 		</script>
 	</body>

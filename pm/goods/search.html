@@ -1,0 +1,248 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="../css/mui.min.css" rel="stylesheet" />
+		<link rel="stylesheet" type="text/css" href="../css/mui.picker.min.css" />
+	</head>
+	
+	<body>
+		<header class="mui-bar mui-bar-nav">
+		    <a class="mui-icon mui-icon-left-nav mui-pull-left" id="backList2"></a>
+		    <h1 class="mui-title">查询条件</h1>
+		</header>
+		<div class="mui-content">
+			<div class="mui-content-padded">
+				<div class="mui-input-row mui-search">
+					<input type="search" class="mui-input-clear" placeholder="" id="kq_search" />
+				</div>
+			</div>	
+			
+			<div class="mui-card">
+				<form class="mui-input-group">
+					
+					<div class="mui-input-row">
+					        <label>商品名称:</label>
+					    <input type="text" id="goodsName" value="" class="mui-input-clear" placeholder="商品名称">
+					</div>
+					
+					<div class="mui-input-row">
+					        <label>供应商:</label>
+					    <input type="text" id="supplierName" class="mui-input-clear" readonly="readonly" placeholder="供应商名称" />
+					    <input type="hidden" id="supplierId" value="" />
+					</div>
+					<div class="mui-input-row">
+					        <label>商品类别:</label>
+					    	<input type="text"  id="goodsTypeName"  class="mui-input-clear"  placeholder="商品类别" readonly="readonly" />
+					    	<input type="hidden" id="goodsType" value="" />
+					    </div>
+					<div class="mui-button-row">
+						<button type="button" id="searchButton" class="mui-btn mui-btn-primary" >查询</button>
+						<button type="button" id="clearButton" class="mui-btn mui-btn-grey" >清空</button>
+					</div>
+				</form>
+			</div>
+			
+			
+		</div>	
+		<script src="../js/mui.min.js"></script>
+		<script src="../js/mui.picker.min.js"></script>
+		<script src="../js/app.js"></script>
+		<script type="text/javascript">
+			var state=app.getState();
+			var listHtml=null;
+			mui.init();
+			mui.plusReady(function(){
+				initButtons();
+//				listHtml=mui.preload({
+//					id: 'goods_list',
+//					url: 'list.html'
+//				});
+			});
+			window.addEventListener('goodsSearch',function(event){
+			});
+			function initButtons(){
+				queryGoodsTypeInfo();
+				//供应商
+				querySupplierInfo();
+				
+				var backbutton=document.getElementById("backList2");
+				backbutton.addEventListener('tap', function(){
+					if(!listHtml){
+					    listHtml = plus.webview.getWebviewById('goods_list');
+					}
+					mui.fire(listHtml,'goodsList',{
+						mode:'search',
+						name:'',
+						supplierId:'',
+						goodsType:''
+					});
+					mui.openWindow({
+					    id:'goods_list'
+					});
+//					jumpPage('goodsList','goods_list');
+					
+				}, false);
+				var clearButton =document.getElementById("clearButton");
+				clearButton.addEventListener('tap', function() {
+					
+					getCV('goodsName').value='';
+					getCV('supplierName').value='';
+					getCV('supplierId').value='';
+					getCV('goodsTypeName').value='';
+					getCV('goodsType').value='';
+				});	
+				var searchButton =document.getElementById("searchButton");
+				searchButton.addEventListener('tap', function() {
+					if(!listHtml){
+					    listHtml = plus.webview.getWebviewById('goods_list');
+					}
+					mui.fire(listHtml,'goodsList',{
+						mode:'search',
+						name:getCV('goodsName').value,
+						supplierId:getCV('supplierId').value,
+						goodsType:getCV('goodsType').value
+					});
+					mui.openWindow({
+					    id:'goods_list'
+					});
+//					jumpPage('goodsList','goods_list');
+					
+				}, false);
+				
+			};
+			
+			function querySupplierInfo(){
+				mui.ajax({
+				            url      : app.getRequestUrl()+'/vue/supplier/findSupplierList',
+				            type     : 'post',
+				            dataType:'json',//服务器返回json格式数据
+				            data:{
+							},
+							beforeSend: function() {
+						        plus.nativeUI.showWaiting("初始化中...", null);
+						    },
+						    complete: function() {
+						        plus.nativeUI.closeWaiting();
+						    },
+				            success  : function(data){
+				            	if(data.msg){
+				            		var arr= data.list;
+				            		supplierSelectData=new Array();
+				            		for(var s=0;s< arr.length;s++){
+				            			var tempData=new Object();
+				            			tempData.value=arr[s].id;
+				            			tempData.text=arr[s].name;
+				            			supplierSelectData.push(tempData);
+				            		}
+				            		var supplierName=document.getElementById("supplierName");
+									supplierName.addEventListener('tap', function() {
+										var _self = this;
+										if(_self.picker) {
+											_self.picker.show(function (rs) {
+												supplierName.value=rs[0].text;
+												document.getElementById("supplierId").value=rs[0].value;
+												_self.picker.dispose();
+												_self.picker = null;
+											});
+										} else {
+											_self.picker = new mui.PopPicker();
+											_self.picker.setData(supplierSelectData);
+											var dc=getCV('supplierId').value;
+											_self.picker.pickers[0].setSelectedValue(dc, 2000);
+											_self.picker.show(function(rs) {
+												supplierName.value=rs[0].text;
+												document.getElementById("supplierId").value=rs[0].value;
+											});
+										}		
+										
+									}, false);
+				            	}else{
+				            		mui.toast("初始化下拉框失败");
+				            	}
+									
+				            },
+				            error    : function(xhr,type,errorThrown){
+				                mui.toast(type);
+				            }
+				        });
+			}
+			
+			function queryGoodsTypeInfo(){
+				
+				mui.ajax({
+				            url      : app.getRequestUrl()+'/vue/goods/initGoodsType',
+				            type     : 'post',
+				            dataType:'json',//服务器返回json格式数据
+				            data:{
+							},
+							beforeSend: function() {
+						        plus.nativeUI.showWaiting("初始化...", null);
+						    },
+						    complete: function() {
+						        plus.nativeUI.closeWaiting();
+						    },
+				            success  : function(data){
+								cityPicker3 = new mui.PopPicker({
+										layer: 3
+									});
+								cityPicker3.setData(data);
+								var showCityPickerButton = getCV('goodsTypeName');
+								
+								showCityPickerButton.addEventListener('tap', function(event) {
+									cityPicker3.show(function(items) {
+										showCityPickerButton.value = _getParam(items[0], 'text') + "-" + _getParam(items[1], 'text') + "-" + _getParam(items[2], 'text');
+										getCV('goodsType').value=_getParam(items[0], 'value') + "," + _getParam(items[1], 'value') + "," + _getParam(items[2], 'value');
+										//返回 false 可以阻止选择框的关闭
+										//return false;
+									});
+								}, false);
+				            },
+				            error    : function(xhr,type,errorThrown){
+				                mui.toast(type);
+				            }
+				        });
+				
+			}
+			
+			function _getParam(obj, param) {
+				return obj[param] || '';
+			}
+			
+			function getCV(id){
+				return document.getElementById(id);
+			}
+			
+//			function jumpPage(listener,webviewId){
+//				if(!listHtml){
+//				    listHtml = plus.webview.getWebviewById(webviewId);
+//				}
+//				mui.fire(listHtml,listener,{
+//					mode:'search'
+//				});
+//				mui.openWindow({
+//				    id:webviewId
+//				});
+//			}
+			var old_back = mui.back;
+			mui.back = function(){
+		    	if(!listHtml){
+				    listHtml = plus.webview.getWebviewById('goods_list');
+				}
+				mui.fire(listHtml,'goodsList',{
+					mode:'search',
+					name:getCV('goodsName').value,
+					supplierId:getCV('supplierId').value,
+					goodsType:getCV('goodsType').value
+				});
+				mui.openWindow({
+				    id:'goods_list'
+				});
+			}
+		</script>
+	</body>
+
+</html>

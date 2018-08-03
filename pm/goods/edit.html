@@ -29,7 +29,7 @@
 					    </div>
 					    <div class="mui-input-row">
 					        <label>型号:</label>
-					    	<input type="text" id="contactname" class="mui-input-clear" placeholder="型号">
+					    	<input type="text" id="unit" class="mui-input-clear" placeholder="型号">
 					    </div>
 					    <div class="mui-input-row">
 					        <label>进价:</label>
@@ -60,6 +60,7 @@
 					        <label>商品类别:</label>
 					    	<input type="text"  id="goodsTypeName"  class="mui-input-clear"  placeholder="商品类别" readonly="readonly" />
 					    	<input type="hidden" id="goodsType" />
+					    	<!--<button type="button" class="mui-btn mui-btn-danger " >选择类别</button>-->
 					    </div>
 					    
 					</div>
@@ -88,17 +89,22 @@
 			var currentId="";
 			var listHtml=null;
 			var supplierSelectData=null;
+			var cityPicker3;
 			mui.init();
 			mui.plusReady(function(){
+				state=app.getState();
 				//保存按钮初始化
 				initButtonData();
-				querySelectInfo();
+				querySupplierInfo();
+				queryGoodsTypeInfo();
 			});
 			//添加newId自定义事件监听
-			window.addEventListener('supplierId',function(event){
+			window.addEventListener('goodsAdd',function(event){
 			  //获得事件参数
 			  	currentId = event.detail.id;
 			  	state=app.getState();
+//			  	querySupplierInfo();
+//				queryGoodsTypeInfo();
 				initData();
 				
 			});
@@ -135,6 +141,13 @@
 					    	getCV('supplierName').value=cinfo.supplierName;
 					    	getCV('supplierId').value=cinfo.supplierId;
 					    	getCV('goodsType').value=cinfo.goodsType;
+					    	getCV('goodsTypeName').value=cinfo.goodsTypeName;
+					    	var gt=cinfo.goodsType;
+					    	if(gt!=""){
+					    		cityPicker3.pickers[0].setSelectedValue(gt.split(",")[0], 2000);
+					    		cityPicker3.pickers[1].setSelectedValue(gt.split(",")[1], 2000);
+					    		cityPicker3.pickers[2].setSelectedValue(gt.split(",")[2], 2000);
+					    	}
 					    	
 		            	}else{
 		            		mui.toast("初始化失败");
@@ -156,13 +169,14 @@
 			    	getCV('supplierName').value='';
 			    	getCV('supplierId').value='';
 			    	getCV('goodsType').value='';
+			    	getCV('goodsTypeName').value='';
 				}
 			}
 			
 			function initButtonData(){
 				var cancelbutton=document.getElementById("cancelButton");
 				cancelbutton.addEventListener('tap', function(){
-					
+					jumpListPage();
 				}, false);
 				var backbutton=document.getElementById("backList1");
 				backbutton.addEventListener('tap', function(){
@@ -217,7 +231,51 @@
 				            }
 				        });
 					}, false);
+					
+					
+					
 			}
+			function queryGoodsTypeInfo(){
+				
+				mui.ajax({
+				            url      : app.getRequestUrl()+'/vue/goods/initGoodsType',
+				            type     : 'post',
+				            dataType:'json',//服务器返回json格式数据
+				            data:{
+							},
+							beforeSend: function() {
+						        plus.nativeUI.showWaiting("初始化...", null);
+						    },
+						    complete: function() {
+						        plus.nativeUI.closeWaiting();
+						    },
+				            success  : function(data){
+								cityPicker3 = new mui.PopPicker({
+										layer: 3
+									});
+								cityPicker3.setData(data);
+								var showCityPickerButton = getCV('goodsTypeName');
+								
+								showCityPickerButton.addEventListener('tap', function(event) {
+									cityPicker3.show(function(items) {
+										showCityPickerButton.value = _getParam(items[0], 'text') + "-" + _getParam(items[1], 'text') + "-" + _getParam(items[2], 'text');
+										getCV('goodsType').value=_getParam(items[0], 'value') + "," + _getParam(items[1], 'value') + "," + _getParam(items[2], 'value');
+										//返回 false 可以阻止选择框的关闭
+										//return false;
+									});
+								}, false);
+				            },
+				            error    : function(xhr,type,errorThrown){
+				                mui.toast(type);
+				            }
+				        });
+				
+			}
+			
+			function _getParam(obj, param) {
+				return obj[param] || '';
+			}
+			
 			function getCV(id){
 				return document.getElementById(id);
 			}
@@ -227,14 +285,15 @@
 				    listHtml = plus.webview.getWebviewById('goods_list');
 				}
 				mui.fire(listHtml,'goodsList',{
-					//userid:app.getState().id
+					mode:'edit'
 				});
 				mui.openWindow({
 				    id:'goods_list'
 				});
 			}
 			
-			function querySelectInfo(){
+			
+			function querySupplierInfo(){
 				mui.ajax({
 				            url      : app.getRequestUrl()+'/vue/supplier/findSupplierList',
 				            type     : 'post',
@@ -259,7 +318,28 @@
 //				            			var str=JSON.stringify(supplierSelectData);
 //		            					console.log(str);
 				            		}
-				            		initSelectData();
+				            		var supplierName=document.getElementById("supplierName");
+									supplierName.addEventListener('tap', function() {
+										var _self = this;
+										if(_self.picker) {
+											_self.picker.show(function (rs) {
+												supplierName.value=rs[0].text;
+												document.getElementById("supplierId").value=rs[0].value;
+												_self.picker.dispose();
+												_self.picker = null;
+											});
+										} else {
+											_self.picker = new mui.PopPicker();
+											_self.picker.setData(supplierSelectData);
+											var dc=getCV('supplierId').value;
+											_self.picker.pickers[0].setSelectedValue(dc, 2000);
+											_self.picker.show(function(rs) {
+												supplierName.value=rs[0].text;
+												document.getElementById("supplierId").value=rs[0].value;
+											});
+										}		
+										
+									}, false);
 				            	}else{
 				            		mui.toast("初始化下拉框失败");
 				            	}
@@ -270,32 +350,10 @@
 				            }
 				        });
 			}
-			
-			function initSelectData(){
-				var supplierName=document.getElementById("supplierName");
-				supplierName.addEventListener('tap', function() {
-					var _self = this;
-					if(_self.picker) {
-						_self.picker.show(function (rs) {
-							supplierName.value=rs[0].text;
-							document.getElementById("supplierId").value=rs[0].value;
-							_self.picker.dispose();
-							_self.picker = null;
-						});
-					} else {
-						_self.picker = new mui.PopPicker();
-						_self.picker.setData(supplierSelectData);
-						var dc=getCV('supplierId').value;
-						_self.picker.pickers[0].setSelectedValue(dc, 2000);
-						_self.picker.show(function(rs) {
-							supplierName.value=rs[0].text;
-							document.getElementById("supplierId").value=rs[0].value;
-						});
-					}		
-					
-				}, false);
-			}
-			
+			var old_back = mui.back;
+				mui.back = function(){
+			    	jumpListPage();
+				}
 		</script>
 	</body>
 
