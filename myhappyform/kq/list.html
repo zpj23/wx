@@ -508,5 +508,27 @@
 				}, false);
 				
 		}
+		
+		var old_back = mui.back;
+		mui.back = function(){
+	    	if(!mainHtml){
+				mainHtml= plus.webview.getWebviewById("main");
+			}
+			mui.fire(mainHtml,'show',{
+			});
+			mui.openWindow({
+				id: 'main',
+				url:'../main.html',
+				show: {
+					aniShow: 'pop-in-left'
+				},
+				styles: {
+					popGesture: 'hide'
+				},
+				waiting: {
+					autoShow: false
+				}
+			});
+		}
 	</script>
 </html>

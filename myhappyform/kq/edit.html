@@ -104,12 +104,17 @@
 			var listHtml=null;
 			var workdate;
 			var departmentname;
+			var departmentDownListArr;
 			mui.init();
 			mui.plusReady(function(){
+				state=app.getState();
 				//初始化日期		
 				initDateData();
 				//保存按钮
 				initSaveButtonData();
+				// 查询部门信息
+				queryDepartDownList();
+				
 			});
 			//添加newId自定义事件监听
 			window.addEventListener('editId',function(event){
@@ -237,6 +242,34 @@
 						
 					}, false);
 			}
+			function queryDepartDownList(){
+				mui.ajax({
+		            url      : app.getRequestUrl()+'/jlDepartmentInfoAction_getDep',
+		            type     : 'post',
+		            dataType:'json',//服务器返回json格式数据
+		            data:{ 
+					    id:currentId,
+					    loginId:state.id,
+						isAdmin:state.isAdmin
+					},
+					beforeSend: function() {
+				    },
+				    complete: function() {
+				    },
+		            success  : function(data){
+						departmentDownListArr=new Array();
+						for(var m=0;m<data.length;m++){
+							var obj={};
+							obj.text=data[m].name;
+							obj.value=data[m].code;
+							departmentDownListArr.push(obj);
+						}
+		            },
+		            error    : function(xhr,type,errorThrown){
+		                mui.toast(type);
+		            }
+		        	});
+			}
 			function initDepartmentData(){
 				departmentname=document.getElementById("departmentname");
 				departmentname.addEventListener('tap', function() {
@@ -250,64 +283,28 @@
 						});
 					} else {
 						_self.picker = new mui.PopPicker();
-						_self.picker.setData([{
-							    value: "HTGD",
-							    text: "海通工地"
-							}, {
-							    value: "HXGD",
-							    text: "海新工地"
-							}, {
-							    value: "ZSGD",
-							    text: "招商工地"
-							}, {
-							    value: "YZCBJJ",
-							    text: "远舟船舶家俱"
-							}, {
-							    value: "ZS",
-							    text: "舟山"
-							}, {
-							    value: "DJZG",
-							    text: "大津重工"
-							}, {
-							    value: "ZH",
-							    text: "启东振华"
-							}]
-						);
+						_self.picker.setData(departmentDownListArr);
 						var dc=getCV('departmentcode').value;
 						_self.picker.pickers[0].setSelectedValue(dc, 2000);
 						_self.picker.show(function(rs) {
 							departmentname.value=rs[0].text;
 							document.getElementById("departmentcode").value=rs[0].value;
 						});
-					}		
-					
+					}	
+					var dc=getCV('departmentcode').value;
+					if(dc!=''){
+						_self.picker.pickers[0].setSelectedValue(dc, 2000);
+					}
 				}, false);
 			}
 			function initSaveButtonData(){
 				var cancelbutton=document.getElementById("cancelButton");
 				cancelbutton.addEventListener('tap', function(){
-					if(!listHtml){
-					    listHtml = plus.webview.getWebviewById('kq_list');
-					}
-					mui.fire(listHtml,'listHtml',{
-						//userid:app.getState().id
-					});
-					mui.openWindow({
-					    id:'kq_list'
-					});
+					jumpPage();
 				}, false);
 				var backbutton=document.getElementById("backList1");
 				backbutton.addEventListener('tap', function(){
-//					console.log(">>>>>>新增返回列表");
-					if(!listHtml){
-					    listHtml = plus.webview.getWebviewById('kq_list');
-					}
-					mui.fire(listHtml,'listHtml',{
-						//userid:app.getState().id
-					});
-					mui.openWindow({
-					    id:'kq_list'
-					});
+					jumpPage();
 				}, false);
 				
 				var saveButton =document.getElementById("saveButton");
@@ -365,32 +362,17 @@
 						    },
 				            success  : function(data){
 				            	if(data.msg){
-				            		
-				            		if(!listHtml){
-									    listHtml = plus.webview.getWebviewById('kq_list');
-									}
-									mui.fire(listHtml,'listHtml',{
-										//userid:app.getState().id
-									});
-									mui.openWindow({
-									    id:'kq_list'
-									});
-				            		
-//				            		mui.openWindow({
-//										id: 'kq_list',
-//										url:'list.html',
-//										show: {
-//											aniShow: 'pop-in'
-//										},
-//										styles: {
-//											popGesture: 'hide'
-//										},
-//										
-//										waiting: {
-//											autoShow: false
-//										}
-//										
+				            		jumpPage();
+//				            		if(!listHtml){
+//									    listHtml = plus.webview.getWebviewById('kq_list');
+//									}
+//									mui.fire(listHtml,'listHtml',{
+//										//userid:app.getState().id
 //									});
+//									mui.openWindow({
+//									    id:'kq_list'
+//									});
+				            		
 				            	}else{
 				            		mui.toast("保存失败");
 				            	}
@@ -404,6 +386,21 @@
 			}
 			function getCV(id){
 				return document.getElementById(id);
+			}
+			function jumpPage(){
+				if(!listHtml){
+				    listHtml = plus.webview.getWebviewById('kq_list');
+				}
+				mui.fire(listHtml,'listHtml',{
+					
+				});
+				mui.openWindow({
+				    id:'kq_list'
+				});
+			}
+			var old_back = mui.back;
+			mui.back = function(){
+		    	jumpPage();
 			}
 		</script>
 	</body>

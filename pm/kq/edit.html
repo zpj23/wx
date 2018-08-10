@@ -225,11 +225,8 @@
 				isPayName=document.getElementById("isPayName");
 				isPayName.addEventListener('tap', function() {
 					var _self = this;
-					var dc=getCV('isPayCode').value;
+					
 					if(_self.picker) {
-						if(dc!=''){
-							_self.picker.pickers[0].setSelectedValue(dc, 2000);
-						}
 						_self.picker.show(function (rs) {
 							isPayName.value=rs[0].text;
 							document.getElementById("isPayCode").value=rs[0].value;
@@ -246,16 +243,16 @@
 							    text: "已付款"
 							}]
 						);
-						if(dc!=''){
-							_self.picker.pickers[0].setSelectedValue(dc, 2000);
-						}
 						_self.picker.show(function(rs) {
 							isPayName.value=rs[0].text;
 							document.getElementById("isPayCode").value=rs[0].value;
 							
 						});
 					}		
-					
+					var dc=getCV('isPayCode').value;
+					if(dc!=''){
+						_self.picker.pickers[0].setSelectedValue(dc, 2000);
+					}
 				}, false);
 			}
 			function initSaveButtonData(){
