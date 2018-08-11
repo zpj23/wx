@@ -33,7 +33,7 @@
 	<body>
 		<header class="mui-bar mui-bar-nav">
 			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
-			<h1 class="mui-title">商品分类</h1>
+			<h1 class="mui-title">商品展示</h1>
 		</header>
 		<div class="mui-content mui-row mui-fullscreen">
 			<div class="mui-col-xs-4">
@@ -52,17 +52,13 @@
 		<script src="../js/mui.min.js"></script>
 		<script src="../js/app.js"></script>
 		<script>
-			var nextHtml=null;
 			mui.init({
 				swipeBack: true //启用右滑关闭功能
 			});
 			
 			mui.plusReady(function(){
 				state=app.getState();
-				nextHtml=mui.preload({
-						id:'next_list',
-						url:'list_second.html'
-					});
+				//initButtonData();
 			});
 			
 			window.addEventListener('dictionaryList',function(event){
@@ -73,7 +69,7 @@
 				var contents = document.getElementById("segmentedControlContents");
 				var html = [];
 				mui.ajax({
-				            url      : app.getRequestUrl()+'/vue/dictionary/getFirstType',
+				            url      : app.getRequestUrl()+'/vue/dictionary/getThirdType',
 				            type     : 'post',
 				            dataType:'json',//服务器返回json格式数据
 				            data:{
@@ -86,41 +82,43 @@
 						    },
 				            success  : function(data){
 				            	if(data.code){
-				            		var firstArr=data.data.first;
-				            		var secondArr=data.data.second;
-				            		for(var i=0;i<firstArr.length;i++){
-				            			html.push('<a class="mui-control-item" href="#content_' + firstArr[i].value + '">' + firstArr[i].text + '</a>');
+				            		var thirdArr=data.data.third;
+				            		var goodsArr=data.data.goodslist;
+				            		for(var i=0;i<thirdArr.length;i++){
+				            			html.push('<a class="mui-control-item" href="#content_' + thirdArr[i].value + '">' + thirdArr[i].text + '</a>');
 				            		}
 				            		controls.innerHTML = html.join('');
 				            		html = [];
 				            		
-									for (i = 0; i < firstArr.length; i++) {
-										html.push('<div id="content_' + firstArr[i].value + '" class="mui-control-content"><ul class="mui-table-view mui-table-view-striped mui-table-view-condensed"  >');
+									for (i = 0; i < thirdArr.length; i++) {
+										html.push('<div id="content_' + thirdArr[i].value + '" class="mui-control-content"><ul class="mui-table-view mui-table-view-striped mui-table-view-condensed">');
 										var count=0;
-										for (j = 0; j < secondArr.length; j++) {
-											var gt=secondArr[j].pvalue;
-											if(gt.indexOf(firstArr[i].value)>-1){
+										for (j = 0; j < goodsArr.length; j++) {
+											var gt=goodsArr[j].goodsType;
+											if(gt.indexOf(thirdArr[i].value)>-1){
 												count++;
 												var listStr='';
-												listStr+='<div class="mui-slider-handle" >';
-												listStr+='<div class="mui-table" >';
+												listStr+='<div class="mui-slider-handle">';
+												listStr+='<div class="mui-table">';
 												listStr+='<div class="mui-table-cell mui-col-xs-12">';
-												listStr+='<h4 class="mui-ellipsis" >'+secondArr[j].text+'</h4>';
-												listStr+='<p class="mui-h6 mui-ellipsis">'+secondArr[j].value+'</p>';
+												listStr+='<h4 class="mui-ellipsis" >'+goodsArr[j].name+'</h4>';
+												listStr+='<p class="mui-h6 mui-ellipsis">供货商：'+goodsArr[j].supplierName+'</p>';
 												listStr+='</div>';
 												listStr+='<div class="mui-table-cell mui-col-xs-5 mui-text-center">';
-												listStr+='<span class="mui-h5" ></span>';
+												listStr+='<span class="mui-h5" >'+goodsArr[j].sellingPrice+'元</span>';
 												listStr+='</div>';
 												listStr+='<div class="mui-table-cell mui-col-xs-1 mui-text-right"><span class="mui-badge">'+count+'</span></div>';
 												listStr+='</div>';
 												listStr+='</div>';
-												html.push('<li class="mui-table-view-cell test" id="id_'+secondArr[j].value+'" name="'+secondArr[j].value+'">' +listStr+ '</li>');
+												
+												html.push('<li class="mui-table-view-cell">' +listStr+ '</li>');
 											}
 											
 										}
 										html.push('</ul></div>');
 									}
 									contents.innerHTML = html.join('');
+									
 									//默认选中第一个
 									controls.querySelector('.mui-control-item').classList.add('mui-active');
 									contents.querySelector('.mui-control-content').classList.add('mui-active');
@@ -134,22 +132,7 @@
 				            }
 				        });
 			}
-			
-			mui('#segmentedControlContents').on('tap', '.test', function(event) {
-							var cid = this.id;
-							cid=cid.split("_")[1];
-							if(!nextHtml){
-							    nextHtml = plus.webview.getWebviewById('next_list');
-							}
-							mui.fire(nextHtml,'nextList',{
-								code:cid
-							});
-							mui.openWindow({
-							    id:'next_list'
-							});
-							
-						});
-			
+
 		</script>
 
 	</body>
