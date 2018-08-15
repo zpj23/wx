@@ -18,9 +18,6 @@
 		if (loginInfo.password.length < 1) {
 			return callback('密码不能为空');
 		}
-		
-//		console.log('username='+loginInfo.account+"&password="+loginInfo.password);
-//		console.log(owner.getRequestUrl()+'/jlLoginAction_loginByPhone');
 		var authed;
 		mui.ajax({
 					type:'POST',
@@ -40,8 +37,6 @@
 						if(data.msg){
 							authed=true; 
 						}
-						//mui.toast(str);
-//						console.log(str);
 						if (authed) {
 							return owner.createState(data.data, callback);
 						} else {
@@ -58,17 +53,7 @@
 							
 							
 				});
-//		var users = JSON.parse(localStorage.getItem('$users') || '[]');
-//		var authed = users.some(function(user) {
-//			return loginInfo.account == user.account && loginInfo.password == user.password;
-//		});
-//		if (authed) {
-//			return owner.createState(loginInfo.account, callback);
-//		} else {
-//			return callback('用户名或密码错误');
-//		}
 	};
-
 	owner.createState = function(data, callback) {
 		var state = owner.getState();
 		state.account = data.username;
@@ -149,8 +134,6 @@
 	 **/
 	owner.setSettings = function(settings) {
 		settings = settings || {};
-//		var str=JSON.stringify(settings);
-//		console.log(str);
 		localStorage.setItem('$settings', JSON.stringify(settings));
 	}
 

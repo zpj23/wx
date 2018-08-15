@@ -104,7 +104,7 @@
 			var listHtml=null;
 			var workdate;
 			var departmentname;
-			var departmentDownListArr;
+			var departmentDownListArr=null;
 			mui.init();
 			mui.plusReady(function(){
 				state=app.getState();
@@ -112,8 +112,6 @@
 				initDateData();
 				//保存按钮
 				initSaveButtonData();
-				// 查询部门信息
-				queryDepartDownList();
 				
 			});
 			//添加newId自定义事件监听
@@ -121,6 +119,7 @@
 			  //获得事件参数
 			  	currentId = event.detail.id;
 			  	state=app.getState();
+				queryDepartDownList();
 				initData();
 				
 			});
@@ -172,7 +171,7 @@
 							
 		            },
 		            error    : function(xhr,type,errorThrown){
-		                mui.toast(type);
+		                mui.toast(type+">>>>>>kq/edit.html");
 		            }
 		        	});
 				}else{
@@ -243,14 +242,12 @@
 					}, false);
 			}
 			function queryDepartDownList(){
-				mui.ajax({
+				if(departmentDownListArr==null){
+					mui.ajax({
 		            url      : app.getRequestUrl()+'/jlDepartmentInfoAction_getDep',
 		            type     : 'post',
 		            dataType:'json',//服务器返回json格式数据
 		            data:{ 
-					    id:currentId,
-					    loginId:state.id,
-						isAdmin:state.isAdmin
 					},
 					beforeSend: function() {
 				    },
@@ -266,9 +263,11 @@
 						}
 		            },
 		            error    : function(xhr,type,errorThrown){
-		                mui.toast(type);
+		                mui.toast(type+">>>>>>kq/edit.html");
 		            }
 		        	});
+				}
+				
 			}
 			function initDepartmentData(){
 				departmentname=document.getElementById("departmentname");
@@ -363,23 +362,13 @@
 				            success  : function(data){
 				            	if(data.msg){
 				            		jumpPage();
-//				            		if(!listHtml){
-//									    listHtml = plus.webview.getWebviewById('kq_list');
-//									}
-//									mui.fire(listHtml,'listHtml',{
-//										//userid:app.getState().id
-//									});
-//									mui.openWindow({
-//									    id:'kq_list'
-//									});
-				            		
 				            	}else{
 				            		mui.toast("保存失败");
 				            	}
 									
 				            },
 				            error    : function(xhr,type,errorThrown){
-				                mui.toast(type);
+				                mui.toast(type+">>>>>>kq/edit.html");
 				            }
 				        });
 					}, false);
@@ -392,15 +381,11 @@
 				    listHtml = plus.webview.getWebviewById('kq_list');
 				}
 				mui.fire(listHtml,'listHtml',{
-					
+					mode:'edit'
 				});
 				mui.openWindow({
 				    id:'kq_list'
 				});
-			}
-			var old_back = mui.back;
-			mui.back = function(){
-		    	jumpPage();
 			}
 		</script>
 	</body>

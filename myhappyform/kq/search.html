@@ -63,27 +63,13 @@
 		<script type="text/javascript">
 			var state=app.getState();
 			var listHtml=null;
+			var departmentDownListArr=null;
 			mui.init();
 			mui.plusReady(function(){
 				initButtons();
 			});
 			window.addEventListener('searchHtml',function(event){
-//				startdate=event.detail.startdate;
-//			    enddate=event.detail.enddate;
-//			    staffname=event.detail.staffname;
-//			    departmentcode=event.detail.departmentcode;
-//			    if(typeof(startdate)=="undefined"){
-//					startdate="";
-//				}
-//				if(typeof(enddate)=="undefined"){
-//					enddate="";
-//				}
-//				if(typeof(staffname)=="undefined"){
-//					staffname="";
-//				}
-//				if(typeof(departmentcode)=="undefined"){
-//					departmentcode="";
-//				}
+				queryDepartDownList();
 			});
 			function initButtons(){
 				var startdate=document.getElementById("startdate");
@@ -161,32 +147,9 @@
 				var departmentname=document.getElementById("departmentname");
 				departmentname.addEventListener('tap', function() {
 					 var picker = new mui.PopPicker();
-					 picker.setData([{
-					    value: "HTGD",
-					    text: "海通工地"
-					}, {
-					    value: "HXGD",
-					    text: "海新工地"
-					}, {
-					    value: "ZSGD",
-					    text: "招商工地"
-					}, {
-					    value: "YZCBJJ",
-					    text: "远舟船舶家俱"
-					}, {
-					    value: "ZS",
-					    text: "舟山"
-					}, {
-					    value: "DJZG",
-					    text: "大津重工"
-					}, {
-					    value: "ZH",
-					    text: "启动振华"
-					}]);
+					 picker.setData(departmentDownListArr);
 					picker.show(function(rs) {
 						departmentname.value=rs[0].text;
-	//						var str=JSON.stringify(rs);
-	//						console.log(str);
 						document.getElementById("departmentcode").value=rs[0].value;
 					});
 				}, false);
@@ -196,7 +159,7 @@
 					    listHtml = plus.webview.getWebviewById('kq_list');
 					}
 					mui.fire(listHtml,'listHtml',{
-						//userid:app.getState().id
+						mode:'searchBack'
 					});
 					mui.openWindow({
 					    id:'kq_list'
@@ -218,6 +181,7 @@
 					    listHtml = plus.webview.getWebviewById('kq_list');
 					}
 					mui.fire(listHtml,'listHtml',{
+						mode:'search',
 						startdate:getCV('startdate').value,
 					    enddate:getCV('enddate').value,
 					    staffname:getCV('staffname').value,
@@ -233,7 +197,46 @@
 				}, false);
 				
 			};
+			var old_back = mui.back;
+			mui.back = function(){
+		    	if(!listHtml){
+				    listHtml = plus.webview.getWebviewById('kq_list');
+				}
+				mui.fire(listHtml,'listHtml',{
+					mode:'searchBack',
+				});
+				mui.openWindow({
+				    id:'kq_list'
+				});
+			}
 			
+			function queryDepartDownList(){
+				if(departmentDownListArr==null){
+					mui.ajax({
+			            url      : app.getRequestUrl()+'/jlDepartmentInfoAction_getDep',
+			            type     : 'post',
+			            dataType:'json',//服务器返回json格式数据
+			            data:{ 
+						},
+						beforeSend: function() {
+					    },
+					    complete: function() {
+					    },
+			            success  : function(data){
+							departmentDownListArr=new Array();
+							for(var m=0;m<data.length;m++){
+								var obj={};
+								obj.text=data[m].name;
+								obj.value=data[m].code;
+								departmentDownListArr.push(obj);
+							}
+			            },
+			            error    : function(xhr,type,errorThrown){
+			                mui.toast(type+">>>>>>kq/search.html");
+			            }
+		        	});
+		        }	
+			}
 			
 			function getCV(id){
 				return document.getElementById(id);

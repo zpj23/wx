@@ -75,6 +75,7 @@
 				window.addEventListener('show', function() {
 					state = app.getState();
 					initNum();
+					
 				}, false);
 				
 				function initNum(){
@@ -95,7 +96,7 @@
 				            	}
 				            },
 				            error    : function(xhr,type,errorThrown){
-				                $.toast(type);
+				                $.toast(type+">>>>>>kq/main.html");
 				            }
 				        });
 				}
@@ -111,6 +112,7 @@
 //				}
 				
 				$.plusReady(function() { 
+					state = app.getState();
 					listHtml=$.preload({
 							id: 'kq_list',
 							url: 'kq/list.html'
@@ -121,7 +123,7 @@
 						    listHtml = plus.webview.getWebviewById('kq_list');
 						}
 						mui.fire(listHtml,'listHtml',{
-//							userid:app.getState().id
+							mode:'main'
 						});
 						mui.openWindow({
 						    id:'kq_list'
@@ -142,11 +144,16 @@
 								    loginId:state.id,
 									isAdmin:state.isAdmin
 								},
+//								beforeSend: function() {
+//							        plus.nativeUI.showWaiting("检测更新中...", null);
+//							    },
+//							    complete: function() {
+//							        plus.nativeUI.closeWaiting();
+//							    },
 					            success  : function(data){
 					            	if(data.msg){
-//					            		$.toast("有新版本，请尽早更新，当前版本仍然可用");
 					            		downLoadInfo=data;
-					            		console.log(downLoadInfo.filename);
+//					            		console.log(downLoadInfo.filename);
 					            		var btnArray = ['否', '是']; //弹框消息确认是否开始下载
 					                    mui.confirm('有新的版本，请及时更新,当前版本仍然可用，是否开始下载新版本？', '版本提示', btnArray, function(e) {
 					                        if(e.index == 1) { //开始下载
@@ -160,7 +167,7 @@
 					            	}
 					            },
 					            error    : function(xhr,type,errorThrown){
-					                $.toast(type);
+					                $.toast(type+">>>>>>kq/main.html");
 					            }
 					        });
 						
@@ -186,6 +193,7 @@
 								                dirEntry.removeRecursively(function() {
 								                    plus.nativeUI.toast("缓存清空成功！");
 								                    downloadflag=false;
+								                    dtask=null;
 //								                    console.log('Directory successufully removed.');
 								                }, function(e){
 //								                    plus.nativeUI.toast("缓存清空失败！"+e.message);
@@ -224,14 +232,20 @@
 				        dtask.addEventListener("statechanged",function(task,status){
 				            if(!dtask){return;}
 				            switch(task.state){
-				                case 1: $.toast('开始下载...');break;//开始
-				                case 2: $.toast('链接到服务器...');break;//链接到服务器
+				                case 1: 
+				                	$.toast('开始下载...');
+				                	
+				                	break;//开始
+				                case 2: $.toast('链接到服务器...');
+				                	plus.nativeUI.showWaiting("下载中......", null);
+				                	break;//链接到服务器
 				                case 3:
 				                    var progressVal = (task.downloadedSize/task.totalSize)*100;
 				                        $('#bar').progressbar({progress:progressVal}).show();
 				                    break;
 				                case 4: 
 				                	$.toast('下载完成');
+				                	plus.nativeUI.closeWaiting();
 				                	downloadflag=true;
 				                	var btnArray = ['否', '是']; //弹框消息确认是否打开文件
 				                    mui.confirm('是否安装新版本？', '下载成功', btnArray, function(e) {

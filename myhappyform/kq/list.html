@@ -268,7 +268,7 @@
 				            	}
 				            },
 				            error    : function(xhr,type,errorThrown){
-				                mui.toast(type);
+				                mui.toast(type+">>>>>>kq/list.html");
 				            }
 				        });
 					});
@@ -295,7 +295,7 @@
 				            	}
 				            },
 				            error    : function(xhr,type,errorThrown){
-				                mui.toast(type);
+				                mui.toast(type+">>>>>>kq/list.html");
 				            }
 				        });
 					});
@@ -363,7 +363,7 @@
 						            	}
 						            },
 						            error    : function(xhr,type,errorThrown){
-						                mui.toast(type);
+						                mui.toast(type+">>>>>>kq/list.html");
 						            }
 						        });
 								
@@ -382,22 +382,31 @@
 		}
 		
 		window.addEventListener('listHtml',function(event){
-			//关闭等待框
-//		    plus.nativeUI.closeWaiting();
-//		    //显示当前页面
-//		    mui.currentWebview.show();
 			state=app.getState();
-			currentPage=1;
+			var mode=event.detail.mode;
+			if(mode=="edit"){
+				currentPage=1;
+			}else if(mode=="main"){
+				currentPage=1;
+				startdate="";
+			    enddate="";
+			    staffname="";
+			    departmentcode="";
+				isshenhe="";
+			}else if(mode=="view"){
+				
+			}else if(mode=="searchBack"){
+				
+			}else if(mode=="search"){
+				currentPage=1;
+				startdate=event.detail.startdate;
+			    enddate=event.detail.enddate;
+			    staffname=event.detail.staffname;
+			    departmentcode=event.detail.departmentcode;
+				isshenhe=event.detail.shenhe;
+			}
 			//初始化
-			startdate=event.detail.startdate;
-		    enddate=event.detail.enddate;
-		    staffname=event.detail.staffname;
-		    departmentcode=event.detail.departmentcode;
-			isshenhe=event.detail.shenhe;
 			initData();
-			
-			
-			
 			
 //			setTimeout(function(){
 //				var array = plus.webview.all();
@@ -409,9 +418,6 @@
 //			},5000);
 			
 		});
-		
-//		window.addEventListener('listHtml',function(event){
-//		});	
 			
 		function  initButtons(){
 			var add = document.getElementById("kq_add");
