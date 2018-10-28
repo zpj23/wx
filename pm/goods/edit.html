@@ -21,22 +21,22 @@
 					<div class="mui-card-content">
 					    <div class="mui-input-row">
 					        <label>商品名称:</label>
-					   	<input type="text"  id="name"  class="mui-input-clear"  placeholder="商品名称" /> 
+					   	<input type="text"  id="name"  class="mui-input-clear"  placeholder="名称" /> 
 					    </div>
 						<div class="mui-input-row">
 					        <label>规格:</label>
-					    	<input type="text" id="type" class="mui-input-clear" placeholder="规格">
+					    	<input type="text" id="type" class="mui-input-clear" placeholder="尺寸，大小">
 					    </div>
 					    <div class="mui-input-row">
-					        <label>型号:</label>
-					    	<input type="text" id="unit" class="mui-input-clear" placeholder="型号">
+					        <label>单位:</label>
+					    	<input type="text" id="unit" class="mui-input-clear" placeholder="台,箱,袋,把,盒等">
 					    </div>
 					    <div class="mui-input-row">
 					        <label>进价:</label>
 					    	<div class="mui-numbox">
 							  <!-- "-"按钮，点击可减小当前数值 -->
 							  <button class="mui-btn mui-numbox-btn-minus" type="button">-</button>
-							  <input class="mui-numbox-input" id="purchasePrice" type="number" value="0" />
+							  <input class="mui-numbox-input" id="purchasePrice" type="number" value="0"  />
 							  <!-- "+"按钮，点击可增大当前数值 -->
 							  <button class="mui-btn mui-numbox-btn-plus" type="button">+</button>
 							</div>
@@ -160,6 +160,7 @@
 		            }
 		        	});
 				}else{
+					getCV('id').value='';
 					getCV('name').value='';
 			    	getCV('type').value='';
 			    	getCV('unit').value='';
