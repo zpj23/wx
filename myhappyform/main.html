@@ -29,7 +29,7 @@
 		            <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3"><a href="#" id="user_manager">
 		                    <span class="mui-icon mui-icon-home" id="shenhecount"></span>
 		                    <div class="mui-media-body">考勤管理</div></a></li>
-		            <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3"><a href="#">
+		            <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3"><a href="#" id="xlcd">
 		                    <span class="mui-icon mui-icon-email"></span>
 		                    <div class="mui-media-body">角色管理</div></a></li>
 		            <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3"><a href="#">
@@ -66,6 +66,7 @@
 		<script>
 			var listHtml=null;
 			var mapHtml=null;
+			var xlcdHtml=null;
 			var state=null;
 			var downLoadInfo=null;
 			(function($, doc) {
@@ -118,10 +119,11 @@
 							id: 'kq_list',
 							url: 'kq/list.html'
 					});
-//					mapHtml=$.preload({
-//							id: 'map_list',
-//							url: 'mapInfo.html'
+//					xlcdHtml=$.preload({
+//						id: 'xlcd_id',
+//							url: 'test/pullrefresh.html'
 //					});
+//					
 					var usermanageButton = doc.getElementById('user_manager');
 					usermanageButton.addEventListener('tap', function(event) {
 						if(!listHtml){
@@ -135,7 +137,20 @@
 						});
 						
 					});
-					
+					//测试下拉菜单
+//					var xlcd = doc.getElementById('xlcd');
+//					xlcd.addEventListener('tap', function(event) {
+//						if(!xlcdHtml){
+//						    xlcdHtml = plus.webview.getWebviewById('xlcd_id');
+//						}
+//						mui.fire(listHtml,'xlcd',{
+//							mode:'main'
+//						});
+//						mui.openWindow({
+//						    id:'xlcd_id'
+//						});
+//						
+//					});
 					
 					var mapButton=doc.getElementById("mapInfo");
 					mapButton.addEventListener('tap',function(event){

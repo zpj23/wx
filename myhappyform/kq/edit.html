@@ -13,7 +13,7 @@
 	<body>
 		<header class="mui-bar mui-bar-nav">
 		    <a class="mui-icon mui-icon-left-nav mui-pull-left" id="backList1"></a>
-		    <h1 class="mui-title">新增数据</h1>
+		    <h1 class="mui-title">新增考勤</h1>
 		</header>
 		<div class="mui-content">
 			<form class="mui-input-group ">
@@ -90,7 +90,7 @@
 			    <div class="mui-button-row">
 			    	<input type="hidden" id="id" value="" />
 			        <button type="button" id="saveButton" class="mui-btn mui-btn-primary" >确认</button>
-			        <button type="button" class="mui-btn mui-btn-danger " id="cancelButton">取消</button>
+                <!--   <button type="button" class="mui-btn mui-btn-danger " id="cancelButton">取消</button>--> 
 			    </div>
 			</form>
 			
@@ -297,10 +297,10 @@
 				}, false);
 			}
 			function initSaveButtonData(){
-				var cancelbutton=document.getElementById("cancelButton");
-				cancelbutton.addEventListener('tap', function(){
-					jumpPage();
-				}, false);
+//				var cancelbutton=document.getElementById("cancelButton");
+//				cancelbutton.addEventListener('tap', function(){
+//					jumpPage();
+//				}, false);
 				var backbutton=document.getElementById("backList1");
 				backbutton.addEventListener('tap', function(){
 					jumpPage();
@@ -361,7 +361,7 @@
 						    },
 				            success  : function(data){
 				            	if(data.msg){
-				            		jumpPage();
+				            		saveJumpPage();
 				            	}else{
 				            		mui.toast("保存失败");
 				            	}
@@ -377,6 +377,17 @@
 				return document.getElementById(id);
 			}
 			function jumpPage(){
+				if(!listHtml){
+				    listHtml = plus.webview.getWebviewById('kq_list');
+				}
+				mui.fire(listHtml,'listHtml',{
+					mode:'editBack'
+				});
+				mui.openWindow({
+				    id:'kq_list'
+				});
+			}
+			function saveJumpPage(){
 				if(!listHtml){
 				    listHtml = plus.webview.getWebviewById('kq_list');
 				}

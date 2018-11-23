@@ -36,29 +36,60 @@
 		<header class="mui-bar mui-bar-nav">
 		    <!--<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left" ></a>-->
 		    <button id='mainPage' class=" mui-pull-left mui-btn-link">主页</button>
-		    <h1 class="mui-title">考勤列表</h1>
+		    <h1 class="mui-title">数据列表</h1>
 		    <button id='kq_add' class=" mui-pull-right mui-btn-link">新增</button>
 		</header>
 		<div class="mui-content">
-			<div class="mui-content-padded" style="height: 30px;">
+			<div class="mui-content-padded">
 				<div class="mui-input-row mui-search" >
 					<input type="search" class="mui-input-clear"  readonly="readonly" placeholder="" id="kq_search_list" />
 				</div>
 				
 			</div>
-			<div class="mui-content-padded"  >
-				<div style="margin-left:150px;margin-top:0px;">
-					<span class="mui-badge mui-badge-inverted">当前显示</span>
+			
+			<div class="mui-content-padded">
+				<ul class="mui-pager">
+					<li class="mui-previous">
+						<a href="#" id="lastPage">
+							上一页
+						</a>
+					</li>
+					<span class="mui-badge mui-badge-inverted">当前第</span>
 					<span class="mui-badge mui-badge-inverted" id="jb_cpage"></span>
-					<span class="mui-badge mui-badge-inverted">条，共</span>
+					<span class="mui-badge mui-badge-inverted">页共</span>
 					<span class="mui-badge mui-badge-inverted" id="jb_tpage"></span>
-					<span class="mui-badge mui-badge-inverted">条</span>
-				</div>
+					<span class="mui-badge mui-badge-inverted">页</span>
+					
+					<li class="mui-next">
+						<a href="#" id="nextPage">
+							下一页
+						</a>
+					</li>
+				</ul>
 			</div>
 			
 			<div class="mui-content-padded" id="myList">
-				<ul class="mui-table-view mui-table-view-striped mui-table-view-condensed" id="OA_task_1">
-				</ul>	
+		    <!--<ul class="mui-table-view mui-table-view-striped mui-table-view-condensed">
+		        <li class="mui-table-view-cell">
+		        	<div class="mui-slider-right mui-disabled">
+						<a class="mui-btn mui-btn-blue">修改</a>
+						<a class="mui-btn mui-btn-red">删除</a>
+					</div>
+					<div class="mui-slider-handle">
+			            <div class="mui-table">
+			                <div class="mui-table-cell mui-col-xs-10">
+			                    <h4 class="mui-ellipsis">信息化推进办公室张彦合同付款信息化</h4>
+			                    <h5>申请人：李四</h5>
+			                    <p class="mui-h6 mui-ellipsis">Hi，李明明，申请交行信息卡，100元等你拿，李明明，申请交行信息卡，100元等你拿，</p>
+			                </div>
+			                <div class="mui-table-cell mui-col-xs-2 mui-text-right">
+			                    <span class="mui-h5">12:25</span>
+			                </div>
+			            </div>
+		            </div>
+		        </li>
+		        
+		    </ul>-->
 		    </div>
 		    
 		    
@@ -82,20 +113,7 @@
 	    var departmentcode="";
 		var isshenhe="";
 		
-		mui.init({
-				pullRefresh: {
-					container: '#myList',
-					down: {
-						style:'circle',
-						callback: pulldownRefresh
-					},
-					up: {
-						auto:true,
-						contentrefresh: '正在加载...',
-						callback: pullupRefresh
-					}
-				}
-			});
+		mui.init();
 		mui.plusReady(function(){
 			currentPage=1;
 			//初始化按钮
@@ -114,38 +132,6 @@
 			});	
 			
 		});
-		//往上拉
-		function pullupRefresh() {
-				setTimeout(function() {
-					if(currentPage==1&&totalPage==0){
-						mui('#myList').pullRefresh().endPullup(false); //继续加载
-					}else{
-						if(currentPage>totalPage){
-							mui('#myList').pullRefresh().endPullup(true); //参数为true代表没有更多数据了。
-						}else{
-							mui('#myList').pullRefresh().endPullup(false); //继续加载
-							currentPage++;
-							initData();
-						}
-					}
-					
-					
-					
-				}, 1500);
-			}
-			/**
-			 * 往下拉加载最新数据
-			 */
-			function pulldownRefresh() {
-				setTimeout(function() {
-					currentPage=1;
-					var obj=document.getElementById("OA_task_1");
-					obj.innerHTML="";
-					initData();
-					mui('#myList').pullRefresh().endPulldown();
-				}, 1500);
-			}
-		
 		//初始化数据
 		function initData(){
 			
@@ -182,28 +168,36 @@
 				},
 				async:false,
 				beforeSend: function() {
-//			        plus.nativeUI.showWaiting("加载中...", null);
+			        plus.nativeUI.showWaiting("加载中...", null);
 			    },
 			    complete: function() {
-//			        plus.nativeUI.closeWaiting();
+			        plus.nativeUI.closeWaiting();
 			    },
 	            success: function(data){
 //	            	var str=JSON.stringify(data);
 //	            	console.log(str);
 	            	totalPage =data.totalpage;
-					document.getElementById("jb_cpage").innerHTML=currentPage*pagerow;
-	            	document.getElementById("jb_tpage").innerHTML=data.count;
+	            	document.getElementById("jb_cpage").innerHTML=currentPage;
+	            	document.getElementById("jb_tpage").innerHTML=totalPage;
 	            	
+	            	myList = document.getElementById("myList");
+	            	var listStr='';
 	            	var arr=new Array();
 	            	arr=data.list;
-	            	var ulObj = document.body.querySelector('#OA_task_1');
+	            	listStr+='<ul class="mui-table-view mui-table-view-striped mui-table-view-condensed" id="OA_task_1">';
 	            	for(var m=0;m<arr.length;m++){
-	            		var listStr='';
 	            		var colorStr="red";
 	            		if(arr[m].shenhe=="1"){
 	            			colorStr="green";
+//	            			if(state.isAdmin=="1"){
+//	            				colorStr="black";
+//	            			}else{
+//	            				colorStr="grey";
+//	            			}
+	            			
 	            		}
 	            		
+						listStr+='<li class="mui-table-view-cell" >';
 						if(arr[m].shenhe=="0"){
 							listStr+='<div class="mui-slider-right mui-disabled">';
 							if(state.isAdmin=="1"){
@@ -248,15 +242,9 @@
 						listStr+='</div>';
 						listStr+='</li>';
 						
-						var li = document.createElement('li');
-	            		li.className = 'mui-table-view-cell';
-	            		li.innerHTML=listStr;
-	            		ulObj.appendChild(li);
-	            		
 	            	}
-	            	//新增或者编辑时查询此时已加载的数据查询完毕后重新置成15
-	            	pagerow=15;
-	            	
+	            	listStr+='</ul>';
+	            	myList.innerHTML=listStr;
 	            	//复制当前记录
 	            	mui('#OA_task_1').on('tap', '.copykq', function(event) {
 						var elem = this;
@@ -397,13 +385,7 @@
 			state=app.getState();
 			var mode=event.detail.mode;
 			if(mode=="edit"){
-				if(currentPage!=1){
-					pagerow=currentPage*pagerow;
-				}
 				currentPage=1;
-				document.getElementById("OA_task_1").innerHTML="";
-				//初始化数据
-				initData();
 			}else if(mode=="main"){
 				currentPage=1;
 				startdate="";
@@ -411,23 +393,29 @@
 			    staffname="";
 			    departmentcode="";
 				isshenhe="";
-				document.getElementById("OA_task_1").innerHTML="";
-				//初始化数据
-				initData();
-			}else if(mode=="editBack"||mode=="view"||mode=="searchBack"){
-				//点击返回不用任何操作
+			}else if(mode=="view"){
+				
+			}else if(mode=="searchBack"){
+				
 			}else if(mode=="search"){
 				currentPage=1;
-				document.getElementById("OA_task_1").innerHTML="";
 				startdate=event.detail.startdate;
 			    enddate=event.detail.enddate;
 			    staffname=event.detail.staffname;
 			    departmentcode=event.detail.departmentcode;
 				isshenhe=event.detail.shenhe;
-				//初始化数据
-				initData();
 			}
+			//初始化
+			initData();
 			
+//			setTimeout(function(){
+//				var array = plus.webview.all();
+//				if(array){
+//					for(var i=0,len=array.length;i<len;i++){
+//					    	console.log(array[i].getURL());
+//				        }
+//				}
+//			},5000);
 			
 		});
 			
@@ -497,6 +485,33 @@
 				
 				}, false);	
 				
+				//分页按钮
+				var lastPageButton = document.getElementById("lastPage");
+				lastPageButton.addEventListener('tap', function(event) {
+					
+					if(currentPage>1){
+						currentPage=currentPage-1;
+//						console.log('上一页'+currentPage);
+						initData();
+					}else{
+						mui.toast("已经是第一页");
+						currentPage=1;
+					}
+				}, false);	
+				var nextPageButton = document.getElementById("nextPage");
+				nextPageButton.addEventListener('tap', function(event) {
+					
+					if(currentPage<totalPage){
+						currentPage=currentPage+1;
+//						console.log('下一页'+currentPage);
+						initData();
+					}else{
+						mui.toast("已经是最后一页");
+						currentPage=totalPage;
+					}
+					
+					
+				}, false);
 				
 		}
 		
