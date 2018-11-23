@@ -67,8 +67,8 @@
 		return callback();
 	};
 	owner.getRequestUrl=function(){
-//		return "http://www.yzcbjj.com";
-		return "http://192.168.11.96:8090";
+		return "http://www.yzcbjj.com";
+//		return "http://192.168.11.96:8090";
 	};
 	
 	/**

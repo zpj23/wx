@@ -172,7 +172,8 @@
 					"kq/list.html",
 					"fj/list.html",
 					"supplier/list.html",
-					"goods/list.html"
+					"goods/list.html",
+					"dictionary/list.html"
 				],
 				"priority": 1
 			},
@@ -257,7 +258,16 @@
 			"goods/list.html": {
 				"resources": [],
 				"refer": [
-					"goods/edit.html"
+					"goods/edit.html",
+					"goods/search.html"
+				],
+				"priority": 0
+			},
+			"dictionary/list.html": {
+				"resources": [],
+				"refer": [
+					"dictionary/edit.html",
+					"dictionary/list_second.html"
 				],
 				"priority": 0
 			}

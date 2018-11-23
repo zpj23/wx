@@ -3,7 +3,9 @@
     "refer": [
       "setting.html",
       "kq/list.html",
-      "kq/listMain.html"
+      "kq/listMain.html",
+      "mapInfo.html",
+      "tempMap.html"
     ]
   },
   "login.html": {
