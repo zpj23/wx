@@ -191,8 +191,16 @@
 //	            	var str=JSON.stringify(data);
 //	            	console.log(str);
 	            	totalPage =data.totalpage;
-					document.getElementById("jb_cpage").innerHTML=currentPage*pagerow;
-	            	document.getElementById("jb_tpage").innerHTML=data.count;
+	            	var dqjl=currentPage*pagerow;//默认的当前记录数
+	            	var zjl=data.count;//总记录数
+	            	if(dqjl>zjl){
+	            		//当前记录数设置为总记录数
+	            		document.getElementById("jb_cpage").innerHTML=zjl;
+	            	}else{
+	            		document.getElementById("jb_cpage").innerHTML=dqjl;
+	            	}
+					
+	            	document.getElementById("jb_tpage").innerHTML=zjl;
 	            	
 	            	var arr=new Array();
 	            	arr=data.list;
