@@ -3,7 +3,7 @@
 
 	<head>
 		<meta charset="UTF-8">
-		<title>新增页面</title>
+		<title>新增商品</title>
 		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
 		<link href="../css/mui.min.css" rel="stylesheet" />
 		<link rel="stylesheet" type="text/css" href="../css/mui.picker.min.css" />
@@ -177,11 +177,11 @@
 			function initButtonData(){
 				var cancelbutton=document.getElementById("cancelButton");
 				cancelbutton.addEventListener('tap', function(){
-					jumpListPage();
+					jumpListPageBack();
 				}, false);
 				var backbutton=document.getElementById("backList1");
 				backbutton.addEventListener('tap', function(){
-					jumpListPage();
+					jumpListPageBack();
 				}, false);
 				
 				var saveButton =document.getElementById("saveButton");
@@ -292,7 +292,17 @@
 				    id:'goods_list'
 				});
 			}
-			
+			function jumpListPageBack(){
+				if(!listHtml){
+				    listHtml = plus.webview.getWebviewById('goods_list');
+				}
+				mui.fire(listHtml,'goodsList',{
+					mode:'editBack'
+				});
+				mui.openWindow({
+				    id:'goods_list'
+				});
+			}
 			
 			function querySupplierInfo(){
 				mui.ajax({
@@ -353,7 +363,7 @@
 			}
 			var old_back = mui.back;
 				mui.back = function(){
-			    	jumpListPage();
+			    	jumpListPageBack();
 				}
 		</script>
 	</body>

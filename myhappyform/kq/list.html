@@ -112,7 +112,7 @@
 					"id": 'kq_view',
 					"url": 'view.html'
 			});	
-			
+			state=app.getState();
 		});
 		//往上拉
 		function pullupRefresh() {
@@ -120,7 +120,7 @@
 					if(currentPage==1&&totalPage==0){
 						mui('#myList').pullRefresh().endPullup(false); //继续加载
 					}else{
-						if(currentPage>totalPage){
+						if(currentPage>=totalPage){
 							mui('#myList').pullRefresh().endPullup(true); //参数为true代表没有更多数据了。
 						}else{
 							mui('#myList').pullRefresh().endPullup(false); //继续加载

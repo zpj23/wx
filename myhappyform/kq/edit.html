@@ -398,6 +398,10 @@
 				    id:'kq_list'
 				});
 			}
+			var old_back = mui.back;
+				mui.back = function(){
+			    	jumpPage();
+				}
 		</script>
 	</body>
 

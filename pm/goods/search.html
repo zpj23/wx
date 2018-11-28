@@ -75,7 +75,7 @@
 					    listHtml = plus.webview.getWebviewById('goods_list');
 					}
 					mui.fire(listHtml,'goodsList',{
-						mode:'search',
+						mode:'searchBack',
 						name:'',
 						supplierId:'',
 						goodsType:''
@@ -109,7 +109,6 @@
 					mui.openWindow({
 					    id:'goods_list'
 					});
-//					jumpPage('goodsList','goods_list');
 					
 				}, false);
 				
@@ -216,24 +215,13 @@
 				return document.getElementById(id);
 			}
 			
-//			function jumpPage(listener,webviewId){
-//				if(!listHtml){
-//				    listHtml = plus.webview.getWebviewById(webviewId);
-//				}
-//				mui.fire(listHtml,listener,{
-//					mode:'search'
-//				});
-//				mui.openWindow({
-//				    id:webviewId
-//				});
-//			}
 			var old_back = mui.back;
 			mui.back = function(){
 		    	if(!listHtml){
 				    listHtml = plus.webview.getWebviewById('goods_list');
 				}
 				mui.fire(listHtml,'goodsList',{
-					mode:'search',
+					mode:'searchBack',
 					name:getCV('goodsName').value,
 					supplierId:getCV('supplierId').value,
 					goodsType:getCV('goodsType').value

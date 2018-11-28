@@ -41,49 +41,20 @@
 				<input type="search" class="mui-input-clear"  readonly="readonly" placeholder="" id="goods_search_list" />
 			</div>
 			</div>
-			<div class="mui-content-padded">
-				<ul class="mui-pager">
-					<li class="mui-previous">
-						<a href="#" id="lastPage_up" >
-							上一页
-						</a>
-					</li>
-					<span class="mui-badge mui-badge-inverted">当前第</span>
-					<span class="mui-badge mui-badge-inverted" id="jb_cpage_up"></span>
-					<span class="mui-badge mui-badge-inverted">页共</span>
-					<span class="mui-badge mui-badge-inverted" id="jb_tpage_up"></span>
-					<span class="mui-badge mui-badge-inverted">页</span>
-					
-					<li class="mui-next">
-						<a href="#" id="nextPage_up">
-							下一页
-						</a>
-					</li>
-				</ul>
-		</div>
-		<div class="mui-content-padded">
-			<div  id="myList"></div>
-		</div>	
-		<div class="mui-content-padded">
-				<ul class="mui-pager">
-					<li class="mui-previous">
-						<a href="#" id="lastPage_down" >
-							上一页
-						</a>
-					</li>
-					<span class="mui-badge mui-badge-inverted">当前第</span>
-					<span class="mui-badge mui-badge-inverted" id="jb_cpage_down"></span>
-					<span class="mui-badge mui-badge-inverted">页共</span>
-					<span class="mui-badge mui-badge-inverted" id="jb_tpage_down"></span>
-					<span class="mui-badge mui-badge-inverted">页</span>
-					
-					<li class="mui-next">
-						<a href="#" id="nextPage_down">
-							下一页
-						</a>
-					</li>
-				</ul>
+			<div class="mui-content-padded"  >
+				<div style="margin-left:150px;margin-top:0px;">
+					<span class="mui-badge mui-badge-inverted">当前显示</span>
+					<span class="mui-badge mui-badge-inverted" id="jb_cpage"></span>
+					<span class="mui-badge mui-badge-inverted">条，共</span>
+					<span class="mui-badge mui-badge-inverted" id="jb_tpage"></span>
+					<span class="mui-badge mui-badge-inverted">条</span>
+				</div>
 			</div>
+			
+			<div class="mui-content-padded" id="myList">
+				<ul class="mui-table-view mui-table-view-striped mui-table-view-condensed" id="OA_task_1">
+				</ul>	
+		    </div>
 		</div>
 		<script src="../js/mui.min.js"></script>
 		<script src="../js/app.js"></script>
@@ -97,9 +68,23 @@
 			var search_goodsName='';
 			var search_supplierId='';
 			var search_goodsType='';
-			mui.init();
+			mui.init({
+				pullRefresh: {
+					container: '#myList',
+					down: {
+						style:'circle',
+						callback: pulldownRefresh
+					},
+					up: {
+						auto:true,
+						contentrefresh: '正在加载...',
+						callback: pullupRefresh
+					}
+				}
+			});
 			//初始化加载
 			mui.plusReady(function(){
+				currentPage=1;
 				editHtml=mui.preload({
 					id: 'goods_add',
 					url: 'edit.html'
@@ -112,6 +97,36 @@
 				state=app.getState();
 				
 			});
+			
+			//往上拉
+		function pullupRefresh() {
+				setTimeout(function() {
+					if(currentPage==1&&totalPage==0){
+						mui('#myList').pullRefresh().endPullup(false); //继续加载
+					}else{
+						if(currentPage>=totalPage){
+							mui('#myList').pullRefresh().endPullup(true); //参数为true代表没有更多数据了。
+						}else{
+							mui('#myList').pullRefresh().endPullup(false); //继续加载
+							currentPage++;
+							initData();
+						}
+					}
+				}, 1500);
+			}
+			/**
+			 * 往下拉加载最新数据
+			 */
+			function pulldownRefresh() {
+				setTimeout(function() {
+					currentPage=1;
+					var obj=document.getElementById("OA_task_1");
+					obj.innerHTML="";
+					initData();
+					mui('#myList').pullRefresh().endPulldown();
+				}, 1500);
+			}
+			
 			//初始化加载以后每次进页面加载监听
 			window.addEventListener('goodsList',function(event){
 				state=app.getState();
@@ -121,8 +136,15 @@
 					search_goodsName='';
 					search_supplierId='';
 					search_goodsType='';
+					initData();
 				}else if(event.detail.mode=="edit"){
-					//所有查询条件都保留，不变更。
+					//保存信息
+					if(currentPage!=1){
+						pagerow=currentPage*pagerow;
+					}
+					currentPage=1;
+					document.getElementById("OA_task_1").innerHTML="";
+					initData();
 				}else if(event.detail.mode=="search"){
 					currentPage=1;
 					search_goodsName=event.detail.name;
@@ -137,8 +159,11 @@
 					if(typeof(search_goodsType)=="undefined"){
 						search_goodsType='';
 					}
+					initData();
+				}else if(event.detail.mode=="editBack"||event.detail.mode=="searchBack"){
+					//返回 不做任何操作
 				}
-				initData();
+				
 				
 			});
 			//初始化按钮
@@ -181,18 +206,21 @@
 				    },
 		            success: function(data){
 		            	totalPage =data.totalPage;
-		            	document.getElementById("jb_cpage_up").innerHTML=currentPage;
-		            	document.getElementById("jb_tpage_up").innerHTML=totalPage;
-		            	document.getElementById("jb_cpage_down").innerHTML=currentPage;
-		            	document.getElementById("jb_tpage_down").innerHTML=totalPage;
+		            	var dqjl=currentPage*pagerow;//默认的当前记录数
+		            	var zjl=data.count;//总记录数
+		            	if(dqjl>zjl){
+		            		//当前记录数设置为总记录数
+		            		document.getElementById("jb_cpage").innerHTML=zjl;
+		            	}else{
+		            		document.getElementById("jb_cpage").innerHTML=dqjl;
+		            	}
+		            	document.getElementById("jb_tpage").innerHTML=zjl;
 		            	
-		            	myList = document.getElementById("myList");
-		            	var listStr='';
 		            	var arr=new Array();
-		            	arr=data.list;
-	//	            	console.log(data);
-		            	listStr+='<ul class="mui-table-view mui-table-view-striped mui-table-view-condensed" id="OA_task_1">';
+	            		arr=data.list;
+	            		var ulObj = document.body.querySelector('#OA_task_1');
 		            	for(var m=0;m<arr.length;m++){
+		            		var listStr='';
 							listStr+='<li class="mui-table-view-cell" >';
 							listStr+='<div class="mui-slider-right mui-disabled">';
 							listStr+='<a class="mui-btn mui-btn-blue editkq" name="'+arr[m].id+'"  >修改</a>';
@@ -205,17 +233,20 @@
 							listStr+='<h5>规格：'+arr[m].type+'，单位：'+arr[m].unit+'</h5>';
 							listStr+='<p class="mui-h6 mui-ellipsis">'+arr[m].supplierName+'</p>';
 							listStr+='</div>';
-							listStr+='<div class="mui-table-cell mui-col-xs-5 mui-text-center">';
-							listStr+='<span class="mui-h5" >'+'</span>';
-							listStr+='</div>';
 							listStr+='<div class="mui-table-cell mui-col-xs-1 mui-text-right"><span class="mui-badge">'+((currentPage-1)*pagerow+m+1)+'</span></div>';
 							listStr+='</div>';
 							listStr+='</div>';
 							listStr+='</li>';
 							
+							var li = document.createElement('li');
+		            		li.className = 'mui-table-view-cell';
+		            		li.innerHTML=listStr;
+		            		ulObj.appendChild(li);
+							
 		            	}
-		            	listStr+='</ul>';
-		            	myList.innerHTML=listStr;
+		            	//新增或者编辑时查询此时已加载的数据查询完毕后重新置成15
+	            		pagerow=15;
+	            		
 						//编辑信息
 		            	mui('#OA_task_1').on('tap', '.editkq', function(event) {
 							var elem = this;
@@ -276,60 +307,6 @@
 		        });
 			}
 			
-			//上部分页按钮
-				var lastPageButton = document.getElementById("lastPage_up");
-				lastPageButton.addEventListener('tap', function(event) {
-					
-					if(currentPage>1){
-						currentPage=currentPage-1;
-//						console.log('上一页'+currentPage);
-						initData();
-					}else{
-						mui.toast("已经是第一页");
-						currentPage=1;
-					}
-				}, false);	
-				var nextPageButton = document.getElementById("nextPage_up");
-				nextPageButton.addEventListener('tap', function(event) {
-					
-					if(currentPage<totalPage){
-						currentPage=currentPage+1;
-//						console.log('下一页'+currentPage);
-						initData();
-					}else{
-						mui.toast("已经是最后一页");
-						currentPage=totalPage;
-					}
-					
-					
-				}, false);
-				//下部分页
-				var lastPageButton_down = document.getElementById("lastPage_down");
-				lastPageButton_down.addEventListener('tap', function(event) {
-					
-					if(currentPage>1){
-						currentPage=currentPage-1;
-//						console.log('上一页'+currentPage);
-						initData();
-					}else{
-						mui.toast("已经是第一页");
-						currentPage=1;
-					}
-				}, false);	
-				var nextPageButton_down = document.getElementById("nextPage_down");
-				nextPageButton_down.addEventListener('tap', function(event) {
-					
-					if(currentPage<totalPage){
-						currentPage=currentPage+1;
-//						console.log('下一页'+currentPage);
-						initData();
-					}else{
-						mui.toast("已经是最后一页");
-						currentPage=totalPage;
-					}
-					
-					
-				}, false);
 				
 				var mainPage = document.getElementById('mainPage');
 					mainPage.addEventListener('tap', function(event) {
