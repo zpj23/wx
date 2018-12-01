@@ -95,9 +95,61 @@
 				});	
 				initButtons();
 				state=app.getState();
-				
+				bindEvent();
 			});
-			
+			function bindEvent(){
+				//编辑信息
+            	mui('#OA_task_1').on('tap', '.editkq', function(event) {
+					var elem = this;
+					var cid = elem.name;
+					if(!add_html){
+					    add_html = plus.webview.getWebviewById('goods_add');
+					}
+					mui.fire(add_html,'goodsAdd',{
+						id:cid
+					});
+					mui.openWindow({
+					    id:'goods_add'
+					});
+					
+				});
+				//删除信息
+            	var btnArray = ['确认', '取消'];
+            	mui('#OA_task_1').on('tap', '.shanchukq', function(event) {
+					var elem = this;
+					var li = elem.parentNode.parentNode;
+					mui.confirm('确认删除该条记录？', '警告', btnArray, function(e) {
+						if (e.index == 0) {
+							var cid = elem.name;
+							mui.ajax({
+					            url      : app.getRequestUrl()+'/vue/goods/delById',
+					            type     : 'post',
+					            dataType:'json',//服务器返回json格式数据
+					            data:{ 
+								    delId:cid,
+								    loginId:state.id,
+									isAdmin:state.isAdmin
+								},
+					            success  : function(data){
+					            	if(data.msg){
+					            		li.parentNode.removeChild(li);
+					            	}else{
+					            		mui.toast("删除失败");
+					            	}
+					            },
+					            error    : function(xhr,type,errorThrown){
+					                mui.toast(type);
+					            }
+					        });
+							
+						} else {
+							setTimeout(function() {
+								mui.swipeoutClose(li);
+							}, 0);
+						}
+					});
+				});
+			}
 			//往上拉
 		function pullupRefresh() {
 				setTimeout(function() {
@@ -136,6 +188,7 @@
 					search_goodsName='';
 					search_supplierId='';
 					search_goodsType='';
+					document.getElementById("OA_task_1").innerHTML="";
 					initData();
 				}else if(event.detail.mode=="edit"){
 					//保存信息
@@ -147,6 +200,7 @@
 					initData();
 				}else if(event.detail.mode=="search"){
 					currentPage=1;
+					document.getElementById("OA_task_1").innerHTML="";
 					search_goodsName=event.detail.name;
 					if(typeof(search_goodsName)=="undefined"){
 						search_goodsName="";
@@ -199,10 +253,10 @@
 					},
 					async:false,
 					beforeSend: function() {
-				        plus.nativeUI.showWaiting("加载中...", null);
+//				        plus.nativeUI.showWaiting("加载中...", null);
 				    },
 				    complete: function() {
-				        plus.nativeUI.closeWaiting();
+//				        plus.nativeUI.closeWaiting();
 				    },
 		            success: function(data){
 		            	totalPage =data.totalPage;
@@ -221,7 +275,6 @@
 	            		var ulObj = document.body.querySelector('#OA_task_1');
 		            	for(var m=0;m<arr.length;m++){
 		            		var listStr='';
-							listStr+='<li class="mui-table-view-cell" >';
 							listStr+='<div class="mui-slider-right mui-disabled">';
 							listStr+='<a class="mui-btn mui-btn-blue editkq" name="'+arr[m].id+'"  >修改</a>';
 							listStr+='<a class="mui-btn mui-btn-red shanchukq" name="'+arr[m].id+'" >删除</a>';
@@ -236,8 +289,6 @@
 							listStr+='<div class="mui-table-cell mui-col-xs-1 mui-text-right"><span class="mui-badge">'+((currentPage-1)*pagerow+m+1)+'</span></div>';
 							listStr+='</div>';
 							listStr+='</div>';
-							listStr+='</li>';
-							
 							var li = document.createElement('li');
 		            		li.className = 'mui-table-view-cell';
 		            		li.innerHTML=listStr;
@@ -246,60 +297,6 @@
 		            	}
 		            	//新增或者编辑时查询此时已加载的数据查询完毕后重新置成15
 	            		pagerow=15;
-	            		
-						//编辑信息
-		            	mui('#OA_task_1').on('tap', '.editkq', function(event) {
-							var elem = this;
-							var cid = elem.name;
-	//						var str=JSON.stringify(cid);
-	//						console.log(str);
-							if(!add_html){
-							    add_html = plus.webview.getWebviewById('goods_add');
-							}
-							mui.fire(add_html,'goodsAdd',{
-								id:cid
-							});
-							mui.openWindow({
-							    id:'goods_add'
-							});
-							
-						});
-						//删除信息
-		            	var btnArray = ['确认', '取消'];
-		            	mui('#OA_task_1').on('tap', '.shanchukq', function(event) {
-							var elem = this;
-							var li = elem.parentNode.parentNode;
-							mui.confirm('确认删除该条记录？', '警告', btnArray, function(e) {
-								if (e.index == 0) {
-									var cid = elem.name;
-									mui.ajax({
-							            url      : app.getRequestUrl()+'/vue/goods/delById',
-							            type     : 'post',
-							            dataType:'json',//服务器返回json格式数据
-							            data:{ 
-										    delId:cid,
-										    loginId:state.id,
-											isAdmin:state.isAdmin
-										},
-							            success  : function(data){
-							            	if(data.msg){
-							            		li.parentNode.removeChild(li);
-							            	}else{
-							            		mui.toast("删除失败");
-							            	}
-							            },
-							            error    : function(xhr,type,errorThrown){
-							                mui.toast(type);
-							            }
-							        });
-									
-								} else {
-									setTimeout(function() {
-										mui.swipeoutClose(li);
-									}, 0);
-								}
-							});
-						});
 		            },
 		            error    : function(xhr,type,errorThrown){
 		                mui.toast(type);

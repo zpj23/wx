@@ -258,28 +258,11 @@
 			function initSaveButtonData(){
 				var cancelbutton=document.getElementById("cancelButton");
 				cancelbutton.addEventListener('tap', function(){
-					if(!listHtml){
-					    listHtml = plus.webview.getWebviewById('kq_list');
-					}
-					mui.fire(listHtml,'kqList',{
-						mode:'edit'
-					});
-					mui.openWindow({
-					    id:'kq_list'
-					});
+					jumpBack();
 				}, false);
 				var backbutton=document.getElementById("backList1");
 				backbutton.addEventListener('tap', function(){
-//					console.log(">>>>>>新增返回列表");
-					if(!listHtml){
-					    listHtml = plus.webview.getWebviewById('kq_list');
-					}
-					mui.fire(listHtml,'kqList',{
-						mode:'edit'
-					});
-					mui.openWindow({
-					    id:'kq_list'
-					});
+					jumpBack();
 				}, false);
 				
 				var saveButton =document.getElementById("saveButton");
@@ -335,21 +318,6 @@
 									    id:'kq_list'
 									});
 				            		
-//				            		mui.openWindow({
-//										id: 'kq_list',
-//										url:'list.html',
-//										show: {
-//											aniShow: 'pop-in'
-//										},
-//										styles: {
-//											popGesture: 'hide'
-//										},
-//										
-//										waiting: {
-//											autoShow: false
-//										}
-//										
-//									});
 				            	}else{
 				            		mui.toast("保存失败");
 				            	}
@@ -364,17 +332,21 @@
 			function getCV(id){
 				return document.getElementById(id);
 			}
-			var old_back = mui.back;
-			mui.back = function(){
-		    	if(!listHtml){
+			function jumpBack(){
+				if(!listHtml){
 				    listHtml = plus.webview.getWebviewById('kq_list');
 				}
 				mui.fire(listHtml,'kqList',{
-					mode:'edit'
+					mode:'editBack'
 				});
 				mui.openWindow({
 				    id:'kq_list'
 				});
+			}
+			
+			var old_back = mui.back;
+			mui.back = function(){
+		    	jumpBack();
 			}
 		</script>
 	</body>

@@ -113,6 +113,8 @@
 					"url": 'view.html'
 			});	
 			state=app.getState();
+			
+			bindEvent();//初始化绑定点击时触发的事件
 		});
 		//往上拉
 		function pullupRefresh() {
@@ -265,140 +267,145 @@
 	            	//新增或者编辑时查询此时已加载的数据查询完毕后重新置成15
 	            	pagerow=15;
 	            	
-	            	//复制当前记录
-	            	mui('#OA_task_1').on('tap', '.copykq', function(event) {
-						var elem = this;
-						var cid = elem.name;
-						var li = elem.parentNode.parentNode;
-						mui.ajax({
-				            url      : app.getRequestUrl()+'/jlManualCheckPhoneAction_docopy',
-				            type     : 'post',
-				            dataType:'json',//服务器返回json格式数据
-				            data:{ 
-							    id:cid,
-							    loginId:state.id,
-								isAdmin:state.isAdmin
-							},
-				            success  : function(data){
-				            	if(data.msg){
-				            		mui.toast("复制成功");
-				            		initData();
-				            	}else{
-				            		mui.toast("复制失败");
-				            	}
-				            },
-				            error    : function(xhr,type,errorThrown){
-				                mui.toast(type+">>>>>>kq/list.html");
-				            }
-				        });
-					});
-	            	//审核考勤信息
-	            	mui('#OA_task_1').on('tap', '.shenhekq', function(event) {
-						var elem = this;
-						var cid = elem.name;
-						var li = elem.parentNode.parentNode;
-						mui.ajax({
-				            url      : app.getRequestUrl()+'/jlManualCheckPhoneAction_doshenhe',
-				            type     : 'post',
-				            dataType:'json',//服务器返回json格式数据
-				            data:{ 
-							    id:cid,
-							    loginId:state.id,
-								isAdmin:state.isAdmin
-							},
-				            success  : function(data){
-				            	if(data.msg){
-				            		mui.toast("审核成功");
-				            		initData();
-				            	}else{
-				            		mui.toast("审核失败");
-				            	}
-				            },
-				            error    : function(xhr,type,errorThrown){
-				                mui.toast(type+">>>>>>kq/list.html");
-				            }
-				        });
-					});
-					
-					//查看考勤信息
-					mui('#OA_task_1').on('tap', '.viewkq', function(event) {
-						var elem = this;
-						var cid = elem.name;
-//						var str=JSON.stringify(cid);
-//						console.log(str);
-						
-
-						if(!viewHtml){
-						    viewHtml = plus.webview.getWebviewById('kq_view');
-						}
-						mui.fire(viewHtml,'viewId',{
-							id:cid
-						});
-						mui.openWindow({
-						    id:'kq_view'
-						});
-						
-					});
-					//编辑考勤信息
-	            	mui('#OA_task_1').on('tap', '.editkq', function(event) {
-						var elem = this;
-						var cid = elem.name;
-//						var str=JSON.stringify(cid);
-//						console.log(str);
-						
-
-						if(!editHtml){
-						    editHtml = plus.webview.getWebviewById('kq_edit');
-						}
-						mui.fire(editHtml,'editId',{
-							id:cid
-						});
-						mui.openWindow({
-						    id:'kq_edit'
-						});
-						
-					});
-					//删除考勤信息
-	            	var btnArray = ['确认', '取消'];
-	            	mui('#OA_task_1').on('tap', '.shanchukq', function(event) {
-						var elem = this;
-						var li = elem.parentNode.parentNode;
-						mui.confirm('确认删除该条记录？', '警告', btnArray, function(e) {
-							if (e.index == 0) {
-								var cid = elem.name;
-								mui.ajax({
-						            url      : app.getRequestUrl()+'/jlManualCheckPhoneAction_delInfoByIdByPhone',
-						            type     : 'post',
-						            dataType:'json',//服务器返回json格式数据
-						            data:{ 
-									    delId:cid,
-									    loginId:state.id,
-										isAdmin:state.isAdmin
-									},
-						            success  : function(data){
-						            	if(data.msg){
-						            		li.parentNode.removeChild(li);
-						            	}else{
-						            		mui.toast("删除失败");
-						            	}
-						            },
-						            error    : function(xhr,type,errorThrown){
-						                mui.toast(type+">>>>>>kq/list.html");
-						            }
-						        });
-								
-							} else {
-								setTimeout(function() {
-									mui.swipeoutClose(li);
-								}, 0);
-							}
-						});
-					});
 	            },
 	            error    : function(xhr,type,errorThrown){
 	                mui.toast(type);
 	            }
 	        });
+		}
+		
+		function bindEvent(){
+			//复制当前记录
+        	mui('#OA_task_1').on('tap', '.copykq', function(event) {
+				var elem = this;
+				var cid = elem.name;
+				var li = elem.parentNode.parentNode;
+				mui.ajax({
+		            url      : app.getRequestUrl()+'/jlManualCheckPhoneAction_docopy',
+		            type     : 'post',
+		            dataType:'json',//服务器返回json格式数据
+		            data:{ 
+					    id:cid,
+					    loginId:state.id,
+						isAdmin:state.isAdmin
+					},
+		            success  : function(data){
+		            	if(data.msg){
+		            		mui.toast("复制成功");
+		            		pulldownRefresh();
+		            	}else{
+		            		mui.toast("复制失败");
+		            	}
+		            },
+		            error    : function(xhr,type,errorThrown){
+		                mui.toast(type+">>>>>>kq/list.html");
+		            }
+		        });
+			});
+        	//审核考勤信息
+        	mui('#OA_task_1').on('tap', '.shenhekq', function(event) {
+				var elem = this;
+				var cid = elem.name;
+				var li = elem.parentNode.parentNode;
+				mui.ajax({
+		            url      : app.getRequestUrl()+'/jlManualCheckPhoneAction_doshenhe',
+		            type     : 'post',
+		            dataType:'json',//服务器返回json格式数据
+		            data:{ 
+					    id:cid,
+					    loginId:state.id,
+						isAdmin:state.isAdmin
+					},
+		            success  : function(data){
+		            	if(data.msg){
+		            		mui.toast("审核成功");
+		            		pulldownRefresh();
+		            	}else{
+		            		mui.toast("审核失败");
+		            	}
+		            },
+		            error    : function(xhr,type,errorThrown){
+		                mui.toast(type+">>>>>>kq/list.html");
+		            }
+		        });
+			});
+			
+			//查看考勤信息
+			mui('#OA_task_1').on('tap', '.viewkq', function(event) {
+				var elem = this;
+				var cid = elem.name;
+				if(!viewHtml){
+				    viewHtml = plus.webview.getWebviewById('kq_view');
+				}
+				mui.fire(viewHtml,'viewId',{
+					id:cid
+				});
+				mui.openWindow({
+				    id:'kq_view'
+				});
+				//关闭之前li的状态
+				var li = elem.parentNode.parentNode;
+				setTimeout(function() {
+					mui.swipeoutClose(li);
+				}, 0);
+			});
+			//编辑考勤信息
+        	mui('#OA_task_1').on('tap', '.editkq', function(event) {
+				var elem = this;
+				var cid = elem.name;
+				
+				if(!editHtml){
+				    editHtml = plus.webview.getWebviewById('kq_edit');
+				}
+				mui.fire(editHtml,'editId',{
+					id:cid
+				});
+				mui.openWindow({
+				    id:'kq_edit'
+				});
+				//关闭之前li的状态
+				var li = elem.parentNode.parentNode;
+				setTimeout(function() {
+					mui.swipeoutClose(li);
+				}, 0);
+			});
+			//删除考勤信息
+        	
+        	mui('#OA_task_1').on('tap', '.shanchukq', function(event) {
+        		var btnArray = ['确认', '取消'];
+				var elem = this;
+				var li = elem.parentNode.parentNode;
+				mui.confirm('确认删除该条记录？', '警告', btnArray, function(e) {
+					if (e.index == 0) {
+						var cid = elem.name;
+						mui.ajax({
+				            url      : app.getRequestUrl()+'/jlManualCheckPhoneAction_delInfoByIdByPhone',
+				            type     : 'post',
+				            dataType:'json',//服务器返回json格式数据
+				            data:{ 
+							    delId:cid,
+							    loginId:state.id,
+								isAdmin:state.isAdmin
+							},
+				            success  : function(data){
+				            	if(data.msg){
+				            		li.parentNode.removeChild(li);
+				            	}else{
+				            		mui.toast("删除失败");
+				            	}
+				            },
+				            error    : function(xhr,type,errorThrown){
+				                mui.toast(type+">>>>>>kq/list.html");
+				            }
+				        });
+						
+					} else {
+								setTimeout(function() {
+									mui.swipeoutClose(li);
+								}, 0);
+					}
+				});
+			});	
 		}
 		
 		window.addEventListener('listHtml',function(event){
