@@ -27,29 +27,29 @@
 		<div class="mui-content">
 				<ul class="mui-table-view mui-grid-view mui-grid-9">
 		            <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3"><a href="#" id="user_manager">
-		                    <span class="mui-icon mui-icon-home" id="shenhecount"></span>
+		                    <span class="mui-icon mui-icon-gear" id="shenhecount"></span>
 		                    <div class="mui-media-body">维修日志</div></a></li>
 		            <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3"><a href="#" id="goods_manage">
-		                    <span class="mui-icon mui-icon-email"></span>
+		                    <span class="mui-icon mui-icon-locked"></span>
 		                    <div class="mui-media-body">商品管理</div></a></li>
 		            <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3"><a href="#" id="supplier_manage">
-		                    <span class="mui-icon mui-icon-chatbubble" ></span>
+		                    <span class="mui-icon mui-icon-person" ></span>
 		                    <div class="mui-media-body">供应商管理</div></a></li>
 		            <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3"><a href="#" id="dictionary_manage" >
-		                    <span class="mui-icon mui-icon-location"></span>
+		                    <span class="mui-icon mui-icon-image"></span>
 		                    <div class="mui-media-body">商品展示</div></a></li>
+		            <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3"><a href="#" id="category_manage">
+		                    <span class="mui-icon mui-icon-list"></span>
+		                    <div class="mui-media-body">分类管理</div></a></li>
 		            <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3"><a href="#">
-		                    <span class="mui-icon mui-icon-search"></span>
+		                    <span class="mui-icon mui-icon-arrowthindown"></span>
 		                    <div class="mui-media-body">入库管理</div></a></li>
-		            <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3"><a href="#">
-		                    <span class="mui-icon mui-icon-phone"></span>
-		                    <div class="mui-media-body">出库管理</div></a></li>
 		            <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3"><a href="#" id="downloadapp">
-		                    <span class="mui-icon mui-icon-gear"></span>
-		                    <div class="mui-media-body">库存管理</div></a></li>
+		                    <span class="mui-icon mui-icon-arrowthinup"></span>
+		                    <div class="mui-media-body">出库管理</div></a></li>
 		            <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3"><a href="#">
-		                    <span class="mui-icon mui-icon-info"></span>
-		                    <div class="mui-media-body">about</div></a></li>
+		                    <span class="mui-icon mui-icon-loop"></span>
+		                    <div class="mui-media-body">库存</div></a></li>
 		           <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3"><a href="#">
 		                    <span class="mui-icon mui-icon-more"></span>
 		                    <div class="mui-media-body">more</div></a></li>
@@ -135,6 +135,10 @@
 						id:'dictionary_list',
 						url:'dictionary/list.html'
 					});
+					categoryHtml=$.preload({
+						id:'category_list',
+						url:'category/list.html'
+					});
 					//维修管理
 					var usermanageButton = doc.getElementById('user_manager');
 					usermanageButton.addEventListener('tap', function(event) {
@@ -191,7 +195,23 @@
 						});
 						
 					});
-//					
+					
+					var category_manage=document.getElementById('category_manage');
+					category_manage.addEventListener('tap', function(event) {
+						if(!categoryHtml){
+						    categoryHtml = plus.webview.getWebviewById('category_list');
+						}
+						mui.fire(categoryHtml,'categoryList',{
+							mode:'main'
+						});
+						mui.openWindow({
+						    id:'category_list'
+						});
+						
+					});
+					
+
+
 //					//app更新
 //					
 //					var updateButton=doc.getElementById("downloadapp");

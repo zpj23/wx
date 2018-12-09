@@ -40,12 +40,6 @@
 		    <button id='kq_add' class=" mui-pull-right mui-btn-link">新增</button>
 		</header>
 		<div class="mui-content">
-			<div class="mui-content-padded">
-				<div class="mui-input-row mui-search" >
-					<input type="search" class="mui-input-clear"  readonly="readonly" placeholder="" id="kq_search_list" />
-				</div>
-				
-			</div>
 			
 			<div class="mui-content-padded"  >
 				<div style="margin-left:150px;margin-top:0px;">
@@ -70,8 +64,6 @@
 		var state=null;
 		var myList=null;
 		var editHtml=null; 
-		var viewHtml=null;
-		var searchHtml=null;
 		var currentPage=1;
 		var pagerow=15;
 		var totalPage=0;
@@ -101,17 +93,9 @@
 			//初始化按钮
 			initButtons();
 			editHtml=mui.preload({
-					id: 'kq_edit',
+					id: 'category_edit',
 					url: 'edit.html'
 				});
-			searchHtml=mui.preload({
-					"id": 'kq_search',
-					"url": 'search.html'
-			});	
-			viewHtml=mui.preload({
-					"id": 'kq_view',
-					"url": 'view.html'
-			});	
 			bindEvent();
 		});
 		function bindEvent(){
@@ -119,13 +103,13 @@
 				var elem = this;
 				var cid = elem.name;
 				if(!editHtml){
-				    editHtml = plus.webview.getWebviewById('kq_edit');
+				    editHtml = plus.webview.getWebviewById('category_edit');
 				}
 				mui.fire(editHtml,'editId',{
 					id:cid
 				});
 				mui.openWindow({
-				    id:'kq_edit'
+				    id:'category_edit'
 				});
 				//关闭之前li的状态
 				var li = elem.parentNode.parentNode;
