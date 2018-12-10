@@ -36,26 +36,12 @@
 		<header class="mui-bar mui-bar-nav">
 		    <!--<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left" ></a>-->
 		    <button id='mainPage' class=" mui-pull-left mui-btn-link">主页</button>
-		    <h1 class="mui-title">数据列表</h1>
-		    <button id='kq_add' class=" mui-pull-right mui-btn-link">新增</button>
+		    <h1 class="mui-title" id="titleDiv"></h1>
+		    <button id='category_add' class=" mui-pull-right mui-btn-link">新增</button>
 		</header>
-		<div class="mui-content">
-			
-			<div class="mui-content-padded"  >
-				<div style="margin-left:150px;margin-top:0px;">
-					<span class="mui-badge mui-badge-inverted">当前显示</span>
-					<span class="mui-badge mui-badge-inverted" id="jb_cpage"></span>
-					<span class="mui-badge mui-badge-inverted">条，共</span>
-					<span class="mui-badge mui-badge-inverted" id="jb_tpage"></span>
-					<span class="mui-badge mui-badge-inverted">条</span>
-				</div>
-			</div>
-			
-			<div class="mui-content-padded" id="myList">
-				<ul class="mui-table-view mui-table-view-striped mui-table-view-condensed" id="OA_task_1">
-				</ul>	
-		    </div>
-		    
+		<div class="mui-content" id="myList">
+			<ul class="mui-table-view mui-table-view-striped mui-table-view-condensed" id="OA_task_1">
+			</ul>	
 		</div>
 	</body>
 	<script src="../js/mui.js"></script>
@@ -64,32 +50,11 @@
 		var state=null;
 		var myList=null;
 		var editHtml=null; 
-		var currentPage=1;
-		var pagerow=15;
-		var totalPage=0;
 		var mainHtml =null;
-		var startdate="";
-	    var enddate="";
-	    var staffname="";
-		var isshenhe="";
-		var remarkContent="";
-		
-		mui.init({
-				pullRefresh: {
-					container: '#myList',
-					down: {
-						style:'circle',
-						callback: pulldownRefresh
-					},
-					up: {
-						auto:true,
-						contentrefresh: '正在加载...',
-						callback: pullupRefresh
-					}
-				}
-			});
+		var CURRENTTYPECODE='';//当前列表的父级编码,多个层级用逗号分割
+		var tempPName='';//临时存储
+		mui.init();
 		mui.plusReady(function(){
-			currentPage=1;
 			//初始化按钮
 			initButtons();
 			editHtml=mui.preload({
@@ -99,13 +64,14 @@
 			bindEvent();
 		});
 		function bindEvent(){
-        	mui('#OA_task_1').on('tap', '.editkq', function(event) {
+			//编辑
+        	mui('#OA_task_1').on('tap', '.editCategoryClass', function(event) {
 				var elem = this;
 				var cid = elem.name;
 				if(!editHtml){
 				    editHtml = plus.webview.getWebviewById('category_edit');
 				}
-				mui.fire(editHtml,'editId',{
+				mui.fire(editHtml,'editCategory',{
 					id:cid
 				});
 				mui.openWindow({
@@ -118,20 +84,20 @@
 				}, 0);
 				
 			});
-			//删除考勤信息
+			//删除信息
         	var btnArray = ['确认', '取消'];
-        	mui('#OA_task_1').on('tap', '.shanchukq', function(event) {
+        	mui('#OA_task_1').on('tap', '.deleteCategory', function(event) {
 				var elem = this;
 				var li = elem.parentNode.parentNode;
-				mui.confirm('确认删除该条记录？', '警告', btnArray, function(e) {
+				mui.confirm('确认删除？', '警告', btnArray, function(e) {
 					if (e.index == 0) {
 						var cid = elem.name;
 						mui.ajax({
-				            url      : app.getRequestUrl()+'/vue/maintain/delInfoById',
+				            url      : app.getRequestUrl()+'/vue/dictionary/delByCode',
 				            type     : 'post',
 				            dataType:'json',//服务器返回json格式数据
 				            data:{ 
-							    delId:cid,
+							    code:cid,
 							    loginId:state.id,
 								isAdmin:state.isAdmin
 							},
@@ -154,80 +120,77 @@
 					}
 				});
 			});
+			//显示子级
+			mui('#OA_task_1').on('tap', '.nextCategoryLevel', function(event) {
+				var elem = this;
+				var cid = elem.name;
+				CURRENTTYPECODE+=","+cid;	
+				initData();
+			});
+			
+			
 		}
 		//初始化数据
 		function initData(){
+			document.getElementById("OA_task_1").innerHTML="";
+			var tempCode='';
+			if(CURRENTTYPECODE.indexOf(",")>-1){
+				tempCode=CURRENTTYPECODE.substring(CURRENTTYPECODE.lastIndexOf(",")+1,CURRENTTYPECODE.length);
+			}else{
+				tempCode=CURRENTTYPECODE;
+			}
 			mui.ajax({
-	            url    : app.getRequestUrl()+'/vue/maintain/findList',
+	            url    : app.getRequestUrl()+'/vue/dictionary/findDataListInDataBaseByTypeCode',
 	            type   : 'POST',
 	            dataType:'json',//服务器返回json格式数据
+	            beforeSend: function() {
+			        plus.nativeUI.showWaiting("加载中...", null);
+			    },
+			    complete: function() {
+			        plus.nativeUI.closeWaiting();
+			    },
 	            data:{
-	            	datemin:startdate,
-	            	datemax:enddate,
-	            	username:staffname,
-	            	ispay:isshenhe,
-	            	remark:remarkContent,
-	            	cpage:currentPage,
-	            	pagerow:pagerow,
+	            	typeCode:tempCode,
 				    loginId:state.id,
 					isAdmin:state.isAdmin
 				},
 				async:false,
-				beforeSend: function() {
-//			        plus.nativeUI.showWaiting("加载中...", null);
-			    },
-			    complete: function() {
-//			        plus.nativeUI.closeWaiting();
-			    },
 	            success: function(data){
-	            	totalPage =data.totalPage;
-	            	var dqjl=currentPage*pagerow;//默认的当前记录数
-	            	var zjl=data.count;//总记录数
-	            	if(dqjl>zjl){
-	            		//当前记录数设置为总记录数
-	            		document.getElementById("jb_cpage").innerHTML=zjl;
-	            	}else{
-	            		document.getElementById("jb_cpage").innerHTML=dqjl;
-	            	}
-	            	document.getElementById("jb_tpage").innerHTML=zjl;
-	            	
+	            	var ulObj = document.body.querySelector('#OA_task_1');
 	            	var arr=new Array();
-            		arr=data.list;
-            		var ulObj = document.body.querySelector('#OA_task_1');
-            		for(var m=0;m<arr.length;m++){
-            			var listStr='';
-	            		var colorStr="red";
-	            		if(arr[m].isPay=="1"){
-	            			//已付款
-	            			colorStr="green";
-	            		}
-						listStr+='<div class="mui-slider-right mui-disabled">';
-						listStr+='<a class="mui-btn mui-btn-blue editkq" name="'+arr[m].id+'"  >修改</a>';
-						listStr+='<a class="mui-btn mui-btn-red shanchukq" name="'+arr[m].id+'" >删除</a>';
-						listStr+='</div>';
-						listStr+='<div class="mui-slider-handle">';
-						listStr+='<div class="mui-table">';
-						listStr+='<div class="mui-table-cell mui-col-xs-9">';
-						listStr+='<h4 class="mui-ellipsis" >'+arr[m].username+'</h4>';
-						listStr+='<h5>'+arr[m].remark+'</h5>';
-						listStr+='<p class="mui-h6 mui-ellipsis">'+arr[m].jine+'元</p>';
-						listStr+='</div>';
-						listStr+='<div class="mui-table-cell mui-col-xs-5 mui-text-center">';
-						listStr+='<span class="mui-h5" style="color:'+colorStr+';">'+(arr[m].registertime).substring(0,10)+'</span>';
-						listStr+='</div>';
-						listStr+='<div class="mui-table-cell mui-col-xs-1 mui-text-right"><span class="mui-badge">'+((currentPage-1)*pagerow+m+1)+'</span></div>';
-						listStr+='</div>';
-						listStr+='</div>';
-						
-						var li = document.createElement('li');
-	            		li.className = 'mui-table-view-cell';
-	            		li.innerHTML=listStr;
-	            		ulObj.appendChild(li);
-						
-	            	}
+            		arr=data.data;
             		
-            		//新增或者编辑时查询此时已加载的数据查询完毕后重新置成15
-	            	pagerow=15;
+            		if(arr.length>0){
+            			for(var m=0;m<arr.length;m++){
+	            			var listStr='';
+	            			
+	            			listStr+='<div class="mui-slider-left mui-disabled">';
+							listStr+='<a class="mui-btn mui-btn-blue editCategoryClass" name="'+arr[m].typeCode+'"  >修改</a>';
+							listStr+='<a class="mui-btn mui-btn-red deleteCategory" name="'+arr[m].typeCode+'" >删除</a>';
+							listStr+='</div>';
+							if(CURRENTTYPECODE.split(",").length<3){
+								listStr+='<div class="mui-slider-right mui-disabled">';
+								listStr+='<a class="mui-btn mui-btn-green nextCategoryLevel" name="'+arr[m].typeCode+'"  >子级</a>';
+								listStr+='</div>';
+							}
+							
+							listStr+='<div class="mui-slider-handle">';
+							listStr+='<div class="mui-table">';
+							listStr+='<div class="mui-table-cell mui-col-xs-9">';
+							listStr+='<h4 class="mui-ellipsis" >'+arr[m].typeName+'</h4>';
+							listStr+='<h5>父级：'+arr[m].parentTypeName+'，编码：'+tempCode+'</h5>';
+							listStr+='</div>';
+							listStr+='<div class="mui-table-cell mui-col-xs-1 mui-text-right"><span class="mui-badge">'+(m+1)+'</span></div>';
+							listStr+='</div>';
+							listStr+='</div>';
+							
+							var li = document.createElement('li');
+		            		li.className = 'mui-table-view-cell';
+		            		li.innerHTML=listStr;
+		            		ulObj.appendChild(li);
+		            	}
+            			initTitle(arr[0].parentTypeName);
+            		}
 					
 	            },
 	            error    : function(xhr,type,errorThrown){
@@ -235,159 +198,57 @@
 	            }
 	        });
 		}
-		//往上拉
-		function pullupRefresh() {
-			setTimeout(function() {
-				if(currentPage==1&&totalPage==0){
-					mui('#myList').pullRefresh().endPullup(false); //继续加载
-				}else{
-					if(currentPage>=totalPage){
-						mui('#myList').pullRefresh().endPullup(true); //参数为true代表没有更多数据了。
-					}else{
-						mui('#myList').pullRefresh().endPullup(false); //继续加载
-						currentPage++;
-						initData();
-					}
-				}
-			}, 1500);
-		}
-		/**
-		 * 往下拉加载最新数据
-		 */
-		function pulldownRefresh() {
-			setTimeout(function() {
-				currentPage=1;
-				var obj=document.getElementById("OA_task_1");
-				obj.innerHTML="";
-				initData();
-				mui('#myList').pullRefresh().endPulldown();
-			}, 1500);
-		}
 			
-		window.addEventListener('kqList',function(event){
+		window.addEventListener('categoryList',function(event){
 			state=app.getState();
 			//初始化
 			if(event.detail.mode=="main"){
 					//主页跳转过来的
-					currentPage=1;
-					startdate='';
-					enddate='';
-					staffname='';
-					isshenhe='';
-					remarkContent='';
-					document.getElementById("OA_task_1").innerHTML="";
+					CURRENTTYPECODE="DPSP";
 					initData();
 			}else if(event.detail.mode=="edit"){
 				
-				if(currentPage!=1){
-					pagerow=currentPage*pagerow;
-				}
-				currentPage=1;
-				document.getElementById("OA_task_1").innerHTML="";
 				initData();
 				
-			}else if(event.detail.mode=="search"){
-				currentPage=1;
-				document.getElementById("OA_task_1").innerHTML="";
-				startdate=event.detail.startdate;
-				if(typeof(startdate)=="undefined"){
-					startdate="";
-				}
-				enddate=event.detail.enddate;
-				if(typeof(enddate)=="undefined"){
-					enddate='';
-				}
-				staffname=event.detail.staffname;
-				if(typeof(staffname)=="undefined"){
-					staffname='';
-				}
-				
-				isshenhe=event.detail.shenhe;
-				if(typeof(isshenhe)=="undefined"){
-					isshenhe='';
-				}
-				remarkContent=event.detail.remark;
-				if(typeof(remarkContent)=="undefined"){
-					remarkContent='';
-				}
-				initData();
-			}else if(event.detail.mode=="editBack"||event.detail.mode=="searchBack"){
+			}else if(event.detail.mode=="editBack"){
 					//返回 不做任何操作
 			}
 			
 			
 		});
-			
+		//初始化标题 和查询编码
+		function initTitle(title){
+			tempPName=title;
+			document.getElementById("titleDiv").innerHTML=title;
+		}
+		
+		//初始化按钮
 		function  initButtons(){
-			var add = document.getElementById("kq_add");
+			var add = document.getElementById("category_add");
 				add.addEventListener('tap', function(event) {
 				if(!editHtml){
-				    editHtml = plus.webview.getWebviewById('kq_edit');
+				    editHtml = plus.webview.getWebviewById('category_edit');
 				}
-				mui.fire(editHtml,'editId',{
-					id:''
+				mui.fire(editHtml,'editCategory',{
+					id:'',
+					typeCode:'',
+					typeName:'',
+					parentTypeName:tempPName,
+					parentTypeCode:CURRENTTYPECODE.substring(CURRENTTYPECODE.lastIndexOf(",")+1,CURRENTTYPECODE.length)
 				});
 				mui.openWindow({
-				    id:'kq_edit'
+				    id:'category_edit'
 				});
 				
 			}, false);
 			var mainPage = document.getElementById('mainPage');
-					mainPage.addEventListener('tap', function(event) {
-						if(!mainHtml){
-							mainHtml= plus.webview.getWebviewById("main");
-						}
-						mui.fire(mainHtml,'show',{
-						});
-						mui.openWindow({
-							id: 'main',
-							url:'../main.html',
-							show: {
-								aniShow: 'pop-in-left'
-							},
-							styles: {
-								popGesture: 'hide'
-							},
-							waiting: {
-								autoShow: false
-							}
-						});
-					}, false);
-					
-				
-				//查询条件也没页面
-				
-				var kq_search = document.getElementById("kq_search_list");
-				
-				kq_search.addEventListener('tap', function(event) {
-					if(!searchHtml){
-						searchHtml=plus.webview.getWebviewById('kq_search');
-					}
-					mui.fire(searchHtml,'kqSearch',{
-						
-					});
-					mui.openWindow({
-						id: 'kq_search',
-						show: {
-							aniShow: 'pop-in'
-						},
-						styles: {
-							popGesture: 'hide'
-							
-						},
-						
-						waiting: {
-							autoShow: false
-						}
-						
-					});
-				
-				}, false);	
-				
-		}
-		var old_back = mui.back;
-		mui.back = function(){
-	    	if(!mainHtml){
+			mainPage.addEventListener('tap', function(event) {
+				jumpToMain();
+			}, false);
+		}			
+		//跳转到主页
+		function jumpToMain(){
+			if(!mainHtml){
 				mainHtml= plus.webview.getWebviewById("main");
 			}
 			mui.fire(mainHtml,'show',{
@@ -405,6 +266,17 @@
 					autoShow: false
 				}
 			});
+		}
+		var old_back = mui.back;
+		mui.back = function(){
+	    	if(CURRENTTYPECODE=='DPSP'){
+	    		jumpToMain();
+	    	}else{
+	    		CURRENTTYPECODE=CURRENTTYPECODE.substring(0,CURRENTTYPECODE.lastIndexOf(","));
+	    		initData();
+	    	}
+	    	
+	    	
 		}
 	</script>
 </html>
