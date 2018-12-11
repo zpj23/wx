@@ -13,16 +13,15 @@
 	<body>
 		<header class="mui-bar mui-bar-nav">
 		    <a class="mui-icon mui-icon-left-nav mui-pull-left" id="backList1"></a>
-		    <h1 class="mui-title" >新增分类</h1>
+		    <h1 class="mui-title" id="titleh1" ></h1>
 		</header>
 		<div class="mui-content">
 			<form class="mui-input-group ">
 				<div class="mui-content-padded"></div>
 				<div class="mui-card">
-					<div class="mui-card-content" style="padding: 15px;">
+					<div class="mui-card-content" style="padding: 5px;">
 						<div class="mui-input-row">
-							<label>上级名称:</label>
-							<input type="text"  id="pName"  class="mui-input-clear"  placeholder="上级名称" readonly="readonly" />
+							<input type="text"  id="pName"  readonly="readonly" />
 							<input type="hidden" id="pCode" />
 						</div>
 					</div>
@@ -44,7 +43,13 @@
 			    	<div class="mui-card-content">
 					    <div class="mui-input-row">
 					        <label>排序:</label>
-					    	<input type="text" id="orderNum" class="mui-input-clear" placeholder="排序，先后顺序">
+					        <div class="mui-numbox">
+							  <!-- "-"按钮，点击可减小当前数值 -->
+							  <button class="mui-btn mui-numbox-btn-minus" type="button">-</button>
+							  <input class="mui-numbox-input" id="orderNum" type="number" value="0"  />
+							  <!-- "+"按钮，点击可增大当前数值 -->
+							  <button class="mui-btn mui-numbox-btn-plus" type="button">+</button>
+							</div>
 					    </div>
 			    	</div>
 				</div>
@@ -76,26 +81,52 @@
 				initSaveButtonData();
 				state=app.getState();
 			});
-			//添加newId自定义事件监听
+			
+			//添加的监听
 			window.addEventListener('editCategory',function(event){
-			  //获得事件参数
-			  	currentId = event.detail.id;
-				cName=event.detail.typeName;
-				cCode=event.detail.typeCode;
-				pCode=event.detail.parentTypeCode;
-				pName=event.detail.paretTypeName;
-				if(cCode!=""){
-					beforeCode=cCode;
-				}
 			  	state=app.getState();
-			  	initData();
+			  	var mode=event.detail.mode;
+			  	if(mode=="add"){
+			  		getCV('pCode').value=event.detail.parentTypeCode;
+			  		getCV('pName').value=event.detail.parentTypeName;
+			  		getCV('code').value="";
+		    		getCV('name').value="";
+		    		getCV('orderNum').value=1;
+			  		beforeCode='';
+			  		document.getElementById("titleh1").innerHTML="新增";
+			  	}else{
+			  		document.getElementById("titleh1").innerHTML="编辑";
+					beforeCode=event.detail.typeCode;
+					mui.ajax({
+				            url  : app.getRequestUrl()+'/vue/dictionary/findInfoByTypeCode',
+				            type     : 'post',
+				            dataType:'json',//服务器返回json格式数据
+				            data:{
+				            	typeCode:event.detail.typeCode,
+							    loginId:state.id,
+								isAdmin:state.isAdmin
+							},
+							beforeSend: function() {
+						        plus.nativeUI.showWaiting("保存中...", null);
+						    },
+						    complete: function() {
+						        plus.nativeUI.closeWaiting();
+						    },
+				            success  : function(data){
+				            	if(data.data){
+				            		getCV('pCode').value=event.detail.parentTypeCode;
+							  		getCV('pName').value=event.detail.parentTypeName;
+							  		getCV('code').value=data.data.typeCode;
+						    		getCV('name').value=data.data.typeName;
+						    		getCV('orderNum').value=data.data.orderNum;
+				            	}
+				            },
+				            error: function(xhr,type,errorThrown){
+				                mui.toast(type);
+				            }
+				    });
+			  	}
 			});
-			function initData(){
-		    	getCV('pCode').value=pCode;
-		    	getCV('pName').value=pName;
-		    	getCV('code').value=cCode;
-		    	getCV('name').value=cName;
-			}
 			
 			function initSaveButtonData(){
 				var cancelbutton=document.getElementById("cancelButton");
@@ -126,7 +157,6 @@
 						if(!flag){
 							return;
 						}
-						console.log(state);
 						mui.ajax({
 				            url      : app.getRequestUrl()+'/vue/dictionary/saveInfo',
 				            type     : 'post',

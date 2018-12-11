@@ -43,6 +43,9 @@
 			<ul class="mui-table-view mui-table-view-striped mui-table-view-condensed" id="OA_task_1">
 			</ul>	
 		</div>
+		<footer class="mui-bar mui-bar-footer">
+			<button id='category_update' class=" mui-pull-right mui-btn-link">更新</button>
+		</footer>
 	</body>
 	<script src="../js/mui.js"></script>
 	<script src="../js/app.js"></script>
@@ -67,12 +70,18 @@
 			//编辑
         	mui('#OA_task_1').on('tap', '.editCategoryClass', function(event) {
 				var elem = this;
-				var cid = elem.name;
+				var str = elem.name;
 				if(!editHtml){
 				    editHtml = plus.webview.getWebviewById('category_edit');
 				}
+				var pcode=CURRENTTYPECODE.substring(CURRENTTYPECODE.lastIndexOf(",")+1,CURRENTTYPECODE.length);
 				mui.fire(editHtml,'editCategory',{
-					id:cid
+					mode:'edit',
+					id:'',
+					typeCode:str.split("_")[0],
+					typeName:str.split("_")[1],
+					parentTypeName:tempPName,
+					parentTypeCode:pcode
 				});
 				mui.openWindow({
 				    id:'category_edit'
@@ -123,8 +132,10 @@
 			//显示子级
 			mui('#OA_task_1').on('tap', '.nextCategoryLevel', function(event) {
 				var elem = this;
-				var cid = elem.name;
-				CURRENTTYPECODE+=","+cid;	
+				var str = elem.name;
+				
+				CURRENTTYPECODE+=","+str.split("_")[0];
+				tempPName=str.split("_")[1];
 				initData();
 			});
 			
@@ -165,22 +176,22 @@
 	            			var listStr='';
 	            			
 	            			listStr+='<div class="mui-slider-left mui-disabled">';
-							listStr+='<a class="mui-btn mui-btn-blue editCategoryClass" name="'+arr[m].typeCode+'"  >修改</a>';
+							listStr+='<a class="mui-btn mui-btn-blue editCategoryClass" name="'+arr[m].typeCode+'_'+arr[m].typeName+'" >修改</a>';
 							listStr+='<a class="mui-btn mui-btn-red deleteCategory" name="'+arr[m].typeCode+'" >删除</a>';
 							listStr+='</div>';
 							if(CURRENTTYPECODE.split(",").length<3){
 								listStr+='<div class="mui-slider-right mui-disabled">';
-								listStr+='<a class="mui-btn mui-btn-green nextCategoryLevel" name="'+arr[m].typeCode+'"  >子级</a>';
+								listStr+='<a class="mui-btn mui-btn-green nextCategoryLevel" name="'+arr[m].typeCode+'_'+arr[m].typeName+'"  >子级</a>';
 								listStr+='</div>';
 							}
 							
 							listStr+='<div class="mui-slider-handle">';
 							listStr+='<div class="mui-table">';
 							listStr+='<div class="mui-table-cell mui-col-xs-9">';
-							listStr+='<h4 class="mui-ellipsis" >'+arr[m].typeName+'</h4>';
-							listStr+='<h5>父级：'+arr[m].parentTypeName+'，编码：'+tempCode+'</h5>';
+							listStr+='<h4 class="mui-ellipsis" >'+arr[m].typeName+'，编码：'+arr[m].typeCode+'</h4>';
+//							listStr+='<h5>父级：'+arr[m].parentTypeName+'，编码：'+tempCode+'</h5>';
 							listStr+='</div>';
-							listStr+='<div class="mui-table-cell mui-col-xs-1 mui-text-right"><span class="mui-badge">'+(m+1)+'</span></div>';
+							listStr+='<div class="mui-table-cell mui-col-xs-1 mui-text-right"><span class="mui-badge">'+arr[m].orderNum+'</span></div>';
 							listStr+='</div>';
 							listStr+='</div>';
 							
@@ -190,6 +201,8 @@
 		            		ulObj.appendChild(li);
 		            	}
             			initTitle(arr[0].parentTypeName);
+            		}else{
+            			initTitle(tempPName);
             		}
 					
 	            },
@@ -229,18 +242,49 @@
 				if(!editHtml){
 				    editHtml = plus.webview.getWebviewById('category_edit');
 				}
+				var pcode=CURRENTTYPECODE.substring(CURRENTTYPECODE.lastIndexOf(",")+1,CURRENTTYPECODE.length);
 				mui.fire(editHtml,'editCategory',{
+					mode:'add',
 					id:'',
 					typeCode:'',
 					typeName:'',
 					parentTypeName:tempPName,
-					parentTypeCode:CURRENTTYPECODE.substring(CURRENTTYPECODE.lastIndexOf(",")+1,CURRENTTYPECODE.length)
+					parentTypeCode:pcode
 				});
 				mui.openWindow({
 				    id:'category_edit'
 				});
 				
 			}, false);
+			
+				document.getElementById("category_update").addEventListener('tap', function(event) {
+					mui.ajax({
+				            url  : app.getRequestUrl()+'/vue/dictionary/updateCache',
+				            type     : 'post',
+				            dataType:'json',//服务器返回json格式数据
+				            data:{
+							    loginId:state.id,
+								isAdmin:state.isAdmin
+							},
+							beforeSend: function() {
+						        plus.nativeUI.showWaiting("更新缓存中...", null);
+						    },
+						    complete: function() {
+						        plus.nativeUI.closeWaiting();
+						    },
+				            success  : function(data){
+				            	if(data.code){
+				            		mui.toast(data.msg);
+				            	}
+				            },
+				            error: function(xhr,type,errorThrown){
+				                mui.toast(type);
+				            }
+				    });
+				}, false);
+			
+			
+			
 			var mainPage = document.getElementById('mainPage');
 			mainPage.addEventListener('tap', function(event) {
 				jumpToMain();
