@@ -147,7 +147,7 @@
 					    listHtml = plus.webview.getWebviewById('kq_list');
 					}
 					mui.fire(listHtml,'kqList',{
-						mode:'search'
+						mode:'searchBack'
 					});
 					mui.openWindow({
 					    id:'kq_list'
@@ -190,7 +190,7 @@
 				    listHtml = plus.webview.getWebviewById('kq_list');
 				}
 				mui.fire(listHtml,'kqList',{
-					mode:'search',
+					mode:'searchBack',
 					startdate:getCV('startdate').value,
 				    enddate:getCV('enddate').value,
 				    staffname:getCV('staffname').value,

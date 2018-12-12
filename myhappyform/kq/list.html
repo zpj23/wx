@@ -123,6 +123,7 @@
 						mui('#myList').pullRefresh().endPullup(false); //继续加载
 					}else{
 						if(currentPage>=totalPage){
+							
 							mui('#myList').pullRefresh().endPullup(true); //参数为true代表没有更多数据了。
 						}else{
 							mui('#myList').pullRefresh().endPullup(false); //继续加载
@@ -135,6 +136,10 @@
 					
 				}, 1500);
 			}
+			//设置上拉可重新加载数据
+			function setPullRefresh(){
+				mui('#myList').pullRefresh().refresh(true);//重置之前没有更多数据的问题,实现重新可以加载
+			}
 			/**
 			 * 往下拉加载最新数据
 			 */
@@ -145,6 +150,7 @@
 					obj.innerHTML="";
 					initData();
 					mui('#myList').pullRefresh().endPulldown();
+					setPullRefresh();
 				}, 1500);
 			}
 		
@@ -427,6 +433,7 @@
 			    departmentcode="";
 				isshenhe="";
 				document.getElementById("OA_task_1").innerHTML="";
+				setPullRefresh();
 				//初始化数据
 				initData();
 			}else if(mode=="editBack"||mode=="view"||mode=="searchBack"){
@@ -439,6 +446,7 @@
 			    staffname=event.detail.staffname;
 			    departmentcode=event.detail.departmentcode;
 				isshenhe=event.detail.shenhe;
+				setPullRefresh();
 				//初始化数据
 				initData();
 			}

@@ -166,6 +166,10 @@
 					}
 				}, 1500);
 			}
+		//设置上拉可重新加载数据
+			function setPullRefresh(){
+				mui('#myList').pullRefresh().refresh(true);//重置之前没有更多数据的问题,实现重新可以加载
+			}
 			/**
 			 * 往下拉加载最新数据
 			 */
@@ -176,6 +180,7 @@
 					obj.innerHTML="";
 					initData();
 					mui('#myList').pullRefresh().endPulldown();
+					setPullRefresh();
 				}, 1500);
 			}
 			
@@ -189,6 +194,7 @@
 					search_supplierId='';
 					search_goodsType='';
 					document.getElementById("OA_task_1").innerHTML="";
+					setPullRefresh();
 					initData();
 				}else if(event.detail.mode=="edit"){
 					//保存信息
@@ -213,6 +219,7 @@
 					if(typeof(search_goodsType)=="undefined"){
 						search_goodsType='';
 					}
+					setPullRefresh();
 					initData();
 				}else if(event.detail.mode=="editBack"||event.detail.mode=="searchBack"){
 					//返回 不做任何操作

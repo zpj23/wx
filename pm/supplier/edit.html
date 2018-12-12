@@ -48,7 +48,6 @@
 			    <div class="mui-button-row">
 			    	<input type="hidden" id="id" value="" />
 			        <button type="button" id="saveButton" class="mui-btn mui-btn-primary" >确认</button>
-			        <button type="button" class="mui-btn mui-btn-danger " id="cancelButton">取消</button>
 			    </div>
 			</form>
 			
@@ -126,23 +125,17 @@
 			}
 			
 			function initButtonData(){
-				var cancelbutton=document.getElementById("cancelButton");
-				cancelbutton.addEventListener('tap', function(){
-					
-				}, false);
 				var backbutton=document.getElementById("backList1");
 				backbutton.addEventListener('tap', function(){
-//					console.log(">>>>>>新增返回列表");
-					jumpListPage();
-//					if(!listHtml){
-//					    listHtml = plus.webview.getWebviewById('supplier_list');
-//					}
-//					mui.fire(listHtml,'supplierList',{
-//						//userid:app.getState().id
-//					});
-//					mui.openWindow({
-//					    id:'supplier_list'
-//					});
+					if(!listHtml){
+					    listHtml = plus.webview.getWebviewById('supplier_list');
+					}
+					mui.fire(listHtml,'supplierList',{
+						mode:'editBack'
+					});
+					mui.openWindow({
+					    id:'supplier_list'
+					});
 				}, false);
 				
 				var saveButton =document.getElementById("saveButton");
@@ -179,15 +172,6 @@
 				            success  : function(data){
 				            	if(data.msg){
 				            		jumpListPage();
-//				            		if(!listHtml){
-//									    listHtml = plus.webview.getWebviewById('supplier_list');
-//									}
-//									mui.fire(listHtml,'supplierList',{
-//										//userid:app.getState().id
-//									});
-//									mui.openWindow({
-//									    id:'supplier_list'
-//									});
 				            	}else{
 				            		mui.toast("保存失败");
 				            	}
@@ -208,7 +192,7 @@
 				    listHtml = plus.webview.getWebviewById('supplier_list');
 				}
 				mui.fire(listHtml,'supplierList',{
-					//userid:app.getState().id
+					mode:'edit'
 				});
 				mui.openWindow({
 				    id:'supplier_list'

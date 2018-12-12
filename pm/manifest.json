@@ -173,7 +173,8 @@
 					"fj/list.html",
 					"supplier/list.html",
 					"goods/list.html",
-					"dictionary/list.html"
+					"dictionary/list.html",
+					"category/list.html"
 				],
 				"priority": 1
 			},
@@ -268,6 +269,13 @@
 				"refer": [
 					"dictionary/edit.html",
 					"dictionary/list_second.html"
+				],
+				"priority": 0
+			},
+			"category/list.html": {
+				"resources": [],
+				"refer": [
+					"category/edit.html"
 				],
 				"priority": 0
 			}
