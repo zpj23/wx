@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link rel="stylesheet" type="text/css" href="css/mui.min.css" />
+		<script src="js/mui.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/app.js" type="text/javascript" charset="utf-8"></script>
+		<style type="text/css">
+			.chart {
+				height: 250px;
+				margin: 0px;
+				padding: 0px;
+			}
+			
+			h5 {
+				margin-top: 30px;
+				font-weight: bold;
+			}
+			
+			h5:first-child {
+				margin-top: 15px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav" style="padding-right: 15px;">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">家庭系统</h1>
+		</header>
+		<div class="mui-content">
+			<div class="mui-content-padded">
+				<h5>费用类别统计统计图</h5>
+				<div class="chart" id="barChart"></div>
+				<h5>费用月份线性图</h5>
+				<div class="chart" id="lineChart"></div>
+				<h5>费用类别饼图示</h5>
+				<div class="chart" id="pieChart"></div>
+			</div>
+		</div>
+		<script src="libs/echarts-all.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+			(function($, doc) {
+				$.plusReady(function() {
+					$.AjaxR('http://' + localStorage.getItem("ip") + '/WebService.asmx/TongJi', {
+						uid: localStorage.getItem("userid"),
+					}, function(json) {
+						var barlabel = [];
+						var barvalue = [];
+						json = eval('(' + json + ')')
+
+						for(var t = 0; t < json.data1.length; t++) {
+							barlabel.push(json.data1[t].name)
+							barvalue.push(json.data1[t].value)
+						}
+						var getOption = function(chartType) {
+							var chartOption;
+							if(chartType == "feiyongbingtu") {
+								chartOption = {
+									calculable: false,
+									series: [{
+										name: '按类型分类',
+										type: 'pie',
+										radius: '65%',
+										center: ['50%', '50%'],
+										data: json.data1
+									}]
+								}
+							}
+							if(chartType == "leibiezhuxingtu") {
+								chartOption = {
+									legend: {
+										data: ['支出金额']
+									},
+									grid: {
+										x: 50,
+										x2: 10,
+										y: 30,
+										y2: 60
+									},
+									toolbox: {
+										show: false,
+										feature: {
+											mark: {
+												show: true
+											},
+											dataView: {
+												show: true,
+												readOnly: false
+											},
+											magicType: {
+												show: true,
+												type: ['line', 'bar']
+											},
+											restore: {
+												show: true
+											},
+											saveAsImage: {
+												show: true
+											}
+										}
+									},
+									calculable: false,
+									xAxis: [{
+										type: 'category',
+										axisLabel: {
+											interval: 0,
+											rotate: 40
+										},
+										data: barlabel
+									}],
+									yAxis: [{
+										type: 'value',
+										splitArea: {
+											show: true
+										}
+									}],
+									series: [{
+										name: '支出金额',
+										type: "bar",
+										data: barvalue
+									}]
+								};
+							}
+							if(chartType == "yuefenxianxingtu") {
+								chartOption = {
+									legend: {
+										data: ['支出金额']
+									},
+									grid: {
+										x: 35,
+										x2: 10,
+										y: 30,
+										y2: 25
+									},
+									toolbox: {
+										show: false,
+										feature: {
+											mark: {
+												show: true
+											},
+											dataView: {
+												show: true,
+												readOnly: false
+											},
+											magicType: {
+												show: true,
+												type: ['line', 'bar']
+											},
+											restore: {
+												show: true
+											},
+											saveAsImage: {
+												show: true
+											}
+										}
+									},
+									calculable: false,
+									xAxis: [{
+										type: 'category',
+										data: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月']
+									}],
+									yAxis: [{
+										type: 'value',
+										splitArea: {
+											show: true
+										}
+									}],
+									series: [{
+										name: '支出金额',
+										type: 'line',
+										data: json.data2
+									}]
+								};
+							}
+
+							return chartOption;
+						}
+
+						var byId = function(id) {
+							return document.getElementById(id);
+						};
+						var barChart = echarts.init(byId('barChart'));
+						barChart.setOption(getOption('leibiezhuxingtu'));
+						var lineChart = echarts.init(byId('lineChart'));
+						lineChart.setOption(getOption('yuefenxianxingtu'));
+						var pieChart = echarts.init(byId('pieChart'));
+						pieChart.setOption(getOption('feiyongbingtu'));
+						//					byId("echarts").addEventListener('tap', function() {
+						//						var url = this.getAttribute('data-url');
+						//						plus.runtime.openURL(url);
+						//					}, false);
+
+					}, 'text');
+				});
+			}(mui, document));
+		</script>
+
+	</body>
+
+</html>

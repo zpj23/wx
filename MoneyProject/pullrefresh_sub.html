@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>Hello MUI</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link rel="stylesheet" href="css/mui.min.css">
+		<style type="text/css">
+			h1,
+			h2,
+			h3,
+			h4,
+			h5,
+			h6 {
+				line-height: 1.5;
+				margin-top: 5px;
+				margin-bottom: 5px;
+			}
+			
+			.qy {}
+			
+			.mui-table-view-cell:after {
+				left: 15px;
+				right: 15px;
+				height: 1px;
+				content: '';
+				-webkit-transform: scaleY(.5);
+				transform: scaleY(.5);
+				background-color: #c8c7cc;
+			}
+		</style>
+	</head>
+
+	<body>
+		<!--下拉刷新容器-->
+		<div id="pullrefresh" class="mui-content mui-scroll-wrapper">
+			<div class="mui-scroll">
+				<div class="mui-card">
+					<div class="mui-card-header">统计</div>
+					<div class="mui-card-content">
+						<div class="mui-card-content-inner" id="hz">
+
+						</div>
+
+					</div>
+
+					<!--数据列表-->
+					<ul class="mui-table-view ">
+
+						<!--<li class="mui-table-view-cell">
+						<div class="mui-table">
+							<div class="mui-table-cell mui-col-xs-10">
+								<h4 class="mui-ellipsis">类型：支出</h4>
+								<h5>日期：2018-11-20 录入人：李四</h5>
+								<p class="mui-h6 mui-ellipsis">备注：Hi，李明明，申请交行信息卡，100元等你拿，李明明，申请交行信息卡，100元等你拿，</p>
+							</div>
+							<div class="mui-table-cell mui-col-xs-2 mui-text-right">
+								<a class="mui-btn mui-btn-primary">修改</a>
+								<a class="mui-btn mui-btn-red " style="margin-top: 5px;">删除</a>
+							</div>
+						</div>
+					</li>-->
+					</ul>
+				</div>
+			</div>
+			<script src="js/mui.min.js"></script>
+			<script src="js/app.js" type="text/javascript" charset="utf-8"></script>
+			<script>
+				mui.plusReady(function() {
+					var count = 1;
+					mui.init({
+						//					preloadPages: [{
+						//						id: 'add.html',
+						//						url: 'add.html'
+						//					}],
+						gestureConfig: {
+							tap: true, //默认为true
+							doubletap: true, //默认为false
+							longtap: true, //默认为false
+							swipe: true, //默认为true
+							drag: true, //默认为true
+							hold: false, //默认为false，不监听
+							release: false //默认为false，不监听
+						},
+						pullRefresh: {
+							container: '#pullrefresh',
+							down: {
+								height: 50, //可选,默认50.触发下拉刷新拖动距离,
+								auto: false, //可选,默认false.首次加载自动下拉刷新一次
+								contentdown: "下拉可以刷新", //可选，在下拉可刷新状态时，下拉刷新控件上显示的标题内容
+								contentover: "释放立即刷新", //可选，在释放可刷新状态时，下拉刷新控件上显示的标题内容
+								contentrefresh: "正在刷新...", //可选，正在刷新状态时，下拉刷新控件上显示的标题内容/**/
+								callback: pulldownRefresh
+							},
+							up: {
+								height: 50, //可选.默认50.触发上拉加载拖动距离
+								auto: true, //可选,默认false.自动上拉加载一次
+								contentrefresh: "正在加载...", //可选，正在加载状态时，上拉加载控件上显示的标题内容
+								contentnomore: '没有更多数据了', //可选，请求完毕若没有更多数据时显示的提醒内容；
+								callback: pullupRefresh
+							}
+						}
+					});
+
+					mui.preload({
+						id: 'add.html',
+						url: 'add.html',
+						extras: {
+							type: plus.webview.currentWebview().type
+						},
+					});
+					window.addEventListener('refresh1', function(e) { //执行刷新
+						pulldownRefresh();
+					});
+					mui.AjaxR('http://' + localStorage.getItem("ip") + '/WebService.asmx/TjCost', {
+						type: plus.webview.currentWebview().type,
+						uid: localStorage.getItem("userid")
+					}, function(json) {
+						document.getElementById("hz").innerHTML=json;
+
+					}, 'text');
+					/**
+					 * 下拉刷新具体业务实现
+					 */
+					function pulldownRefresh() {
+
+						var table = document.body.querySelector('.mui-table-view')
+						table.innerHTML = "";
+						count = 1;
+
+						pullupRefresh();
+						//					var cells = document.body.querySelectorAll('.mui-table-view-cell');
+						//					for (var i = cells.length, len = i + 3; i < len; i++) {
+						//						var li = document.createElement('li');
+						//						li.className = 'mui-table-view-cell';
+						//						li.innerHTML = '<a class="mui-navigate-right">Item ' + (i + 1) + '</a>';
+						//						//下拉刷新，新纪录插到最前面；
+						//						table.insertBefore(li, table.firstChild);
+						//					}
+						mui('#pullrefresh').pullRefresh().enablePullupToRefresh();
+						mui('#pullrefresh').pullRefresh().endPulldownToRefresh(); //refresh completed
+
+					}
+
+					/**
+					 * 上拉加载具体业务实现
+					 */
+					function pullupRefresh() {
+						//setTimeout(function() {
+						var self = plus.webview.currentWebview();
+
+						//mui('#pullrefresh').pullRefresh().endPullupToRefresh((++count > 2)); //参数为true代表没有更多数据了。
+						var table = document.body.querySelector('.mui-table-view');
+
+						//var cells = document.body.querySelectorAll('.mui-table-view-cell');
+						mui.AjaxR('http://' + localStorage.getItem("ip") + '/WebService.asmx/CostList', {
+							type: self.type,
+							uid: localStorage.getItem("userid"),
+							pagesize: 10,
+							page: count
+						}, function(json) {
+							//var listhtml = "";
+							if(json.length > 0) {
+								++count;
+							}
+							mui('#pullrefresh').pullRefresh().endPullupToRefresh(json.length == 0);
+							for(var i = 0; i < json.length; i++) {
+								var li = document.createElement('li');
+								li.className = 'mui-table-view-cell';
+								li.data = json[i];
+								li.innerHTML = '<div class="mui-table">' +
+									'<div class="mui-table-cell qy mui-col-xs-10">' +
+									'<h4 class="mui-ellipsis">类型：' + json[i].mingcheng + ' &nbsp;&nbsp;' + (self.type == 1 ? "收入" : "支出") + ':' + json[i].yuan + '元</h4>' +
+									'<h5>日期：' + json[i].riqi + '&nbsp;&nbsp;录入人：' + json[i].xiaofeiren + '</h5>' +
+									'<p class="mui-h6 mui-ellipsis">备注：' + json[i].beizhu + '</p>' +
+									'</div>' +
+									'<div class="mui-table-cell mui-col-xs-2 mui-text-right">' +
+									'<a class="mui-btn mui-btn-primary">修改</a>' +
+									'<a class="mui-btn mui-btn-red " style="margin-top: 5px;">删除</a>' +
+									'</div>' +
+									'</div>';
+
+								//li.innerHTML = "日期：" + json[i].riqi + "　类型：" + json[i].mingcheng + "<br/>录入人：" + json[i].xiaofeiren + "　　" + (self.type == 1 ? "收入" : "支出") + ":<font color='red'>" + json[i].yuan + "</font>元<br/> 备注:" + json[i].beizhu;
+								table.appendChild(li);
+								//listhtml += "<li data=\"" + json[i].id + "\" class=\"mui-table-view-cell\">日期：" + json[i].riqi + "　　类型：" + json[i].mingcheng + "<br/>录入人：" + json[i].xiaofeiren + "　　　" + (self.type == 1 ? "收入" : "支出") + ":<font color='red'>" + json[i].yuan + "</font>元<br/> 备注:" + json[i].beizhu + "</li>"
+							}
+							//doc.getElementById("list").innerHTML = doc.getElementById("list").innerHTML + listhtml;
+
+						});
+						//					for (var i = cells.length, len = i + 20; i < len; i++) {
+						//						var li = document.createElement('li');
+						//						li.className = 'mui-table-view-cell';
+						//						li.innerHTML = '<a class="mui-navigate-right">Item ' + (i + 1) + '</a>';
+						//						table.appendChild(li);
+						//					}
+						//}, 1500);
+					}
+					//			if(mui.os.plus) {
+					//				mui.plusReady(function() {
+					//					setTimeout(function() {
+					//						mui('#pullrefresh').pullRefresh().pullupLoading();
+					//					}, 50);
+					//					console.log(1)
+					//
+					//				});
+					//			} else {
+					//				mui.ready(function() {
+					//					mui('#pullrefresh').pullRefresh().pullupLoading();
+					//				});
+					//			}
+					//mui.ready(function() {
+
+					mui('.mui-table-view').on('longtap', 'li', function(e) {
+						var li = this;
+						var id = this.data.id;
+						var btnArray = ['是', '否'];
+						mui.confirm('是否删除该选项？', '提醒', btnArray, function(e) {
+							if(e.index == 0) {
+								mui.AjaxR("http://" + localStorage.getItem("ip") + "/WebService.asmx/DelCost", {
+									id: id,
+									uid: localStorage.getItem("userid")
+								}, function(json) {
+									if(json == "1") {
+										mui.toast("删除成功");
+										li.parentNode.removeChild(li);
+										pulldownRefresh();
+									}
+
+								}, 'json')
+
+							} else {
+
+							}
+						})
+
+					});
+					mui('.mui-table-view').on('tap', '.mui-btn-red', function(e) {
+						var elem = this;
+						var li = elem.parentNode.parentNode.parentNode;
+						//console.log(li.data);
+						var btnArray = ['是', '否'];
+						mui.confirm('是否删除该选项？', '提醒', btnArray, function(e) {
+							if(e.index == 0) {
+								mui.AjaxR("http://" + localStorage.getItem("ip") + "/WebService.asmx/DelCost", {
+									id: li.data.id,
+									uid: localStorage.getItem("userid")
+								}, function(json) {
+									if(json == "1") {
+										mui.toast("删除成功");
+										li.parentNode.removeChild(li);
+									}
+
+								})
+
+							} else {
+
+							}
+						})
+
+					});
+					var detailPage = null;
+					mui('.mui-table-view').on('tap', '.mui-btn-primary', function(e) {
+						var elem = this;
+						var li = elem.parentNode.parentNode.parentNode;
+						if(!detailPage) {
+
+							detailPage = plus.webview.getWebviewById('add.html');
+
+						}
+						//触发详情页面的newsId事件
+						mui.fire(detailPage, 'mod', {
+							data: li.data
+						});
+
+						//打开详情页面          
+						detailPage = mui.openWindow({
+							id: 'add.html'
+						});
+
+					});
+					mui('.mui-table-view').on('tap', '.qy', function(e) {
+						var li = this.parentNode.parentNode;
+						if(!detailPage) {
+
+							detailPage = plus.webview.getWebviewById('add.html');
+
+						}
+						//触发详情页面的newsId事件
+						mui.fire(detailPage, 'mod', {
+							data: li.data
+						});
+
+						//打开详情页面          
+						detailPage = mui.openWindow({
+							id: 'add.html'
+						});
+
+					});
+
+				});
+			</script>
+	</body>
+
+</html>

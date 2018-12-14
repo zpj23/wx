@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title></title>
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<link href="css/style.css" rel="stylesheet" />
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<h1 class="mui-title">注册</h1>
+		</header>
+		<div class="mui-content">
+			<form id='regform' class="mui-input-group">
+				<div class="mui-input-row">
+					<label> 手机</label>
+					<input id='tel' type="text" class="mui-input-clear mui-input" placeholder="请输入手机号码">
+				</div>
+				<div class="mui-input-row">
+					<label> 用户名</label>
+					<input id='name' type="text" class="mui-input-clear mui-input" placeholder="请输入用户姓名">
+				</div>
+				<div class="mui-input-row">
+					<label> 邀请码</label>
+					<input id='yqm' type="text" class="mui-input-clear mui-input" placeholder="请输入体验邀请码">
+				</div>
+				<div class="mui-button-row">
+					<button id='reg' class="mui-btn  mui-btn-primary">注册</button>
+
+				</div>
+			</form>
+		</div>
+		<script src="js/mui.min.js"></script>
+		<script src="js/app.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+			(function($, doc) {
+				$.init({
+					statusBarBackground: '#f7f7f7'
+				});
+
+				$("#regform").on('tap', '#reg', function(event) {
+					if(doc.getElementById('tel').value=="" ||doc.getElementById('name').value==""||doc.getElementById('yqm').value==""){
+					  mui.alert("所有内容必须填写");
+					  return;
+					}
+					$.AjaxR("http://" + localStorage.getItem("ip") + "/WebService.asmx/reg", {
+						data: {
+							tel: doc.getElementById('tel').value,
+							name: doc.getElementById('name').value,
+							yqm:doc.getElementById('yqm').value
+						},
+						dataType: 'text', //服务器返回json格式数据
+						type: 'get', //HTTP请求类型
+						//headers: { 'Content-Type': 'application/json' },
+						success: function(str) {
+							if(str == -2) {
+								$.alert('邀请码不正确！');
+								return;
+							}
+							if(str == -1) {
+								$.alert('网络问题！')
+							} else if(str == 0) {
+								$.alert('注册失败，手机已经注册！')
+
+							} else if(str == 1) {
+								$.toast('注册成功，请登陆！')
+								$.back();
+							}
+						}
+
+					});
+
+				});
+
+			}(mui, document));
+		</script>
+	</body>
+
+</html>

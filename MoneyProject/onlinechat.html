@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link rel="stylesheet" href="css/min/bootstrap.min.css" />
+		<link rel="stylesheet" href="css/nor/index.css" />
+		<link rel="stylesheet" type="text/css" href="css/mui.min.css"/>
+		<style type="text/css">
+			.form-control {
+				background-color: #eee;
+			}
+			
+			.list-group {
+				margin-bottom: 0px;
+				padding-left: 0;
+				margin-top: 0px;
+			}
+			
+			#spliter {
+				cursor: pointer;
+				background-color: transparent;
+				background-repeat: no-repeat!important;
+				width: 25px;
+				left: 0px;
+				top: 0px;
+				bottom: 0px;
+			}
+			
+			.x-layout-split {
+				top: 40%;
+				width: 15px;
+				height: 50px;
+				padding: 6px 0px;
+				position: absolute;
+			}
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav" style="padding-right: 15px;">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">家庭系统</h1>
+		</header>
+		<div class="mui-content">
+		<div class="container-fluid">
+			<div class="row">
+				<div id="zone_left" style="width:38%;float:left;background-color: #f9fff2;
+    border: 1px solid #e4e4e4;margin-right: 2px;">
+					<div style="height:50px;margin-left:10px;">
+						<img style="float:left;width: 40%;" src="images/logo.png" />
+						<div style="float:left;color:orange;font-size:25px;font-weight:900;margin-left:10px;margin-top:10px;">永恒</div>
+					</div>
+					<div style="height:75px;">
+						<div class="input-group">
+							<span class="input-group-addon" style="color:orange;">昵称</span>
+							<div id="inp_nickname" class="form-control">11</div>
+
+						</div>
+						<div id="user_count" class="list-group-item list-group-item-success" style="cursor:pointer;"><span id="nowusers_count" class="badge" style="background-color:green;"></span><span style="margin-right:5px;" class="glyphicon glyphicon-comment"></span>在线</div>
+					</div>
+					<div id="user_list" class="list-group" style="overflow-y:auto;"></div>
+				</div>
+
+				<div style="width:60%;float:left;" id="chatmain">
+					<div id="div_msgpanel" class="panel panel-success">
+						<div class="panel-heading">
+							<div class="panel-title">
+								<span id="msg_title">公共聊天记录</span>
+
+							</div>
+
+						</div>
+						<div id="div_msgbox" class="panel-body" style="overflow-y:auto;"></div>
+						<div id="div_privmsg" class="panel-body" style="overflow-y:auto;display:none;"></div>
+					</div>
+					<div style="position:relative;left:0px;bottom:10px;">
+						<div style="float:right;">
+							<!--<span style='color:gray;font-size:12px;'>ctrl+回车发送</span>-->
+
+
+							<button id="btn_conn" type="button" class="btn btn-warning">连接</button>
+							<button id="btn_say" type="button" class="btn btn-success">发送</button>
+						</div>
+					</div>
+					<div style="clear:both">
+						<textarea id="inp_say" maxlength="500" placeholder="点击左侧用户可私聊" class="form-control" style="height:125px;resize:none;"></textarea>
+					</div>
+					<div id="spliter">
+						<div class=" x-layout-split glyphicon glyphicon-triangle-left" id="userbtn"></div>
+
+					</div>
+				</div>
+			</div>
+			<script>
+				var u = navigator.userAgent;
+				var isAndroid = u.indexOf('Android') > -1 || u.indexOf('Adr') > -1;
+				if(isAndroid) {
+					window.addEventListener("resize", function() {
+						if(document.activeElement.tagName == "INPUT" || document.activeElement.tagName == "TEXTAREA") {
+							window.setTimeout(function() {
+								document.activeElement.scrollIntoViewIfNeeded();
+							}, 0);
+						}
+					})
+				}
+			</script>
+			<script src="js/mui.min.js"></script>
+			<script type="text/javascript" src="js/min/jquery-1.9.1.min.js"></script>
+			<script type="text/javascript" src="js/min/layer/layer.js"></script>
+			<script type="text/javascript" src="js/min/laypage/laypage.js"></script>
+			<script type="text/javascript" src="js/min/jpegencoder.js?v=20160711"></script>
+			<script type="text/javascript" src="js/nor/index.js?v=201607211"></script>
+			
+	</body>
+</div>
+</html>

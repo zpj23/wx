@@ -1,0 +1,250 @@
+{
+  "login.html": {
+    "resources": [
+      "js/app.js",
+      "js/mui.min.js",
+      "css/mui.min.css",
+      "css/style.css",
+      "js/mui.enterfocus.js",
+      "fonts/mui.ttf",
+      "login.html",
+      "js/update.js"
+    ],
+    "refer": [
+      "login.html",
+      "main.html",
+      "reg.html"
+    ]
+  },
+  "main.html": {
+    "resources": [
+      "css/mui.min.css",
+      "fonts/mui.ttf",
+      "js/app.js",
+      "js/mui.min.js"
+    ],
+    "refer": [
+      "add.html",
+      "list.html",
+      "user.html",
+      "leibie.html",
+      "pullrefresh_sub.html",
+      "pullrefresh_main.html",
+      "setting.html",
+      "chart.html",
+      "onlinechat.html",
+      "rizhi.html",
+      "baidumap.html",
+      "barcode.html",
+      "index.html",
+      "mstt.html"
+    ]
+  },
+  "user.html": {
+    "resources": [
+      "css/mui.min.css",
+      "js/mui.min.js",
+      "js/app.js"
+    ],
+    "refer": []
+  },
+  "list.html": {
+    "resources": [
+      "css/mui.min.css"
+    ],
+    "refer": []
+  },
+  "leibie.html": {
+    "resources": [
+      "css/mui.min.css",
+      "js/mui.min.js",
+      "js/app.js"
+    ],
+    "refer": [
+      "addliebie.html"
+    ]
+  },
+  "addliebie.html": {
+    "resources": [
+      "css/mui.min.css",
+      "js/mui.min.js",
+      "js/app.js"
+    ],
+    "refer": []
+  },
+  "add.html": {
+    "resources": [
+      "css/mui.min.css",
+      "css/mui.picker.css",
+      "css/mui.poppicker.css",
+      "css/mui.picker.min.css",
+      "js/mui.min.js",
+      "js/mui.picker.js",
+      "js/mui.poppicker.js",
+      "js/mui.picker.min.js",
+      "js/app.js"
+    ],
+    "refer": [
+      "pullrefresh_main.html",
+      "pullrefresh_sub.html"
+    ]
+  },
+  "pullrefresh_main.html": {
+    "resources": [
+      "pullrefresh_sub.html",
+      "list.html",
+      "js/mui.min.js",
+      "css/mui.min.css"
+    ],
+    "refer": [
+      "pullrefresh_sub.html",
+      "list.html"
+    ]
+  },
+  "setting.html": {
+    "resources": [
+      "/js/mui.min.js",
+      "/css/mui.min.css",
+      "/js/mui.view.js",
+      "/js/feedback.js"
+    ],
+    "refer": []
+  },
+  "pullrefresh_sub.html": {
+    "refer": [
+      "add.html"
+    ],
+    "resources": [
+      "css/mui.min.css",
+      "js/mui.min.js",
+      "js/app.js"
+    ]
+  },
+  "chart.html": {
+    "href": "chart.html",
+    "resources": [
+      "css/mui.min.css",
+      "js/mui.min.js",
+      "libs/echarts-all.js",
+      "js/app.js"
+    ],
+    "refer": [],
+    "priority": 0
+  },
+  "onlinechat.html": {
+    "href": "onlinechat.html",
+    "resources": [
+      "js/mui.min.js",
+      "images/logo.png",
+      "css/min/bootstrap.min.css",
+      "css/nor/index.css",
+      "css/mui.min.css",
+      "js/min/jquery-1.9.1.min.js",
+      "js/min/layer/layer.js",
+      "js/min/laypage/laypage.js",
+      "js/min/jpegencoder.js",
+      "js/nor/index.js",
+      "PLUG/WebSocketMain.swf"
+    ],
+    "refer": [],
+    "priority": 0
+  },
+  "reg.html": {
+    "href": "reg.html",
+    "resources": [
+      "css/mui.min.css",
+      "css/style.css",
+      "js/mui.min.js",
+      "js/app.js"
+    ],
+    "refer": [],
+    "priority": 0
+  },
+  "rizhi.html": {
+    "resources": [
+      "/images/yuantiao.jpg",
+      "rizhipage.html",
+      "css/mui.min.css",
+      "js/mui.min.js"
+    ],
+    "refer": [
+      "addrizhi.html",
+      "camera.html",
+      "rizhipage.html"
+    ]
+  },
+  "camera.html": {
+    "resources": [
+      "/css/common.css",
+      "/js/common.js",
+      "/js/immersed.js"
+    ],
+    "refer": []
+  },
+  "addrizhi.html": {
+    "resources": [
+      "/images/logo.png",
+      "css/mui.min.css",
+      "js/plugins/cropper/css/cropper.min.css",
+      "js/plugins/cropper/images/bg.png",
+      "js/mui.min.js",
+      "js/app.js",
+      "js/plugins/jquery-3.1.1.slim.min.js",
+      "js/plugins/cropper/js/cropper.min.js"
+    ],
+    "refer": [
+      "rizhipage.html"
+    ]
+  },
+  "mstt.html": {
+    "href": "mstt.html",
+    "resources": [
+      "css/mui.min.css",
+      "libs/modules/egret/egret.min.js",
+      "libs/modules/egret/egret.web.min.js",
+      "libs/modules/game/game.min.js",
+      "libs/modules/game/game.web.min.js",
+      "libs/modules/tween/tween.min.js",
+      "libs/modules/res/res.min.js",
+      "libs/modules/dragonbones/dragonbones.min.js",
+      "libs/modules/gui/gui.min.js",
+      "main.min.js",
+      "resource/default.res.json",
+      "js/mui.min.js"
+    ],
+    "refer": [],
+    "priority": 0
+  },
+  "baidumap.html": {
+    "href": "baidumap.html",
+    "resources": [
+      "css/mui.min.css",
+      "js/mui.min.js",
+      "js/app.js",
+      "images/marker_red_sprite.png"
+    ],
+    "refer": [],
+    "priority": 0
+  },
+  "rizhipage.html": {
+    "href": "rizhipage.html",
+    "resources": [
+      "css/mui.min.css",
+      "js/mui.min.js",
+      "js/app.js"
+    ],
+    "refer": [
+      "addrizhi.html"
+    ],
+    "priority": 0
+  },
+  "barcode.html": {
+    "href": "barcode.html",
+    "resources": [
+      "css/mui.min.css",
+      "js/mui.min.js"
+    ],
+    "refer": [],
+    "priority": 0
+  }
+}

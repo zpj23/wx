@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<style type="text/css">
+			.mui-table-view .mui-media-object {
+				/* line-height: 42px; */
+				max-width: 80px;
+				height: 80px;
+			}
+			
+			.mui-table-view-cell:after {
+				position: absolute;
+				right: 0;
+				bottom: 0;
+				left: 0px;
+				height: 1px;
+				content: '';
+				-webkit-transform: scaleY(.5);
+				transform: scaleY(.5);
+				background-color: #c8c7cc;
+			}
+			
+			img {
+				border-radius: 40px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="pullrefresh" class="mui-content mui-scroll-wrapper">
+			<div class="mui-scroll">
+				<!--数据列表-->
+				<ul class="mui-table-view mui-table-view-chevron">
+
+				</ul>
+			</div>
+		</div>
+
+		<script src="js/mui.min.js"></script>
+		<script src="js/app.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+			(function($, doc) {
+
+				mui.init({
+					gestureConfig: {
+						tap: true, //默认为true
+						doubletap: true, //默认为false
+						longtap: true, //默认为false
+						swipe: true, //默认为true
+						drag: true, //默认为true
+						hold: false, //默认为false，不监听
+						release: false //默认为false，不监听
+					},
+					pullRefresh: {
+						container: '#pullrefresh',
+						down: {
+							height: 50, //可选,默认50.触发下拉刷新拖动距离,
+							auto: false, //可选,默认false.首次加载自动下拉刷新一次
+							contentdown: "下拉可以刷新", //可选，在下拉可刷新状态时，下拉刷新控件上显示的标题内容
+							contentover: "释放立即刷新", //可选，在释放可刷新状态时，下拉刷新控件上显示的标题内容
+							contentrefresh: "正在刷新...", //可选，正在刷新状态时，下拉刷新控件上显示的标题内容/**/
+							callback: pulldownRefresh
+						},
+						up: {
+							height: 50, //可选.默认50.触发上拉加载拖动距离
+							auto: true, //可选,默认false.自动上拉加载一次
+							contentrefresh: "正在加载...", //可选，正在加载状态时，上拉加载控件上显示的标题内容
+							contentnomore: '没有更多数据了', //可选，请求完毕若没有更多数据时显示的提醒内容；
+							callback: pullupRefresh
+						}
+					}
+				});
+				mui.preload({
+					id: 'addrizhi.html',
+					url: 'addrizhi.html'
+				});
+				window.addEventListener('refresh1', function(e) { //执行刷新
+					pulldownRefresh();
+				});
+				/**
+				 * 下拉刷新具体业务实现
+				 */
+				function pulldownRefresh() {
+
+					var table = document.body.querySelector('.mui-table-view')
+					table.innerHTML = "";
+					count = 1;
+
+					pullupRefresh();
+					//					var cells = document.body.querySelectorAll('.mui-table-view-cell');
+					//					for (var i = cells.length, len = i + 3; i < len; i++) {
+					//						var li = document.createElement('li');
+					//						li.className = 'mui-table-view-cell';
+					//						li.innerHTML = '<a class="mui-navigate-right">Item ' + (i + 1) + '</a>';
+					//						//下拉刷新，新纪录插到最前面；
+					//						table.insertBefore(li, table.firstChild);
+					//					}
+					mui('#pullrefresh').pullRefresh().enablePullupToRefresh();
+					mui('#pullrefresh').pullRefresh().endPulldownToRefresh(); //refresh completed
+
+				}
+				var count = 1;
+				/**
+				 * 上拉加载具体业务实现
+				 */
+				function pullupRefresh() {
+					//setTimeout(function() {
+					var self = plus.webview.currentWebview();
+					//mui('#pullrefresh').pullRefresh().endPullupToRefresh((++count > 2)); //参数为true代表没有更多数据了。
+					var table = document.body.querySelector('.mui-table-view');
+					//var cells = document.body.querySelectorAll('.mui-table-view-cell');
+					//var mask = mui.createMask(); //遮罩层
+					mui.AjaxR('http://' + localStorage.getItem("ip") + '/WebService.asmx/RiZhiList', {
+						data: {
+							uid: localStorage.getItem("userid"),
+							pagesize: 10,
+							page: count
+						},
+						async: false,
+						success: function(json) {
+							if(json.length > 0) {
+								++count;
+							}
+							mui('#pullrefresh').pullRefresh().endPullupToRefresh(json.length == 0);
+							for(var i = 0; i < json.length; i++) {
+								var li = document.createElement('li');
+								li.className = 'mui-table-view-cell mui-media';
+								li.data = json[i];
+								li.innerHTML = '<a href="javascript:;">' +
+									'<img class="mui-media-object mui-pull-left" src="http://' + localStorage.getItem("ip") + json[i].pic + '">' +
+									'<div class="mui-media-body">' +
+									json[i].title +
+									'<p class="mui-ellipsis">日期：' + json[i].date + '<br>地址：' + json[i].location + '<br>' + json[i].neirong + '</p>' +
+									'</div>' +
+									'</a>';
+
+								//li.innerHTML = "日期：" + json[i].riqi + "　类型：" + json[i].mingcheng + "<br/>录入人：" + json[i].xiaofeiren + "　　" + (self.type == 1 ? "收入" : "支出") + ":<font color='red'>" + json[i].yuan + "</font>元<br/> 备注:" + json[i].beizhu;
+								table.appendChild(li);
+								//listhtml += "<li data=\"" + json[i].id + "\" class=\"mui-table-view-cell\">日期：" + json[i].riqi + "　　类型：" + json[i].mingcheng + "<br/>录入人：" + json[i].xiaofeiren + "　　　" + (self.type == 1 ? "收入" : "支出") + ":<font color='red'>" + json[i].yuan + "</font>元<br/> 备注:" + json[i].beizhu + "</li>"
+							}
+						}
+					});
+
+				}
+
+				mui('.mui-table-view').on('longtap', 'li', function(e) {
+					var elem = this;
+					var li = elem;
+					//console.log(li.data);
+					var btnArray = ['是', '否'];
+					mui.confirm('是否删除该选项？', '提醒', btnArray, function(e) {
+						if(e.index == 0) {
+							mui.post("http://" + localStorage.getItem("ip") + "/WebService.asmx/DelRiZhi", {
+								id: li.data.id,
+								uid: localStorage.getItem("userid")
+							}, function(json) {
+								if(json == "1") {
+									mui.toast("删除成功");
+									li.parentNode.removeChild(li);
+								}
+
+							}, 'json')
+
+						} else {
+
+						}
+					})
+
+				});
+				var detailPage = null;
+				mui('.mui-table-view').on('tap', 'li', function(e) {
+					var elem = this;
+					var li = elem;
+					if(!detailPage) {
+						detailPage = plus.webview.getWebviewById('addrizhi.html');
+
+					}
+					//触发详情页面的newsId事件
+					mui.fire(detailPage, 'mod', {
+						data: li.data
+					});
+
+					//打开详情页面          
+					detailPage = mui.openWindow({
+						id: 'addrizhi.html'
+					});
+
+				});
+
+			}(mui, document));
+		</script>
+
+	</body>
+
+</html>

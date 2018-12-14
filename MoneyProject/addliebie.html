@@ -1,0 +1,101 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<style type="text/css">
+			#subbutton {
+				margin-top: 10px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav" style="padding-right: 15px;">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">家庭系统</h1>
+
+		</header>
+		<div class="mui-content">
+			<div class="mui-content-padded">
+				<form class="mui-input-group">
+					<div class="mui-input-row">
+						<label>类别名称</label>
+						<input type="text" id="mingcheng" placeholder="请输入">
+					</div>
+
+				</form>
+
+				<button id='subbutton' class="mui-btn mui-btn-block mui-btn-primary">保存</button>
+
+			</div>
+		</div>
+
+		<script src="js/mui.min.js"></script>
+		<script src="js/app.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+			(function($, doc) {
+				$.init({
+					statusBarBackground: '#f7f7f7',
+					beforeback: function() {
+						//获得父页面的webview
+						var list = plus.webview.getWebviewById('leibie');　　　　 //触发父页面的自定义事件(refresh),从而进行刷新
+						mui.fire(list, 'refresh');
+						//返回true,继续页面关闭逻辑
+						return true;
+					}
+				});
+				var id = 0;
+				//				var old_back = $.back;
+				//$.back = function(){
+				//var btn = ["确定","取消"];
+				//$.confirm('确认关闭当前窗口？','Hello MUI',btn,function(e){
+				//  if(e.index==0){
+				//  	//执行mui封装好的窗口关闭逻辑；
+				//  	old_back();
+				//  }
+				//});
+				//}
+				$.plusReady(function() {
+					window.addEventListener('newsId', function(event) {
+						//获得事件参数
+						id = event.detail.id;
+						$("#mingcheng")[0].value = event.detail.name;
+					});
+					doc.getElementById("subbutton").addEventListener('tap', function() {
+
+						if($("#mingcheng")[0].value == "") {
+							$.alert("不允许为空");
+							return;
+						} else {
+							$.AjaxR("http://" + localStorage.getItem("ip") + "/WebService.asmx/EditLieBie", {
+								id: id,
+								name: $("#mingcheng")[0].value,
+								userid:localStorage.getItem("userid"),
+								type: 2
+							}, function(json) {
+								if(json == "1") {
+                                   if(id==0){
+                                   	$.toast("添加成功");
+                                   }else{
+                                   	$.toast("修改成功");
+                                   }
+									
+									$.back();
+								}
+
+							}, 'json')
+
+						}
+
+					})
+
+				});
+			}(mui, document));
+		</script>
+	</body>
+
+</html>

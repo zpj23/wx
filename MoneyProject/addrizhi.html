@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<link rel="stylesheet" type="text/css" href="js/plugins/cropper/css/cropper.min.css" />
+		<style type="text/css">
+			.mui-input-row {
+				position: relative;
+				margin: 2px;
+				padding: 5px;
+				background-color: #fff;
+			}
+			
+			.ui-alert {
+				text-align: left;
+				font-family: 'Helvetica Neue', Helvetica, sans-serif;
+				line-height: 1.1;
+				float: left;
+				padding: 10px 0px;
+			}
+			
+			
+			
+			.mui-numbox {
+				width: 160px;
+			}
+			
+			.pickimg {
+				width: 100%;
+			}
+			
+			.pickimg img {
+				width: 50%;
+			}
+			
+			#imgBox {
+				height: 150px!important;
+				width: 150px!important;
+				margin: 30px auto;
+				background: url('js/plugins/cropper/images/bg.png');
+			}
+			
+			.upbtn {
+				font-size: 18px;
+				/* float: right; */
+				position: relative;
+				right: -160px;
+				top: -50px;
+			}
+			
+			.userrow {
+				position: relative;
+				margin: 2px;
+				padding: 5px;
+				background-color: #fff;
+			}
+			
+			.yycls {
+				padding: 0px;
+				position: absolute;
+				left: 75px;
+				top: 10px;
+			}
+			
+			.mui-input-row label~input,
+			.mui-input-row label~select,
+			.mui-input-row label~textarea {
+				float: right;
+				width: 98%;
+				margin-bottom: 5px;
+				padding: 10px;
+				border: solid 1px #bbb;
+			}
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav" style="padding-right: 15px;">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">家庭系统</h1>
+
+		</header>
+		<div class="mui-content">
+			<div class="mui-content-padded">
+				<div class="userrow">
+					<div id="imgBox">
+						<img id="userImage_id" width="150" height="150" />
+						<button type="button" id="moreMenus" class="mui-btn mui-icon mui-icon-compose mui-btn-green  upbtn">上传</button>
+					</div>
+					<table align="center">
+						<tr>
+							<td style="padding:2px 5px;"><button type="button" disabled id="scaleX_id" class="mui-btn mui-btn-blue toolbutton">左右变换</button></td>
+							<td style="padding:2px 5px;"><button type="button" disabled id="scaleY_id" class="mui-btn mui-btn-blue toolbutton">上下变换</button></td>
+							<td style="padding:2px 5px;"><button type="button" disabled id="rotateMax_id" class="mui-btn mui-btn-blue toolbutton">旋转90°</button></td>
+						</tr>
+						<tr>
+							<td colspan="3" style="padding:5px 5px;"><button type="button" disabled id="confirm_id" class="mui-btn mui-btn-green mui-btn-block toolbutton">确定并保存</button> </td>
+						</tr>
+					</table>
+
+				</div>
+				<div class="mui-input-row">
+					<label>标题</label>
+					<input type="hidden" id="pic">
+					<input type="text" id="title" placeholder="请输入标题">
+					<button id='yuyintitle' class="mui-icon mui-icon-mic mui-btn-yellow yycls"></button>
+				</div>
+				<div class="mui-input-row">
+					<label>内容</label>
+					<textarea id="neirong" rows="5" placeholder="内容" class="mui-input-speech mui-input-clear"></textarea>
+					<button id='yuyinneirong' class="mui-icon mui-icon-mic mui-btn-yellow yycls"></button>
+				</div>
+				<div class="mui-input-row">
+					<label>定位</label>
+					<input type="text" id="location" placeholder="自动获取">
+					<button id='dingwei' class="mui-icon mui-icon-location mui-btn-green yycls"></button>
+
+				</div>
+				<button id='subbutton' class="mui-btn mui-btn-block mui-btn-primary">保存</button>
+
+			</div>
+		</div>
+
+		<script src="js/mui.min.js"></script>
+		<script src="js/app.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript" src="js/plugins/jquery-3.1.1.slim.min.js"></script>
+		<script type="text/javascript" src="js/plugins/cropper/js/cropper.min.js"></script>
+		<script type="text/javascript">
+			mui.init({
+				statusBarBackground: '#f7f7f7',
+				beforeback: function() {
+					//获得父页面的webview
+					var list = plus.webview.getWebviewById('rizhipage.html');　　　　 //触发父页面的自定义事件(refresh),从而进行刷新
+					mui.fire(list, 'refresh1');
+					//返回true,继续页面关闭逻辑
+					return true;
+				}
+			});
+			var id = 0;
+			//				var old_back = $.back;
+			//$.back = function(){
+			//var btn = ["确定","取消"];
+			//$.confirm('确认关闭当前窗口？','Hello MUI',btn,function(e){
+			//  if(e.index==0){
+			//  	//执行mui封装好的窗口关闭逻辑；
+			//  	old_back();
+			//  }
+			//});
+			//}
+			mui.plusReady(function() {
+
+				//					document.getElementById("fabiao").addEventListener("tap", function() {
+				//						upload(); //上传文件 
+				//					});
+				function geoInf(position) {
+					//					var str = "";
+					//					str += "地址：" + position.addresses + "\n"; //获取地址信息
+					//					str += "坐标类型：" + position.coordsType + "\n";
+					//					var timeflag = position.timestamp; //获取到地理位置信息的时间戳；一个毫秒数；
+					//					str += "时间戳：" + timeflag + "\n";
+					//					var codns = position.coords; //获取地理坐标信息；
+					//					var lat = codns.latitude; //获取到当前位置的纬度；
+					//					str += "纬度：" + lat + "\n";
+					//					var longt = codns.longitude; //获取到当前位置的经度
+					//					str += "经度：" + longt + "\n";
+					//					var alt = codns.altitude; //获取到当前位置的海拔信息；
+					//					str += "海拔：" + alt + "\n";
+					//					var accu = codns.accuracy; //地理坐标信息精确度信息；
+					//					str += "精确度：" + accu + "\n";
+					//					var altAcc = codns.altitudeAccuracy; //获取海拔信息的精确度；
+					//					str += "海拔精确度：" + altAcc + "\n";
+					//					var head = codns.heading; //获取设备的移动方向；
+					//					str += "移动方向：" + head + "\n";
+					//					var sped = codns.speed; //获取设备的移动速度；
+					//					str += "移动速度：" + sped;
+					//console.log(JSON.stringify(position));
+					$("#location").val(position.addresses);
+					mui.toast("定位成功");
+				}
+
+				function getGeocode() {
+					plus.geolocation.getCurrentPosition(geoInf, function(e) {
+						mui.alert("请打开GIS定位服务")
+						//mui.alert("获取定位位置信息失败：" + e.message);
+					}, {
+						geocode: true,
+						provider: 'amap'
+					});
+				}
+
+				window.addEventListener('mod', function(event) {
+					var rec = event.detail.data;
+					id = rec.id;
+					document.getElementById('pic').value = rec.pic;
+					document.getElementById("title").value = rec.title;
+					document.getElementById("neirong").value = rec.neirong;
+					document.getElementById("location").value = rec.location;
+					loadImage('http://' + localStorage.getItem("ip") + rec.pic)
+				});
+
+				function startRecognize(obj) {
+					if(plus.os.name == 'Android' && navigator.userAgent.indexOf('StreamApp') > 0) {
+						plus.nativeUI.toast('当前环境暂不支持语音识别插件');
+						return;
+					}
+					var options = {};
+					options.engine = 'iFly';
+					//options.timeout = 10000;
+					//options.userInterface=true;
+					//options.punctuation = false;	// 是否需要标点符号 
+					//outSet("开始语音识别：");
+					plus.speech.startRecognize(options, function(s) {
+						if(s.indexOf("结束") > -1) {
+							plus.speech.stopRecognize();
+						} else {
+							obj.value += s;
+							startRecognize(obj);
+						}
+					}, function(e) {
+						startRecognize(obj);
+					});
+				}
+				document.getElementById('yuyinneirong').addEventListener('tap', function(event) {
+					startRecognize(document.getElementById('neirong'));
+				});
+				document.getElementById('yuyintitle').addEventListener('tap', function(event) {
+					startRecognize(document.getElementById('title'));
+				});
+
+				document.getElementById('dingwei').addEventListener('tap', function(event) {
+					getGeocode();
+				});
+
+				plus.nativeUI.closeWaiting();
+				document.getElementById("moreMenus").addEventListener("tap", function() {
+
+					var editButtons = new Array();
+					editButtons.push({
+						title: "拍照上传",
+						style: "default"
+					});
+					editButtons.push({
+						title: "从相册选择",
+						style: "default"
+					});
+					plus.nativeUI.actionSheet({
+						cancel: "取消",
+						buttons: editButtons
+					}, function(e) {
+						var index = e.index;
+						switch(index) {
+							case 1:
+								captureImage(); //拍照
+								break;
+							case 2:
+								selectImage(); //相册选择
+								break;
+						}
+					});
+				});
+				document.getElementById("scaleX_id").addEventListener("tap", function() {
+					window._scaleX = window._scaleX * -1;
+					$("#userImage_id").cropper("scaleX", window._scaleX);
+
+				});
+				document.getElementById("scaleY_id").addEventListener("tap", function() {
+					window._scaleY = window._scaleY * -1;
+					$("#userImage_id").cropper("scaleY", window._scaleY);
+				});
+				document.getElementById("rotateMax_id").addEventListener("tap", function() {
+					$("#userImage_id").cropper("rotate", 90);
+				});
+				//确定裁切
+				document.getElementById("confirm_id").addEventListener("tap", function(e) {
+					var dataURL = $("#userImage_id").cropper("getCroppedCanvas", {
+						width: 150,
+						height: 150
+					});
+					var imgUrl = dataURL.toDataURL("image/jpeg");
+
+					$("#userImage_id").attr("src", imgUrl);
+					//$("#userImage_id").cropper("replace", imgUrl);
+					$("#userImage_id").cropper("clear"); //裁切完成取消显示裁切框
+
+					$("#userImage_id").cropper("disable");
+					//确定裁切后销毁裁切组件，标记一下，下次继续裁切时需要初始化一下裁切组件
+					window.imageDisable = true;
+					//禁用几个功能按钮
+					$("button.toolbutton").prop("disabled", true);
+					//向后台提供数据
+					uploadFile(imgUrl);
+				}); //初始化裁切组件
+				initImageCropper();
+				getGeocode();
+			});
+			document.getElementById("subbutton").addEventListener('tap', function() {
+				if($("#pic").val() == "") {
+					mui.alert("请上传图片");
+					return;
+				}
+				if($("#title").val() == "" || $("#neirong").val() == "") {
+					mui.alert("不允许为空");
+					return;
+				} else {
+					mui.AjaxR("http://" + localStorage.getItem("ip") + "/WebService.asmx/EditRiZhi", {
+						id: id,
+						pic: $("#pic").val(),
+						title: $("#title").val(),
+						uid: localStorage.getItem("userid"),
+						location: $("#location").val(),
+						neirong: $("#neirong").val()
+					}, function(json) {
+						if(json == "1") {
+							if(id == 0) {
+								mui.toast("添加日志成功");
+							} else {
+								mui.toast("修改成功");
+							}
+
+							mui.back();
+						}
+
+					})
+
+				}
+
+			})
+			//拍照
+			function captureImage() {
+				var cmr = plus.camera.getCamera(2);
+				cmr.captureImage(
+					function(path) {
+						//将图片地址转换
+						plus.io.resolveLocalFileSystemURL(path, function(entry) {
+							var newPath = entry.toLocalURL() + "?version=" + Math.random();
+							loadImage(newPath);
+						});
+					},
+					function(error) {
+						mui.toast(error.message);
+					}, {
+						filename: "_documents/"
+					}
+				);
+
+			}
+
+			//文件上传
+			function uploadFile(image) {
+				var url = "http://" + localStorage.getItem("ip") + "/WebService.asmx/UploadPic";
+				mui.AjaxR(url, {
+					data: {
+						imageBase64: image
+					},
+					dataType:'text',
+					success: function(data) {
+						//			if(data.result == "success"){
+						//				mui.toast("上传成功!");
+						//				document.getElementById("imagePath_div").innerText = rootPath + "/" + data.message + ".image";
+						//				return;
+						//			}
+						$("#pic").val(data);
+					}
+				});
+			}
+
+			function initImageCropper() {
+				//初始化组件
+				$("#userImage_id").cropper({
+					aspectRatio: 3 / 3,
+					autoCropArea: 1,
+					viewMode: 3,
+					dragMode: "move", //设置移动图片、重新绘制选图区域
+					cropBoxResizable: false,
+					movable: true, //是否允许移动裁切框
+					zoomable: true, //是否允许放大图片
+					guides: false, //取消显示裁切线中间的虚线网格
+					minContainerWidth: 150,
+					minContainerHeight: 150,
+					minCanvasWidth: 150,
+					minCanvasHeight: 150,
+					crop: function(data) {
+						//初始化
+						window._scaleX = data.scaleX;
+						window._scaleY = data.scaleY;
+					}
+				});
+				
+			}
+
+			//选择图片
+			function selectImage() {
+				plus.gallery.pick(function(path) {
+					loadImage(path);
+				}, function(e) {
+					mui.toast("没有选择图片.");
+				});
+			}
+
+			//确定选择图片
+			function loadImage(path) {
+				var img = document.getElementById("userImage_id");
+				img.src = path;
+				if(window.imageDisable == true) {
+					$("#userImage_id").cropper("enable");
+				}
+				$("#userImage_id").cropper("replace", path);
+				//启用几个功能按钮
+				$("button.toolbutton").prop("disabled", false);
+				document.getElementById("userImage_id").onclick = function() {
+					plus.runtime.openFile(path);
+				}
+			}
+		</script>
+	</body>
+
+</html>

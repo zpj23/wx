@@ -1,0 +1,76 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<style type="text/css">
+			#saveuser{
+				margin-top: 10px;
+				
+			}
+			
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav" style="padding-right: 15px;">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">家庭系统</h1>
+
+		</header>
+		<div class="mui-content">
+			<div class="mui-content-padded">
+				<form class="mui-input-group">
+					<div class="mui-input-row">
+						<label>用户姓名</label>
+						<input type="text" id="name" class="mui-input-clear" placeholder="用户姓名">
+					</div>
+					<div class="mui-input-row">
+						<label>登陆手机</label>
+						<input type="text" id="tel" class="mui-input-clear" placeholder="手机号码">
+					</div>
+					
+				</form>
+<button type="button" id="saveuser" class="mui-btn mui-btn-blue mui-btn-block">保存</button>
+			</div>
+		</div>
+
+		<script src="js/mui.min.js"></script>
+		<script src="js/app.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+			(function($, doc) {
+				$.init({
+					statusBarBackground: '#f7f7f7'
+				});
+				var id = 0;
+				$.plusReady(function() {
+					var userid = localStorage.getItem("userid");
+					var usertel = localStorage.getItem("usertel");
+					var username = localStorage.getItem("username");
+					doc.getElementById("name").value = username;
+					doc.getElementById("tel").value = usertel;
+					doc.getElementById("saveuser").addEventListener('tap', function() {
+						$.AjaxR('http://'+localStorage.getItem("ip")+'/WebService.asmx/UpdateUser', {
+							id: userid,
+							name: doc.getElementById("name").value,
+							tel: doc.getElementById("tel").value
+						}, function(json) {
+							if(json == "1") {
+								localStorage.setItem("usertel", doc.getElementById("tel").value);
+								localStorage.setItem("username", doc.getElementById("name").value);
+								$.alert("修改成功");
+								$.back();
+							}
+						});
+
+					})
+
+				});
+			}(mui, document));
+		</script>
+	</body>
+
+</html>

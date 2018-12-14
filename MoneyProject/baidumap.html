@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<style type="text/css">
+			#map {
+				width: 100%;
+				position: fixed;
+				top: 45px;
+				bottom: 0px;
+				line-height: 200px;
+				text-align: center;
+				background: #FFFFFF;
+			}
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav" style="padding-right: 15px;">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">家庭系统</h1>
+		</header>
+		<div id="map">地图加载中...</div>
+		<script src="js/mui.min.js"></script>
+		<script src="js/app.js"></script>
+		<script type="text/javascript">
+			(function($, doc) {
+				$.init({
+					statusBarBackground: '#f7f7f7'
+				});
+				var map = null;
+
+				function createMap() {
+					if(!map) {
+						map = new plus.maps.Map('map');
+						map.getUserLocation(function(state, point) {
+							if(0 == state) {
+								map.centerAndZoom(point, 16);
+								map.showZoomControls(true);
+								map.setTraffic(true);
+								var marker = new plus.maps.Marker(point);
+								marker.setIcon("images/marker_red_sprite.png");
+	                            //marker.setLabel("我的位置");
+								var bubble = new plus.maps.Bubble("我的位置");
+								marker.setBubble(bubble);
+								map.addOverlay(marker);
+
+							} else {
+								console.log("Failed!");
+							}
+						});
+						//						map = plus.maps.create('map', {
+						//							top: '45px',
+						//							bottom: '0px'
+						//						});
+						//						plus.webview.currentWebview().append(map);
+					}
+				}
+				// 创建地图控件
+
+				$.plusReady(function() {
+					createMap();
+				});
+			}(mui, document));
+		</script>
+	</body>
+
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link href="css/mui.min.css" rel="stylesheet" />
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav" style="padding-right: 15px;">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left">返回</a>
+			<h1 class="mui-title">家庭系统</h1>
+			<a class="mui-icon mui-icon-plusempty mui-pull-right" id="addrizhi">添加</a>
+		</header>
+		<div class="mui-content">
+
+		</div>
+		<script src="js/mui.min.js"></script>
+
+		<script type="text/javascript">
+			(function($, doc) {
+
+				$.init({
+
+					gestureConfig: {
+						longtap: true,
+						tap: true,
+						doubletap: true
+					},
+					preloadPages: [{
+						id: 'addrizhi.html',
+						url: 'addrizhi.html'
+					}],
+					subpages: [{
+						url: 'rizhipage.html',
+						id: 'rizhipage.html',
+						styles: {
+							top: '45px',
+							bottom: '0px',
+						}
+					}]
+				});
+
+				doc.getElementById("addrizhi").addEventListener('tap', function() {
+					$.openWindow({
+						url: 'addrizhi.html',
+						id: 'addrizhi',
+						//preload: true,
+						createNew: true,
+						show: {
+							aniShow: 'pop-in'
+						},
+						styles: {
+							popGesture: 'hide'
+						},
+						waiting: {
+							autoShow: false
+						}
+					});
+
+				});
+				var contentWebview = null;
+				doc.querySelector('header').addEventListener('doubletap', function() {
+					if(contentWebview == null) {
+						contentWebview = plus.webview.currentWebview().children()[0];
+					}
+					contentWebview.evalJS("mui('#pullrefresh').pullRefresh().scrollTo(0,0,100)");
+				});
+
+			}(mui, document));
+		</script>
+
+	</body>
+
+</html>
