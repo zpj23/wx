@@ -40,7 +40,7 @@
 						if (authed) {
 							return owner.createState(data.data, callback);
 						} else {
-							return callback('用户名或密码错误');
+							return callback(data.info+"");
 						}
 					},
 					error:function(xhr,type,errorThrown){
@@ -67,8 +67,8 @@
 		return callback();
 	};
 	owner.getRequestUrl=function(){
-		return "http://www.yzcbjj.com";
-//		return "http://192.168.11.96:8090";
+//		return "http://www.yzcbjj.com";
+		return "http://192.168.11.96:8090";
 	};
 	
 	/**

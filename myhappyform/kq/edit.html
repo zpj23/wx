@@ -7,7 +7,12 @@
 		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
 		<link href="../css/mui.min.css" rel="stylesheet" />
 		<link rel="stylesheet" type="text/css" href="../css/mui.picker.min.css" />
-		
+		<style>
+			.mui-popover {
+				height: 300px;
+			}
+			
+		</style>
 	</head>
 	
 	<body>
@@ -34,7 +39,22 @@
 						</div>
 					</div>
 				</div>
-				<div class="mui-content-padded"></div>
+				<div class="mui-content-padded">
+				</div>
+				<div class="mui-card">
+					<div class="mui-card-content">
+						<div class="mui-input-row">
+					        <label>施工人员:</label>
+					    	<input type="text" id="staffname" class="mui-input-clear mui-input-speech" placeholder="施工人员" />
+						</div>
+						<div class="mui-input-row">
+					        <label>选择人员：</label>
+							<a href="#middlePopover" class="mui-btn mui-btn-primary" style="float:left;padding:5px;margin: 5px; width: 100px;height: 30px;" >选择人员</a>
+						</div>
+					</div>
+				</div>
+				<div class="mui-content-padded">
+				</div>
 			    <div class="mui-card">
 					<div class="mui-card-content">
 						<div class="mui-input-row">
@@ -44,10 +64,6 @@
 					    <div class="mui-input-row">
 					        <label>施工区域:</label>
 					    <input type="text"  id="sgqy" class="mui-input-clear" placeholder="施工区域">
-					    </div>
-					    <div class="mui-input-row">
-					        <label>施工人员:</label>
-					    <input type="text" id="staffname" class="mui-input-clear" placeholder="施工人员">
 					    </div>
 					    
 					    <div class="mui-input-row">
@@ -76,7 +92,7 @@
 				<div class="mui-card">
 					<div class="mui-card-content" style="padding: 15px;">
 						<label>施工内容:</label>
-						<textarea id="workcontent" style="background-color: whitesmoke;" rows="5"  placeholder=""></textarea>
+						<textarea id="workcontent"  style="background-color: whitesmoke;" rows="5"  placeholder=""></textarea>
 					</div>
 				</div>	
 				<div class="mui-content-padded"></div>
@@ -86,14 +102,22 @@
 						<textarea id="remark" style="background-color: whitesmoke;" rows="5"  placeholder=""></textarea>
 					</div>
 				</div>
-				
 			    <div class="mui-button-row">
 			    	<input type="hidden" id="id" value="" />
 			        <button type="button" id="saveButton" class="mui-btn mui-btn-primary" >确认</button>
                 <!--   <button type="button" class="mui-btn mui-btn-danger " id="cancelButton">取消</button>--> 
 			    </div>
 			</form>
-			
+			<div id="middlePopover" class="mui-popover">
+				<div class="mui-popover-arrow"></div>
+				<div class="mui-scroll-wrapper">
+					<div class="mui-scroll">
+						<ul class="mui-table-view" id="peopleList">
+							
+						</ul>
+					</div>
+				</div>
+			</div>
 		</div>
 		<script src="../js/mui.js"></script>
 		<script src="../js/mui.picker.min.js"></script>
@@ -112,8 +136,55 @@
 				initDateData();
 				//保存按钮
 				initSaveButtonData();
-				
+				//初始化曾经录入过的人员列表
+//				initStaffNameList();
 			});
+			//初始化曾经录入过的人员列表
+			function initStaffNameList(){
+				mui.ajax({
+		            url      : app.getRequestUrl()+'/jlManualCheckPhoneAction_findStaffNameByPhone',
+		            type     : 'post',
+		            dataType:'json',//服务器返回json格式数据
+		            data:{ 
+					    loginId:state.id,
+						isAdmin:state.isAdmin
+					},
+					beforeSend: function() {
+//				        plus.nativeUI.showWaiting("初始化中...", null);
+				    },
+				    complete: function() {
+//				        plus.nativeUI.closeWaiting();
+				    },
+		            success  : function(data){
+						var html='';
+						if(data.length>0){
+							for(var i=0;i<data.length;i++){
+								html+='<li class="mui-table-view-cell">';
+								html+='<div>';
+								html+='<a href="#"  >'+data[i].staffname+'</a>';
+								html+='<button type="button" class="mui-btn choosePeopleClass" style="float: right;height: 30px;" name="'+data[i].staffname+'" >选择</button>';
+								html+='</div></li>';
+							}
+							document.getElementById("peopleList").innerHTML=html;
+						}else{
+							document.getElementById("peopleList").innerHTML='';
+						}
+						
+		            },
+		            error    : function(xhr,type,errorThrown){
+		            }
+		        });
+				
+				
+			}
+//			mui('.mui-scroll-wrapper').scroll();
+//			mui('body').on('shown', '.mui-popover', function(e) {
+////				console.log('shown', e.detail.id);//detail为当前popover元素
+//			});
+//			mui('body').on('hidden', '.mui-popover', function(e) {
+////				console.log('hidden', e.detail.id);//detail为当前popover元素
+//			});
+			
 			//添加newId自定义事件监听
 			window.addEventListener('editId',function(event){
 			  //获得事件参数
@@ -121,7 +192,7 @@
 			  	state=app.getState();
 				queryDepartDownList();
 				initData();
-				
+				initStaffNameList();
 			});
 			
 			function initData(){
@@ -297,10 +368,6 @@
 				}, false);
 			}
 			function initSaveButtonData(){
-//				var cancelbutton=document.getElementById("cancelButton");
-//				cancelbutton.addEventListener('tap', function(){
-//					jumpPage();
-//				}, false);
 				var backbutton=document.getElementById("backList1");
 				backbutton.addEventListener('tap', function(){
 					jumpPage();
@@ -372,6 +439,23 @@
 				            }
 				        });
 					}, false);
+					
+					/****选择人员******/
+					mui('#peopleList').on('tap', '.choosePeopleClass', function(event) {
+							var elem = this;
+							var tempName = elem.name;
+							var beforeValue=getCV('staffname').value;//获取之前的人员值
+							if(beforeValue.indexOf(tempName)>-1){
+								mui.toast("已添加，请勿重复添加");
+							}else{
+								if(beforeValue==''){
+									getCV('staffname').value=tempName;
+								}else{
+									getCV('staffname').value=beforeValue+','+tempName;
+								}
+							}
+							
+					});
 			}
 			function getCV(id){
 				return document.getElementById(id);
@@ -402,6 +486,8 @@
 				mui.back = function(){
 			    	jumpPage();
 				}
+		
+				
 		</script>
 	</body>
 

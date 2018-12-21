@@ -84,6 +84,25 @@
 				bindEvent();
 			});
 			function bindEvent(){
+				
+				
+				//拨打电话
+            	mui('#OA_task_1').on('tap', '.callClass', function(event) {
+					var elem = this;
+					var phoneNumber = elem.name;
+					if(mui.os.plus){
+						plus.device.dial(phoneNumber);
+					}else{
+						location.href = 'tel:'+phoneNumber;
+					}
+					//关闭之前li的状态
+					var li = elem.parentNode.parentNode;
+					setTimeout(function() {
+						mui.swipeoutClose(li);
+					}, 0);
+				});
+				
+				
 	        	//编辑信息
             	mui('#OA_task_1').on('tap', '.editkq', function(event) {
 					var elem = this;
@@ -97,7 +116,11 @@
 					mui.openWindow({
 					    id:'supplier_add'
 					});
-					
+					//关闭之前li的状态
+					var li = elem.parentNode.parentNode;
+					setTimeout(function() {
+						mui.swipeoutClose(li);
+					}, 0);
 				});
 				//删除信息
             	var btnArray = ['确认', '取消'];
@@ -247,6 +270,11 @@
             			var ulObj = document.body.querySelector('#OA_task_1');
 		            	for(var m=0;m<arr.length;m++){
 		            		var listStr='';
+		            		
+							listStr+='<div class="mui-slider-left mui-disabled">';
+							listStr+='<a class="mui-btn mui-btn-green callClass" name="'+arr[m].phone+'" >拨号</a>';
+							listStr+='</div>';
+							
 							listStr+='<div class="mui-slider-right mui-disabled">';
 							listStr+='<a class="mui-btn mui-btn-blue editkq" name="'+arr[m].id+'"  >修改</a>';
 							listStr+='<a class="mui-btn mui-btn-red shanchukq" name="'+arr[m].id+'" >删除</a>';

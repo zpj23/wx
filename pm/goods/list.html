@@ -111,7 +111,11 @@
 					mui.openWindow({
 					    id:'goods_add'
 					});
-					
+					//关闭之前li的状态
+					var li = elem.parentNode.parentNode;
+					setTimeout(function() {
+						mui.swipeoutClose(li);
+					}, 0);
 				});
 				//删除信息
             	var btnArray = ['确认', '取消'];
