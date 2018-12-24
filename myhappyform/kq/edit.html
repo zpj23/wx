@@ -9,9 +9,17 @@
 		<link rel="stylesheet" type="text/css" href="../css/mui.picker.min.css" />
 		<style>
 			.mui-popover {
-				height: 300px;
+				height: 500px;
 			}
-			
+			#topPopover {
+				position: fixed;
+				top: 16px;
+				right: 6px;
+			}
+			#topPopover .mui-popover-arrow {
+				left: auto;
+				right: 6px;
+			}
 		</style>
 	</head>
 	
@@ -19,6 +27,7 @@
 		<header class="mui-bar mui-bar-nav">
 		    <a class="mui-icon mui-icon-left-nav mui-pull-left" id="backList1"></a>
 		    <h1 class="mui-title">新增考勤</h1>
+		    <a id="menu" class="mui-action-menu mui-icon mui-icon-personadd mui-pull-right" href="#topPopover"></a>
 		</header>
 		<div class="mui-content">
 			<form class="mui-input-group ">
@@ -43,13 +52,13 @@
 				</div>
 				<div class="mui-card">
 					<div class="mui-card-content">
+						<!--<div class="mui-input-row">
+					        <label>选择施工人员：</label>
+							<a href="#middlePopover" class="mui-btn mui-btn-primary" style="float:left;padding:5px;margin: 5px; width: 100px;height: 30px;" >选择人员</a>
+						</div>-->
 						<div class="mui-input-row">
 					        <label>施工人员:</label>
 					    	<input type="text" id="staffname" class="mui-input-clear mui-input-speech" placeholder="施工人员" />
-						</div>
-						<div class="mui-input-row">
-					        <label>选择人员：</label>
-							<a href="#middlePopover" class="mui-btn mui-btn-primary" style="float:left;padding:5px;margin: 5px; width: 100px;height: 30px;" >选择人员</a>
 						</div>
 					</div>
 				</div>
@@ -108,7 +117,8 @@
                 <!--   <button type="button" class="mui-btn mui-btn-danger " id="cancelButton">取消</button>--> 
 			    </div>
 			</form>
-			<div id="middlePopover" class="mui-popover">
+			<!--右上角弹出菜单-->
+			<div id="topPopover" class="mui-popover">
 				<div class="mui-popover-arrow"></div>
 				<div class="mui-scroll-wrapper">
 					<div class="mui-scroll">
