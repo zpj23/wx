@@ -90,11 +90,11 @@
 								isAdmin:state.isAdmin
 							},
 				            success  : function(data){
+				            	doc.getElementById('shenhecount').innerHTML='';
 				            	if(data.msg){
 				            		if(data.data!="0"){
 				            			doc.getElementById('shenhecount').innerHTML='<span class="mui-badge">'+data.data+'</span>';
 				            		}
-				            		
 				            	}
 				            },
 				            error    : function(xhr,type,errorThrown){
@@ -162,7 +162,7 @@
 						});
 						mui.openWindow({
 						    id:'map_list',
-						    url: 'mapInfo.html'
+						    url: 'map/baidumap.html'
 						});
 					});
 					
