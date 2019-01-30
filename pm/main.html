@@ -41,18 +41,19 @@
 		            <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3"><a href="#" id="category_manage">
 		                    <span class="mui-icon mui-icon-list"></span>
 		                    <div class="mui-media-body">分类管理</div></a></li>
+		            <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3"><a href="#" id="log_manage">
+		                    <span class="mui-icon mui-icon-paperclip"></span>
+		                    <div class="mui-media-body">日志管理</div></a></li>        
 		            <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3"><a href="#">
 		                    <span class="mui-icon mui-icon-arrowthindown"></span>
 		                    <div class="mui-media-body">入库管理</div></a></li>
-		            <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3"><a href="#" id="downloadapp">
+		            <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3"><a href="#" >
 		                    <span class="mui-icon mui-icon-arrowthinup"></span>
 		                    <div class="mui-media-body">出库管理</div></a></li>
 		            <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3"><a href="#">
 		                    <span class="mui-icon mui-icon-loop"></span>
 		                    <div class="mui-media-body">库存</div></a></li>
-		           <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3"><a href="#">
-		                    <span class="mui-icon mui-icon-more"></span>
-		                    <div class="mui-media-body">more</div></a></li>
+		           
 		        </ul> 
 		</div>
 		<div class="mui-content">
@@ -71,6 +72,7 @@
 			var state=null;
 			var downLoadInfo=null;
 			var uploadHtml=null;
+			var logHtml=null;
 			(function($, doc) {
 				
 				$.init();
@@ -78,41 +80,8 @@
 				//
 				window.addEventListener('show', function() {
 					state = app.getState();
-//					initNum();
 				}, false);
 				
-				function initNum(){
-					$.ajax({
-				            url      : app.getRequestUrl()+'/jlManualCheckPhoneAction_getShNum',
-				            type     : 'post',
-				            dataType:'json',//服务器返回json格式数据
-				            data:{ 
-							    loginId:state.id,
-								isAdmin:state.isAdmin
-							},
-				            success  : function(data){
-				            	if(data.msg){
-				            		if(data.data!="0"){
-				            			doc.getElementById('shenhecount').innerHTML='<span class="mui-badge">'+data.data+'</span>';
-				            		}
-				            		
-				            	}
-				            },
-				            error    : function(xhr,type,errorThrown){
-				                $.toast(type);
-				            }
-				        });
-				}
-				//操作进度条
-//				function operatejdt(flag){
-//					if(flag){
-//						$('#bar').progressbar({progress:0}).show();
-//						document.getElementById("bar").classList.add('mui-hidden');
-//					}else{
-////						$('#bar').progressbar({}).hide();
-//						document.getElementById("bar").classList.remove('mui-hidden');
-//					}
-//				}
 				
 				$.plusReady(function() { 
 					listHtml=$.preload({
@@ -139,6 +108,11 @@
 						id:'category_list',
 						url:'category/list.html'
 					});
+					logHtml=$.preload({
+						id:'log_list',
+						url:'log/list.html'
+					});
+					
 					//维修管理
 					var usermanageButton = doc.getElementById('user_manager');
 					usermanageButton.addEventListener('tap', function(event) {
@@ -210,10 +184,20 @@
 						
 					});
 					
-
-
+					var log_manage=document.getElementById('log_manage');
+					log_manage.addEventListener('tap', function(event) {
+						if(!logHtml){
+						    logHtml = plus.webview.getWebviewById('log_list');
+						}
+						mui.fire(logHtml,'logList',{
+							mode:'main'
+						});
+						mui.openWindow({
+						    id:'log_list'
+						});
+						
+					});
 //					//app更新
-//					
 //					var updateButton=doc.getElementById("downloadapp");
 //						updateButton.addEventListener('tap',function(event){
 //						if(!uploadHtml){
@@ -226,91 +210,6 @@
 //						    id:'upload_list'
 //						});
 //					});
-					
-					//初始化下载对象
-//				    var dtask = null;
-//				    var downloadflag=false;
-//				    function createDownload(){
-//				        //判断文件是否已经下载
-//						plus.io.resolveLocalFileSystemURL('_downloads/'+downLoadInfo.filename,function(entry){
-//				            if(entry.isFile){
-//				                var btnArray = ['否', '是']; //弹框消息确认是否打开文件
-//			                    mui.confirm("已经下载到"+entry.fullPath+'。是否安装新版本？', '安装信息', btnArray, function(e) {
-//			                        if(e.index == 1) { //打开附件
-//				                        plus.runtime.openFile('_downloads/'+downLoadInfo.filename, {}, function(e) {
-//				                        	plus.nativeUI.alert("无法打开此文件：" + e.emssage);
-//					                    });
-//			                        } else { //不打开
-//			                        	plus.io.requestFileSystem(plus.io.PUBLIC_DOWNLOADS,function(fs){
-//								        	fs.root.getDirectory('_downloads/', {create: false}, function(dirEntry) {
-//								                console.log("进入删除方法");
-//								                dirEntry.removeRecursively(function() {
-//								                    plus.nativeUI.toast("缓存清空成功！");
-//								                    downloadflag=false;
-////								                    console.log('Directory successufully removed.');
-//								                }, function(e){
-////								                    plus.nativeUI.toast("缓存清空失败！"+e.message);
-////								                    console.log("cuowu"+e.message)
-//								                });
-//								            }, function(e){
-////								                    plus.nativeUI.toast("缓存清空成功失败！"+e.message);
-//								                    //console.log("cuowu"+e.message)
-//								                }); 
-//								        });
-//						                        	
-//			                        }
-//			                    });
-//				            }
-//				        },function(e){dBase();});
-//				    }
-//				    function dBase(){
-//				        if(dtask){
-//				        	if(downloadflag){
-//				        		
-//				        	}else{
-//				        		$.toast('正在下载');
-//				        	}
-//				            return;
-//				        }
-//				        var tempurl=app.getRequestUrl()+"/"+downLoadInfo.url;
-//				        dtask = plus.downloader.createDownload(
-//				        	tempurl,
-//				        	{
-//				        		method:'GET',
-//				        		filename:'_downloads/'+downLoadInfo.filename
-//				        	},
-//				        	function(d,status){
-//				            	$.toast(d.filename);
-//				        });
-//				        dtask.addEventListener("statechanged",function(task,status){
-//				            if(!dtask){return;}
-//				            switch(task.state){
-//				                case 1: $.toast('开始下载...');break;//开始
-//				                case 2: $.toast('链接到服务器...');break;//链接到服务器
-//				                case 3:
-//				                    var progressVal = (task.downloadedSize/task.totalSize)*100;
-//				                        $('#bar').progressbar({progress:progressVal}).show();
-//				                    break;
-//				                case 4: 
-//				                	$.toast('下载完成');
-//				                	downloadflag=true;
-//				                	var btnArray = ['否', '是']; //弹框消息确认是否打开文件
-//				                    mui.confirm('是否安装新版本？', '下载成功', btnArray, function(e) {
-//				                        if(e.index == 1) { //打开文件
-//					                        plus.runtime.openFile( dtask.filename, {}, function(e) {
-//					                        	plus.nativeUI.alert("无法打开此文件：" + e.emssage);
-//					                    	});
-//				                        } else { //不打开
-//				                        }
-//				                    });
-//				                	break;
-//				            }
-//				        });
-//				        dtask.start();
-//				    }
-
-					
-					
 					
 					//设置
 					var settingButton = doc.getElementById('setting');
