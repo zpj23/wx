@@ -143,10 +143,17 @@
 					    	getCV('goodsType').value=cinfo.goodsType;
 					    	getCV('goodsTypeName').value=cinfo.goodsTypeName;
 					    	var gt=cinfo.goodsType;
+					    	var splbArr=gt.split(",");
 					    	if(gt!=""){
-					    		cityPicker3.pickers[0].setSelectedValue(gt.split(",")[0], 2000);
-					    		cityPicker3.pickers[1].setSelectedValue(gt.split(",")[1], 2000);
-					    		cityPicker3.pickers[2].setSelectedValue(gt.split(",")[2], 2000);
+					    		if(splbArr[0]!=""){
+					    			cityPicker3.pickers[0].setSelectedValue(splbArr[0], 2000);
+					    		}
+					    		if(splbArr[1]!=""){
+					    			cityPicker3.pickers[1].setSelectedValue(splbArr[1], 2000);
+					    		}
+					    		if(splbArr[2]!=""){
+					    			cityPicker3.pickers[2].setSelectedValue(splbArr[2], 2000);
+					    		}
 					    	}
 					    	
 		            	}else{
