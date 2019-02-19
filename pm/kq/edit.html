@@ -24,12 +24,22 @@
 					        <label>登记日期:</label>
 					       <!-- <button id='demo4' data-options='{"type":"date"}' class="btn mui-btn mui-btn-block">选择日期 ...</button>  -->
 					  <!--  <label id="workdate">点击选择时间</label><span class="mui-icon mui-icon-plusempty"></span>
-					   -->  <input type="text"  id="registertime" data-options='{"type":"date"}' class="mui-input-clear"  placeholder="登记日期" /> 
+					   -->  <input type="text"  id="registertime" data-options='{}' class="mui-input-clear"  placeholder="登记日期" /> 
 					   		
 					    </div>
 						
 					</div>
 				</div>
+				<div class="mui-content-padded"></div>
+				<div class="mui-card">
+					<div class="mui-card-content" >
+						<div class="mui-input-row">
+							<label>是否付款:</label>
+							<input type="text"  id="isPayName"  class="mui-input-clear"  placeholder="是否付款" readonly="readonly" />
+							<input type="hidden" id="isPayCode" />
+						</div>
+					</div>
+				</div>	
 				<div class="mui-content-padded"></div>
 			    <div class="mui-card">
 					<div class="mui-card-content">
@@ -59,22 +69,12 @@
 						
 					</div>
 				</div>	
-				<div class="mui-content-padded"></div>
-				<div class="mui-card">
-					<div class="mui-card-content" style="padding: 15px;">
-						<div class="mui-input-row">
-							<label>是否付款:</label>
-							<input type="text"  id="isPayName"  class="mui-input-clear"  placeholder="是否付款" readonly="readonly" />
-							<input type="hidden" id="isPayCode" />
-						</div>
-					</div>
-				</div>	
+				
 				<div class="mui-content-padded"></div>
 				
 			    <div class="mui-button-row">
 			    	<input type="hidden" id="id" value="" />
-			        <button type="button" id="saveButton" class="mui-btn mui-btn-primary" >确认</button>
-			        <button type="button" class="mui-btn mui-btn-danger " id="cancelButton">取消</button>
+			        <button type="button" id="saveButton" class="mui-btn mui-btn-primary" >保存</button>
 			    </div>
 			</form>
 			
@@ -133,7 +133,7 @@
 					    	var day=wd.getDate();
 							var month=wd.getMonth() + 1;
 							var year=wd.getFullYear();
-					    	getCV('registertime').value=year+"-"+month+"-"+day;
+					    	getCV('registertime').value=year+"-"+month+"-"+day+" "+wd.getHours()+":"+wd.getMinutes();
 					    	getCV('jine').value=cinfo.jine;
 					    	getCV('remark').value=cinfo.remark;
 					    	
@@ -200,9 +200,6 @@
 								 * rs.h 时，用法同年
 								 * rs.i 分（minutes 的第二个字母），用法同年
 								 */
-								//result.innerText = '选择结果: ' + rs.text;
-								//workdate.innerHTML=rs.text;
-							//	mui(workdate).val=rs.text;
 								registertime.value=rs.text;
 								/* 
 								 * 返回 false 可以阻止选择框的关闭
@@ -256,10 +253,6 @@
 				}, false);
 			}
 			function initSaveButtonData(){
-				var cancelbutton=document.getElementById("cancelButton");
-				cancelbutton.addEventListener('tap', function(){
-					jumpBack();
-				}, false);
 				var backbutton=document.getElementById("backList1");
 				backbutton.addEventListener('tap', function(){
 					jumpBack();
