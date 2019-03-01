@@ -7,7 +7,9 @@
 		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
 		<link href="../css/mui.min.css" rel="stylesheet" />
 		<link rel="stylesheet" type="text/css" href="../css/mui.picker.min.css" />
-		
+		<style>
+			
+		</style>
 	</head>
 	
 	<body>
@@ -46,7 +48,7 @@
 						
 					    <div class="mui-input-row">
 					        <label>维修用户:</label>
-					    	<input type="text" id="username" class="mui-input-clear" placeholder="维修用户">
+					    	<input type="text" id="username" list="url_list"  placeholder="维修用户">
 					    </div>
 					    
 					    <div class="mui-input-row">
@@ -77,7 +79,8 @@
 			        <button type="button" id="saveButton" class="mui-btn mui-btn-primary" >保存</button>
 			    </div>
 			</form>
-			
+			<datalist id="url_list">
+			</datalist>
 		</div>
 		<script src="../js/mui.js"></script>
 		<script src="../js/mui.picker.min.js"></script>
@@ -94,7 +97,7 @@
 				initDateData();
 				//保存按钮
 				initSaveButtonData();
-				
+				initDataList();
 			});
 			//添加newId自定义事件监听
 			window.addEventListener('editId',function(event){
@@ -321,7 +324,24 @@
 				            }
 				        });
 					}, false);
+					
 			}
+			//初始化维修用户下拉的datalist
+			function initDataList(){
+				var temp=localStorage.getItem("namelist");
+				var arr=JSON.parse(temp);
+				var html='';
+				if(arr.length>0){
+					var count=0;
+					for(var i=0;i<arr.length;i++){
+						html+='<option label="'+arr[i]+'" value="'+arr[i]+'" />';
+					}
+					document.getElementById("url_list").innerHTML=html;
+				}else{
+					document.getElementById("url_list").innerHTML='';
+				}
+			}
+			
 			function getCV(id){
 				return document.getElementById(id);
 			}
