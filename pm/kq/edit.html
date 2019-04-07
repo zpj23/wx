@@ -48,7 +48,9 @@
 						
 					    <div class="mui-input-row">
 					        <label>维修用户:</label>
-					    	<input type="text" id="username" list="url_list"  placeholder="维修用户">
+					    	<input type="text" id="username" name="username" list="url_list"  placeholder="维修用户" autocomplete="on">
+					    	<datalist id="url_list">
+							</datalist>
 					    </div>
 					    
 					    <div class="mui-input-row">
@@ -79,8 +81,6 @@
 			        <button type="button" id="saveButton" class="mui-btn mui-btn-primary" >保存</button>
 			    </div>
 			</form>
-			<datalist id="url_list">
-			</datalist>
 		</div>
 		<script src="../js/mui.js"></script>
 		<script src="../js/mui.picker.min.js"></script>
@@ -105,7 +105,7 @@
 			  	currentId = event.detail.id;
 			  	state=app.getState();
 				initData();
-				
+				initDataList();
 			});
 			
 			function initData(){
@@ -328,11 +328,14 @@
 			}
 			//初始化维修用户下拉的datalist
 			function initDataList(){
+				var ht=document.getElementById("url_list").innerHTML;
+				if(ht.trim()!=''){
+					return;
+				}
 				var temp=localStorage.getItem("namelist");
 				var arr=JSON.parse(temp);
 				var html='';
 				if(arr.length>0){
-					var count=0;
 					for(var i=0;i<arr.length;i++){
 						html+='<option label="'+arr[i]+'" value="'+arr[i]+'" />';
 					}

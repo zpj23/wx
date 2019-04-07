@@ -38,9 +38,9 @@
 						var str=JSON.stringify(data);
 						if(data.msg){
 							authed=true; 
+							var nl=JSON.stringify(data.namelist);
+							localStorage.setItem("namelist",nl);
 						}
-						//mui.toast(str);
-//						console.log(str);
 						if (authed) {
 							return owner.createState(data.data, callback);
 						} else {
@@ -56,15 +56,6 @@
 							
 							
 				});
-//		var users = JSON.parse(localStorage.getItem('$users') || '[]');
-//		var authed = users.some(function(user) {
-//			return loginInfo.account == user.account && loginInfo.password == user.password;
-//		});
-//		if (authed) {
-//			return owner.createState(loginInfo.account, callback);
-//		} else {
-//			return callback('用户名或密码错误');
-//		}
 	};
 
 	owner.createState = function(data, callback) {
@@ -80,7 +71,7 @@
 		return callback();
 	};
 	owner.getRequestUrl=function(){
-//		return "http://192.168.11.96:8080";
+//		return "http://192.168.11.96:8080/pm_war";
 //		return "http://47.94.87.191:8080";
 		return "http://47.101.146.253";
 	};
