@@ -43,7 +43,20 @@
 		                    <div class="mui-media-body">分类管理</div></a></li>
 		            <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3"><a href="#" id="log_manage">
 		                    <span class="mui-icon mui-icon-paperclip"></span>
-		                    <div class="mui-media-body">日志管理</div></a></li>        
+		                    <div class="mui-media-body">日志管理</div></a></li>   
+		            
+		            <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3"><a href="#" id="knowledge_manage">
+		                    <span class="mui-icon mui-icon-star"></span>
+		                    <div class="mui-media-body">知识管理</div></a></li>
+		            <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3"><a href="#" >
+		                    <span class="mui-icon mui-icon-arrowthinup"></span>
+		                    <div class="mui-media-body">建设中</div></a></li>
+		            <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3"><a href="#">
+		                    <span class="mui-icon mui-icon-loop"></span>
+		                    <div class="mui-media-body">建设中</div></a></li>
+		            
+		            
+		            
 		            <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3"><a href="#">
 		                    <span class="mui-icon mui-icon-arrowthindown"></span>
 		                    <div class="mui-media-body">入库管理</div></a></li>
@@ -73,6 +86,7 @@
 			var downLoadInfo=null;
 			var uploadHtml=null;
 			var logHtml=null;
+			var knowledgeHtml=null;
 			(function($, doc) {
 				
 				$.init();
@@ -111,6 +125,11 @@
 					logHtml=$.preload({
 						id:'log_list',
 						url:'log/list.html'
+					});
+					
+					knowledgeHtml=$.preload({
+							id: 'knowledge_list',
+							url: 'knowledge/list.html'
 					});
 					
 					//维修管理
@@ -197,6 +216,22 @@
 						});
 						
 					});
+					
+					
+					var knowledgeButton = doc.getElementById('knowledge_manage');
+					knowledgeButton.addEventListener('tap', function(event) {
+						if(!knowledgeHtml){
+						    listHtml = plus.webview.getWebviewById('knowledge_list');
+						}
+						mui.fire(knowledgeHtml,'knowledgeList',{
+							mode:'main'
+						});
+						mui.openWindow({
+						    id:'knowledge_list'
+						});
+						
+					});
+					
 //					//app更新
 //					var updateButton=doc.getElementById("downloadapp");
 //						updateButton.addEventListener('tap',function(event){
