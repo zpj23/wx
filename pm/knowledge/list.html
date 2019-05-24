@@ -80,6 +80,8 @@
 	    var staffname="";
 		var isshenhe="";
 		var remarkContent="";
+		//判断是否进入plusReady进行初始化
+		var bigInitAllInfoFlag=false;
 		
 		mui.init({
 				pullRefresh: {
@@ -95,7 +97,14 @@
 					}
 				}
 			});
+			
 		mui.plusReady(function(){
+			bigInitAllInfoFlag=true;
+			mui.toast("已经过初始化",3000);
+			bigInitAllInfo();
+		});
+		
+		function bigInitAllInfo(){
 			currentPage=1;
 			editHtml=mui.preload({
 					id: 'knowledge_edit',
@@ -104,7 +113,8 @@
 			//初始化按钮
 			initButtons();
 			bindEvent();
-		});
+		}
+		
 		function bindEvent(){
         	mui('#OA_task_1').on('tap', '.editKnowledgeClass', function(event) {
 				var elem = this;
@@ -267,6 +277,11 @@
 			
 		window.addEventListener('knowledgeList',function(event){
 			state=app.getState();
+			if(!bigInitAllInfoFlag){
+				mui.toast("直接跳监听没初始化",3000);
+				bigInitAllInfoFlag=true;
+				bigInitAllInfo();
+			}
 			//初始化
 			if(event.detail.mode=="main"){
 					//主页跳转过来的
@@ -315,7 +330,8 @@
 					    editHtml = plus.webview.getWebviewById('knowledge_edit');
 					}
 					mui.fire(editHtml,'editId',{
-						id:''
+						id:'',
+						mode:'list'
 					});
 					mui.openWindow({
 					    id:'knowledge_edit',

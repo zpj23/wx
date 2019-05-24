@@ -7,9 +7,159 @@
 		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
 		<link href="../css/mui.min.css" rel="stylesheet" />
 		<link rel="stylesheet" type="text/css" href="../css/mui.picker.min.css" />
-		<!--<link rel="stylesheet" href="../css/common.css" type="text/css" charset="utf-8"/>-->
-		<style>
-			
+		<link rel="stylesheet" href="../css/common.css" type="text/css" charset="utf-8"/>
+		<style type="text/css">
+			.mui-preview-image.mui-fullscreen {
+				position: fixed;
+				z-index: 20;
+				background-color: #000;
+			}
+			.mui-preview-header,
+			.mui-preview-footer {
+				position: absolute;
+				width: 100%;
+				left: 0;
+				z-index: 10;
+			}
+			.mui-preview-header {
+				height: 44px;
+				top: 0;
+			}
+			.mui-preview-footer {
+				height: 50px;
+				bottom: 0px;
+			}
+			.mui-preview-header .mui-preview-indicator {
+				display: block;
+				line-height: 25px;
+				color: #fff;
+				text-align: center;
+				margin: 15px auto 4;
+				width: 70px;
+				background-color: rgba(0, 0, 0, 0.4);
+				border-radius: 12px;
+				font-size: 16px;
+			}
+			.mui-preview-image {
+				display: none;
+				-webkit-animation-duration: 0.5s;
+				animation-duration: 0.5s;
+				-webkit-animation-fill-mode: both;
+				animation-fill-mode: both;
+			}
+			.mui-preview-image.mui-preview-in {
+				-webkit-animation-name: fadeIn;
+				animation-name: fadeIn;
+			}
+			.mui-preview-image.mui-preview-out {
+				background: none;
+				-webkit-animation-name: fadeOut;
+				animation-name: fadeOut;
+			}
+			.mui-preview-image.mui-preview-out .mui-preview-header,
+			.mui-preview-image.mui-preview-out .mui-preview-footer {
+				display: none;
+			}
+			.mui-zoom-scroller {
+				position: absolute;
+				display: -webkit-box;
+				display: -webkit-flex;
+				display: flex;
+				-webkit-box-align: center;
+				-webkit-align-items: center;
+				align-items: center;
+				-webkit-box-pack: center;
+				-webkit-justify-content: center;
+				justify-content: center;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				top: 0;
+				width: 100%;
+				height: 100%;
+				margin: 0;
+				-webkit-backface-visibility: hidden;
+			}
+			.mui-zoom {
+				-webkit-transform-style: preserve-3d;
+				transform-style: preserve-3d;
+			}
+			.mui-slider .mui-slider-group .mui-slider-item img {
+				width: auto;
+				height: auto;
+				max-width: 100%;
+				max-height: 100%;
+			}
+			.mui-android-4-1 .mui-slider .mui-slider-group .mui-slider-item img {
+				width: 100%;
+			}
+			.mui-android-4-1 .mui-slider.mui-preview-image .mui-slider-group .mui-slider-item {
+				display: inline-table;
+			}
+			.mui-android-4-1 .mui-slider.mui-preview-image .mui-zoom-scroller img {
+				display: table-cell;
+				vertical-align: middle;
+			}
+			.mui-preview-loading {
+				position: absolute;
+				width: 100%;
+				height: 100%;
+				top: 0;
+				left: 0;
+				display: none;
+			}
+			.mui-preview-loading.mui-active {
+				display: block;
+			}
+			.mui-preview-loading .mui-spinner-white {
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				margin-left: -25px;
+				margin-top: -25px;
+				height: 50px;
+				width: 50px;
+			}
+			.mui-preview-image img.mui-transitioning {
+				-webkit-transition: -webkit-transform 0.5s ease, opacity 0.5s ease;
+				transition: transform 0.5s ease, opacity 0.5s ease;
+			}
+			@-webkit-keyframes fadeIn {
+				0% {
+					opacity: 0;
+				}
+				100% {
+					opacity: 1;
+				}
+			}
+			@keyframes fadeIn {
+				0% {
+					opacity: 0;
+				}
+				100% {
+					opacity: 1;
+				}
+			}
+			@-webkit-keyframes fadeOut {
+				0% {
+					opacity: 1;
+				}
+				100% {
+					opacity: 0;
+				}
+			}
+			@keyframes fadeOut {
+				0% {
+					opacity: 1;
+				}
+				100% {
+					opacity: 0;
+				}
+			}
+			p img {
+				max-width: 100%;
+				height: auto;
+			}
 		</style>
 		<script>
 			
@@ -21,7 +171,6 @@
 		<header class="mui-bar mui-bar-nav">
 		    <a class="mui-icon mui-icon-left-nav mui-pull-left" id="backList1"></a>
 		    <h1 class="mui-title">新增数据</h1>
-		    <div class="nvbt idoc" id="uploadfile"></div>
 		</header>
 		<div class="mui-content">
 			<form class="mui-input-group ">
@@ -56,45 +205,83 @@
 						
 					</div>
 				</div>	
-				
+				<div class="mui-content-padded">
+				</div>
+				<div class="mui-card">
+					<div class="mui-card-content"  style="padding: 15px;">
+							
+						<ul id="pictureShow" class="mui-table-view mui-grid-view">
+							<!--<li class="mui-table-view-cell mui-media mui-col-xs-6">
+				            	<a href="#">
+				                <img class="mui-media-object" src="../images/shuijiao.jpg">
+				                <div class="mui-media-body">幸福就是可以一起睡觉</div></a>
+							</li>-->
+							
+						</ul>
+					</div>	
+				</div>
 				<div class="mui-content-padded"></div>
-				<!--<div class="mui-card">
+				<div class="mui-card">
 					<div class="mui-card-content" style="padding: 15px;">
 						<p class="heading">上传文件列表：</p>
 						<ul id="files" style="text-align:left;">
-							<p id="empty" style="font-size:12px;color:#C6C6C6;">无上传文件</p>
 						</ul>
-						<table style="width:100%;">
+						<!--<table style="width:100%;">
 							<tbody>
 								<tr>
 									<td style="width:40%"><div class="button button-select" onclick="appendByCamera()">拍照</div></td>
 									<td style="width:40%"><div class="button button-select" onclick="appendByGallery()">相册选取</div></td>
 								</tr>
 							</tbody>
-						</table>
+						</table>-->
+						<a href="#picture" class="mui-btn mui-btn-primary " style="display: none;">上传照片</a>
 						<br/>
-						<div class="button" onclick="upload()">上 传</div>
+						<div class="button" id="uploadButton" onclick="upload()">上 传</div>
+						
 					</div>
-				</div>-->
+				</div>
 				
 			    <div class="mui-button-row">
 			    	<input type="hidden" id="id" value="" />
 			        <button type="button" id="saveButton" class="mui-btn mui-btn-primary" >保存</button>
 			    </div>
 			</form>
+			<div id="picture" class="mui-popover mui-popover-action ">
+			    <ul class="mui-table-view">
+			        <li class="mui-table-view-cell">
+			            <a href="#">拍照</a>
+			        </li>
+			        <li class="mui-table-view-cell">
+			            <a href="#">相册选取</a>
+			        </li>
+			    </ul>
+			    <ul class="mui-table-view">
+			        <li class="mui-table-view-cell">
+			            <a href="#picture"><b>取消</b></a>
+			        </li>
+			    </ul>
+			</div>
 		</div>
 		<script src="../js/mui.js"></script>
 		<script src="../js/mui.picker.min.js"></script>
 		<script src="../js/app.js"></script>
-		<!--<script type="text/javascript" src="../js/immersed.js" ></script>-->
-		<!--<script type="text/javascript" src="../js/common.js"></script>-->
+		<script type="text/javascript" src="../js/immersed.js" ></script>
+		<script type="text/javascript" src="../js/common.js"></script>
+		<script src="../js/mui.zoom.js"></script>
+		<script src="../js/mui.previewimage.js"></script>
 		<script type="text/javascript">
+			mui.previewImage();
 			var state=null;
 			var currentId="";
 			var listHtml=null;
+//			var uploadHtml=null;
 			var registertime;
 			mui.init();
 			mui.plusReady(function(){
+//				uploadHtml=mui.preload({
+//					id: 'knowledge_uploader',
+//					url: 'uploader.html'
+//				});
 				//初始化日期		
 				initDateData();
 				//保存按钮
@@ -103,16 +290,21 @@
 			//添加newId自定义事件监听
 			window.addEventListener('editId',function(event){
 			  //获得事件参数
-			  	currentId = event.detail.id;
-			  	state=app.getState();
-				initData();
+			  	if(event.detail.mode=="main"){
+			  		currentId = event.detail.id;
+				  	state=app.getState();
+					initData();
+			  	}
+			  	
 			});
 			
 			function initData(){
-				
+				//清空之前的图片信息
+				pictureShow.innerHTML="";
 				if(currentId!=''&&currentId!=null){
+					
 					mui.ajax({
-		            url      : app.getRequestUrl()+'/vue/maintain/findById',
+		            url      : app.getRequestUrl()+'/vue/knowledge/findById',
 		            type     : 'post',
 		            dataType:'json',//服务器返回json格式数据
 		            data:{ 
@@ -138,7 +330,16 @@
 							var year=wd.getFullYear();
 					    	getCV('registertime').value=year+"-"+month+"-"+day+" "+wd.getHours()+":"+wd.getMinutes();
 					    	getCV('content').value=cinfo.content;
-					    	
+					    	var pic_url=cinfo.url;
+					    	if(null!=pic_url&&pic_url!=""){
+					    		var pic_arr=pic_url.split(",");
+						    	if(pic_arr.length>0){
+						    		for(var p=0;p<pic_arr.length;p++){
+						    			showPic(pic_arr[p]);
+						    		}
+						    	}
+						    	
+					    	}
 					    	
 		            	}else{
 		            		mui.toast("初始化失败");
@@ -151,7 +352,8 @@
 		            }
 		        	});
 				}else{
-					getCV('id').value='';
+					currentId=getUid();
+					getCV('id').value=currentId;
             		getCV('title').value='';
 			    	getCV('registertime').value='';
 			    	getCV('content').value='';
@@ -207,6 +409,20 @@
 					}, false);
 			}
 			function initSaveButtonData(){
+				mui('#picture').on('tap', 'li>a', function() {
+					var html=this.innerHTML;
+					if(html.indexOf("拍照")>-1){
+						appendByCamera();
+						
+					}else if(html.indexOf("相册")>-1){
+						appendByGallery();
+					}else{
+					}
+					mui("#picture").popover('hide');
+				    
+				//  mui("#picture").popover('toggle');//这是可以用来关闭底部弹窗的事件
+				})
+				
 				var backbutton=document.getElementById("backList1");
 				backbutton.addEventListener('tap', function(){
 					jumpBack();
@@ -231,7 +447,6 @@
 						if(!flag){
 							return;
 						}
-//						saveButton.disabled = false;
 						mui.ajax({
 				            url      : app.getRequestUrl()+'/vue/knowledge/saveInfo',
 				            type     : 'post',
@@ -274,6 +489,8 @@
 				        });
 					}, false);
 					
+					
+					
 			}
 			
 			function getCV(id){
@@ -296,83 +513,94 @@
 		    	jumpBack();
 			}
 			
+			function showPic(path){
+				var li = document.createElement('li');
+	            li.className = 'mui-table-view-cell mui-media mui-col-xs-6';
+	            li.innerHTML="<p><img  src='"+app.getRequestUrl()+path+"' data-preview-src='' data-preview-group='1' /></p>";
+	            	
+//	            	<li class="mui-table-view-cell mui-media mui-col-xs-6">
+//				            	<a href="#">
+//				                <img class="mui-media-object" src="../images/shuijiao.jpg">
+//				                <div class="mui-media-body">幸福就是可以一起睡觉</div></a>
+//							</li>
+//	            	<img src="../images/yuantiao.jpg" data-preview-src="" data-preview-group="1" />
+				pictureShow.appendChild(li);
+			}
 			
-			/**************文件上传功能********************/
-
-//			var server=app.getRequestUrl()+'/vue/file/upload';
-//			var files=[];
-//			// 上传文件
-//			function upload(){
-//				alert(1);
-//				if(files.length<=0){
+			/*****************************文件上传********************************************************/
+			var server=app.getRequestUrl()+'/vue/file/upload';
+			var files=[];
+			// 上传文件
+			function upload(){
+				if(files.length<=0){
 //					plus.nativeUI.alert("没有添加上传文件！");
-//					return;
-//				}
-//				alert(2);
-//				mui.toast("开始上传：");
-//				var wt=plus.nativeUI.showWaiting();
-//				alert(server);
-//				var task=plus.uploader.createUpload(server,
-//					{method:"POST"},
-//					function(t,status){ //上传完成
-//						if(status==200){
-//							mui.toast("上传成功："+t.responseText);
-//							wt.close();
-////							w.addEventListener("loaded",function(){
-////								wt.close();
-////								w.show("slide-in-right",300);
-////							},false);
-//						}else{
-////							outLine("上传失败："+status);
-//							mui.toast('上传失败'+status);
-//							wt.close();
-//						}
-//					}
-//				);
-//				task.addData("modeltype","knowledge");
-//				task.addData("tableuuid",getUid());
-//				for(var i=0;i<files.length;i++){
-//					var f=files[i];
-//					task.addFile(f.path,{key:f.name});
-//				}
-//				task.start();
-//			}
-//			// 拍照添加文件
-//			function appendByCamera(){
-//				plus.camera.getCamera().captureImage(function(p){
-//					appendFile(p);
-//				});	
-//			}
-//			// 从相册添加文件
-//			function appendByGallery(){
-//				plus.gallery.pick(function(p){
-//			        appendFile(p);
-//			    });
-//			}
-//			// 添加文件
+					mui("#picture").popover('show');
+					return;
+				}
+				var wt=plus.nativeUI.showWaiting();
+				var task=plus.uploader.createUpload(server,
+					{method:"POST"},
+					function(t,status){ //上传完成
+//						console.log(t.responseText);
+//						console.log(status);
+						var temp=t.responseText;
+						var arr =  JSON.parse(temp);
+//						var arr1=JSON.stringify(temp);
+//						console.log(arr);
+//						console.log(arr.length);
+						for(var m=0;m<arr.length;m++){
+							var obj=arr[m];
+//							console.log(arr[m].status);
+							if(obj.status==200){
+								showPic(obj.path);
+							}else{
+								mui.toast(arr[m].orgin+"上传失败");
+							}
+						}
+						wt.close();
+						document.getElementById("files").innerHTML="";
+						files=[];
+					}
+				);
+				task.addData("type","pic");
+				task.addData("uid",currentId);
+				for(var i=0;i<files.length;i++){
+					var f=files[i];
+					task.addFile(f.path,{key:f.name});
+				}
+				task.start();
+			}
+			// 拍照添加文件
+			function appendByCamera(){
+				plus.camera.getCamera().captureImage(function(p){
+					appendFile(p);
+				});	
+			}
+			// 从相册添加文件
+			function appendByGallery(){
+				plus.gallery.pick(function(p){
+			        appendFile(p);
+			    });
+			}
+			// 添加文件
 //			var index=1;
-//			function appendFile(p){
-//				var fe=document.getElementById("files");
-//				var li=document.createElement("li");
-//				var n=p.substr(p.lastIndexOf('/')+1);
-//				console.log(p);
-//				//n+='<img src="file:///storage/sdcard1/DCIM/Camera/IMG_20171213_155524.jpg"/>';
-//				li.innerText=n;
-//				fe.appendChild(li);
-//				files.push({name:"uploadkey"+index,path:p});
+			function appendFile(p){
+				var fe=document.getElementById("files");
+				var li=document.createElement("li");
+				var n=p.substr(p.lastIndexOf('/')+1);
+				li.innerText=n;
+				fe.appendChild(li);
+				files.push({name:"uploadkey"+getUid(),path:p});
 //				index++;
-//				empty.style.display="none";
-//			}
-//			function clearFiles(){
-//				var fe=document.getElementById("files");
-//				
-//			}
-//			// 产生一个随机数
-//			function getUid(){
-//				return Math.floor(Math.random()*100000000+10000000).toString();
-//			}
-
+			}
+			//用于生成uuid
+			function getUid(){
+				return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4()+S4());
+			}
 			
+			function S4() {
+			    return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
+			}
 			
 		</script>
 	</body>
