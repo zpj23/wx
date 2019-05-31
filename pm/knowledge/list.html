@@ -99,20 +99,22 @@
 			});
 			
 		mui.plusReady(function(){
-			bigInitAllInfoFlag=true;
-			mui.toast("已经过初始化",3000);
 			bigInitAllInfo();
 		});
 		
 		function bigInitAllInfo(){
-			currentPage=1;
-			editHtml=mui.preload({
-					id: 'knowledge_edit',
-					url: 'edit.html'
-				});
-			//初始化按钮
-			initButtons();
-			bindEvent();
+			if(!bigInitAllInfoFlag){
+				state=app.getState();
+				currentPage=1;
+				editHtml=mui.preload({
+						id: 'knowledge_edit',
+						url: 'edit.html'
+					});
+				//初始化按钮
+				initButtons();
+				bindEvent();
+				bigInitAllInfoFlag=true;
+			}
 		}
 		
 		function bindEvent(){
@@ -122,8 +124,9 @@
 				if(!editHtml){
 				    editHtml = plus.webview.getWebviewById('knowledge_edit');
 				}
-				mui.fire(editHtml,'editId',{
-					id:cid
+				mui.fire(editHtml,'knowledgeEdit',{
+					id:cid,
+					mode:'list'
 				});
 				mui.openWindow({
 				    id:'knowledge_edit'
@@ -208,6 +211,17 @@
             		arr=data.list;
             		var ulObj = document.body.querySelector('#OA_task_1');
             		for(var m=0;m<arr.length;m++){
+            			
+//          			<li class="mui-table-view-cell mui-media">
+//							<a href="javascript:;">
+//								<img class="mui-media-object mui-pull-left" src="../images/shuijiao.jpg">
+//								<div class="mui-media-body">
+//									幸福
+//									<p class='mui-ellipsis'>能和心爱的人一起睡觉，是件幸福的事情；可是，打呼噜怎么办？</p>
+//								</div>
+//							</a>
+//						</li>
+            			
             			var listStr='';
 						listStr+='<div class="mui-slider-right mui-disabled">';
 						listStr+='<a class="mui-btn mui-btn-blue editKnowledgeClass" name="'+arr[m].id+'"  >修改</a>';
@@ -216,7 +230,13 @@
 						listStr+='<div class="mui-slider-handle">';
 						listStr+='<div class="mui-table">';
 						listStr+='<div class="mui-table-cell mui-col-xs-9">';
-						listStr+='<h5>'+arr[m].remark+'</h5>';
+						var url=arr[m].url;
+						if(url!=""){
+							url=url.split(",")[0];
+							listStr+='<img class="mui-media-object mui-pull-left" src="'+app.getRequestUrl()+url+'">';
+						}
+						listStr+='<h5>'+arr[m].title+'</h5>';
+						listStr+='<h4 class="mui-ellipsis" >'+arr[m].content+'</h4>';
 						listStr+='</div>';
 						listStr+='<div class="mui-table-cell mui-col-xs-5 mui-text-center">';
 						listStr+='<span class="mui-h5" >'+(arr[m].registertime).substring(0,16)+'</span>';
@@ -226,7 +246,7 @@
 						listStr+='</div>';
 						
 						var li = document.createElement('li');
-	            		li.className = 'mui-table-view-cell';
+	            		li.className = 'mui-table-view-cell mui-media';
 	            		li.innerHTML=listStr;
 	            		ulObj.appendChild(li);
 						
@@ -276,12 +296,7 @@
 		}
 			
 		window.addEventListener('knowledgeList',function(event){
-			state=app.getState();
-			if(!bigInitAllInfoFlag){
-				mui.toast("直接跳监听没初始化",3000);
-				bigInitAllInfoFlag=true;
-				bigInitAllInfo();
-			}
+			bigInitAllInfo();
 			//初始化
 			if(event.detail.mode=="main"){
 					//主页跳转过来的
@@ -329,7 +344,7 @@
 					if(!editHtml){
 					    editHtml = plus.webview.getWebviewById('knowledge_edit');
 					}
-					mui.fire(editHtml,'editId',{
+					mui.fire(editHtml,'knowledgeEdit',{
 						id:'',
 						mode:'list'
 					});
@@ -360,36 +375,6 @@
 							}
 						});
 					}, false);
-					
-				
-				//查询条件也没页面
-				
-//				var kq_search = document.getElementById("kq_search_list");
-//				
-//				kq_search.addEventListener('tap', function(event) {
-//					if(!searchHtml){
-//						searchHtml=plus.webview.getWebviewById('kq_search');
-//					}
-//					mui.fire(searchHtml,'kqSearch',{
-//						
-//					});
-//					mui.openWindow({
-//						id: 'kq_search',
-//						show: {
-//							aniShow: 'pop-in'
-//						},
-//						styles: {
-//							popGesture: 'hide'
-//							
-//						},
-//						
-//						waiting: {
-//							autoShow: false
-//						}
-//						
-//					});
-//				
-//				}, false);	
 				
 		}
 		var old_back = mui.back;

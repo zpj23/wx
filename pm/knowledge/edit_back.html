@@ -211,6 +211,11 @@
 					<div class="mui-card-content"  style="padding: 15px;">
 							
 						<ul id="pictureShow" class="mui-table-view mui-grid-view">
+							<!--<li class="mui-table-view-cell mui-media mui-col-xs-6">
+				            	<a href="#">
+				                <img class="mui-media-object" src="../images/shuijiao.jpg">
+				                <div class="mui-media-body">幸福就是可以一起睡觉</div></a>
+							</li>-->
 							
 						</ul>
 					</div>	
@@ -221,8 +226,17 @@
 						<p class="heading">上传文件列表：</p>
 						<ul id="files" style="text-align:left;">
 						</ul>
+						<!--<table style="width:100%;">
+							<tbody>
+								<tr>
+									<td style="width:40%"><div class="button button-select" onclick="appendByCamera()">拍照</div></td>
+									<td style="width:40%"><div class="button button-select" onclick="appendByGallery()">相册选取</div></td>
+								</tr>
+							</tbody>
+						</table>-->
+						<a href="#picture" class="mui-btn mui-btn-primary " style="display: none;">上传照片</a>
 						<br/>
-						<div class="button" id="uploadButton" >打开上传目录</div>
+						<div class="button" id="uploadButton" onclick="upload()">上 传</div>
 						
 					</div>
 				</div>
@@ -232,6 +246,21 @@
 			        <button type="button" id="saveButton" class="mui-btn mui-btn-primary" >保存</button>
 			    </div>
 			</form>
+			<div id="picture" class="mui-popover mui-popover-action ">
+			    <ul class="mui-table-view">
+			        <li class="mui-table-view-cell">
+			            <a href="#">拍照</a>
+			        </li>
+			        <li class="mui-table-view-cell">
+			            <a href="#">相册选取</a>
+			        </li>
+			    </ul>
+			    <ul class="mui-table-view">
+			        <li class="mui-table-view-cell">
+			            <a href="#picture"><b>取消</b></a>
+			        </li>
+			    </ul>
+			</div>
 		</div>
 		<script src="../js/mui.js"></script>
 		<script src="../js/mui.picker.min.js"></script>
@@ -366,47 +395,19 @@
 					}, false);
 			}
 			function initSaveButtonData(){
-//				mui('#picture').on('tap', 'li>a', function() {
-//					var html=this.innerHTML;
-//					if(html.indexOf("拍照")>-1){
-//						appendByCamera();
-//						
-//					}else if(html.indexOf("相册")>-1){
-//						appendByGallery();
-//					}else{
-//					}
-//					mui("#picture").popover('hide');
-//				    
-//				//  mui("#picture").popover('toggle');//这是可以用来关闭底部弹窗的事件
-//				})
-
-				document.getElementById('uploadButton').addEventListener('tap', function() { 
-			　　　　if (mui.os.plus) { 
-			　　　　　　var a = [{ 
-			　　　　　　　　title: "拍照"          //这些都是可以点击的选项的内容
-			　　　　　　}, { 
-			　　　　　　　　title: "从手机相册选择" 
-			　　　　　　}]; 
-			　　　　　　plus.nativeUI.actionSheet({ 
-			　　　　　　　　title: "上传信息",           //这里就是这个弹窗的title
-			　　　　　　　　cancel: "取消",                     //取消按钮
-			　　　　　　　　buttons: a 
-			
-			　　　　　　}, function(b) { /*actionSheet 按钮点击事件*/ 
-			　　　　　　　　//这里面就是触发的事件，比如想做一个选择性别的弹窗，就可以通过a[b.index].title来获取当前点击了男还是女，注意，此处的b.index是从1开始的。要从0开始的话，要记得减1.
-						var index=b.index-1;
-						if(index>=0){
-							var title=a[index].title;
-							if(title.indexOf("拍照")>-1){
-								appendByCamera();
-							}else if(title.indexOf("相册")>-1){
-								appendByGallery();
-							}
-						}
-					})
-			　　　　} 
-			　　}, false);
-
+				mui('#picture').on('tap', 'li>a', function() {
+					var html=this.innerHTML;
+					if(html.indexOf("拍照")>-1){
+						appendByCamera();
+						
+					}else if(html.indexOf("相册")>-1){
+						appendByGallery();
+					}else{
+					}
+					mui("#picture").popover('hide');
+				    
+				//  mui("#picture").popover('toggle');//这是可以用来关闭底部弹窗的事件
+				})
 				
 				var backbutton=document.getElementById("backList1");
 				backbutton.addEventListener('tap', function(){
@@ -514,6 +515,7 @@
 			function upload(){
 				if(files.length<=0){
 //					plus.nativeUI.alert("没有添加上传文件！");
+					mui("#picture").popover('show');
 					return;
 				}
 				var wt=plus.nativeUI.showWaiting();
@@ -569,13 +571,8 @@
 				li.innerText=n;
 				fe.appendChild(li);
 				files.push({name:"uploadkey"+getUid(),path:p});
-				upload();
+//				index++;
 			}
-			
-			function openCategory(){
-				
-			}
-			
 			//用于生成uuid
 			function getUid(){
 				return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4()+S4());
