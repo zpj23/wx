@@ -36,16 +36,16 @@
 		<header class="mui-bar mui-bar-nav">
 		    <!--<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left" ></a>-->
 		    <button id='mainPage' class=" mui-pull-left mui-btn-link">主页</button>
-		    <h1 class="mui-title">知识列表</h1>
-		    <button id='knowledge_add' class=" mui-pull-right mui-btn-link">新增</button>
+		    <h1 class="mui-title">采购单列表</h1>
+		    <button id='cgd_add_button' class=" mui-pull-right mui-btn-link">新增</button>
 		</header>
 		<div class="mui-content">
-			<!--<div class="mui-content-padded">
+			<div class="mui-content-padded">
 				<div class="mui-input-row mui-search" >
-					<input type="search" class="mui-input-clear"  readonly="readonly" placeholder="" id="kq_search_list" />
+					<input type="search" class="mui-input-clear"  placeholder="" id="kq_search_list" />
 				</div>
 				
-			</div>-->
+			</div>
 			
 			<div class="mui-content-padded"  >
 				<div style="margin-left:150px;margin-top:0px;">
@@ -75,11 +75,7 @@
 		var pagerow=15;
 		var totalPage=0;
 		var mainHtml =null;
-		var startdate="";
-	    var enddate="";
-	    var staffname="";
-		var isshenhe="";
-		var remarkContent="";
+		var name='';
 		//判断是否进入plusReady进行初始化
 		var bigInitAllInfoFlag=false;
 		
@@ -107,8 +103,8 @@
 				state=app.getState();
 				currentPage=1;
 				editHtml=mui.preload({
-						id: 'knowledge_edit',
-						url: 'edit.html'
+						id: 'cgd_add',
+						url: 'add.html'
 					});
 				//初始化按钮
 				initButtons();
@@ -118,19 +114,19 @@
 		}
 		
 		function bindEvent(){
-        	mui('#OA_task_1').on('tap', '.editKnowledgeClass', function(event) {
+        	mui('#OA_task_1').on('tap', '.inStoreClass', function(event) {
 				var elem = this;
 				var cid = elem.name;
-				if(!editHtml){
-				    editHtml = plus.webview.getWebviewById('knowledge_edit');
-				}
-				mui.fire(editHtml,'knowledgeEdit',{
-					id:cid,
-					mode:'list'
-				});
-				mui.openWindow({
-				    id:'knowledge_edit'
-				});
+//				if(!editHtml){
+//				    editHtml = plus.webview.getWebviewById('cgd_add');
+//				}
+//				mui.fire(editHtml,'cgdAdd',{
+//					id:cid,
+//					mode:'list'
+//				});
+//				mui.openWindow({
+//				    id:'knowledge_edit'
+//				});
 				//关闭之前li的状态
 				var li = elem.parentNode.parentNode;
 				setTimeout(function() {
@@ -138,16 +134,16 @@
 				}, 0);
 				
 			});
-			//删除考勤信息
+//			//删除采购单信息
         	var btnArray = ['确认', '取消'];
-        	mui('#OA_task_1').on('tap', '.shanchuKnowledgeClass', function(event) {
+        	mui('#OA_task_1').on('tap', '.shanchuCgdClass', function(event) {
 				var elem = this;
 				var li = elem.parentNode.parentNode;
 				mui.confirm('确认删除该条记录？', '警告', btnArray, function(e) {
 					if (e.index == 0) {
 						var cid = elem.name;
 						mui.ajax({
-				            url      : app.getRequestUrl()+'/vue/knowledge/delInfoById',
+				            url      : app.getRequestUrl()+'/vue/cgd/delInfoById',
 				            type     : 'post',
 				            dataType:'json',//服务器返回json格式数据
 				            data:{ 
@@ -174,16 +170,25 @@
 					}
 				});
 			});
+			
+			//查询功能
+			document.getElementById('kq_search_list').addEventListener('input',function(event){
+				name=document.getElementById('kq_search_list').value;
+				document.getElementById("OA_task_1").innerHTML="";
+				currentPage=1;
+				initData();
+			});
 		}
+		
 		//初始化数据
 		function initData(){
 			mui.ajax({
-	            url    : app.getRequestUrl()+'/vue/knowledge/findList',
+	            url    : app.getRequestUrl()+'/vue/cgd/findList',
 	            type   : 'POST',
 	            dataType:'json',//服务器返回json格式数据
 	            data:{
-	            	remark:remarkContent,
 	            	cpage:currentPage,
+	            	name:name,
 	            	pagerow:pagerow,
 				    loginId:state.id,
 					isAdmin:state.isAdmin
@@ -211,42 +216,43 @@
             		arr=data.list;
             		var ulObj = document.body.querySelector('#OA_task_1');
             		for(var m=0;m<arr.length;m++){
-            			
-//          			<li class="mui-table-view-cell mui-media">
-//							<a href="javascript:;">
-//								<img class="mui-media-object mui-pull-left" src="../images/shuijiao.jpg">
-//								<div class="mui-media-body">
-//									幸福
-//									<p class='mui-ellipsis'>能和心爱的人一起睡觉，是件幸福的事情；可是，打呼噜怎么办？</p>
-//								</div>
-//							</a>
-//						</li>
-            			
             			var listStr='';
+            			
+            			
+            			
 						listStr+='<div class="mui-slider-right mui-disabled">';
-						listStr+='<a class="mui-btn mui-btn-blue editKnowledgeClass" name="'+arr[m].id+'"  >修改</a>';
-						listStr+='<a class="mui-btn mui-btn-red shanchuKnowledgeClass" name="'+arr[m].id+'" >删除</a>';
+//						listStr+='<a class="mui-btn mui-btn-blue inStoreClass" name="'+arr[m].id+'"  >入库</a>';
+						listStr+='<a class="mui-btn mui-btn-red shanchuCgdClass" name="'+arr[m].id+'" >删除</a>';
 						listStr+='</div>';
 						listStr+='<div class="mui-slider-handle">';
 						listStr+='<div class="mui-table">';
-						listStr+='<div class="mui-table-cell mui-col-xs-9">';
-						var url=arr[m].url;
-						if(url!=""){
-							url=url.split(",")[0];
-							listStr+='<img class="mui-media-object mui-pull-left" src="'+app.getRequestUrl()+url+'">';
+						listStr+='<div class="mui-table-cell mui-col-xs-11">';
+						var st='';
+						if(arr[m].state=='0'){
+							st='<font color="red">进货</font>';
+						}else{
+							st='<font color="green">出货</font>';
 						}
-						listStr+='<h5>'+arr[m].title+'</h5>';
-						listStr+='<h4 class="mui-ellipsis" >'+arr[m].content+'</h4>';
-						listStr+='</div>';
-						listStr+='<div class="mui-table-cell mui-col-xs-5 mui-text-center">';
-						listStr+='<span class="mui-h5" >'+(arr[m].registertime).substring(0,16)+'</span>';
+						listStr+='<li class="mui-table-view-cell mui-collapse"><a class="mui-navigate-right" href="#">'+arr[m].name+'  '+arr[m].createtime+' '+st+'</a>';
+						listStr+='<ul class="mui-table-view mui-table-view-chevron">';
+						
+						var detailArr=arr[m].details;
+						for(var n=0;n<detailArr.length;n++){
+							listStr+='<li class="mui-table-view-cell" style="padding-left:20px"><a class="mui-navigate-left"  href="#">'+detailArr[n].goodsName+' ,  '+detailArr[n].num+' '+detailArr[n].unit+'</a>';
+							listStr+='</li>';
+						}
+						listStr+='</ul>'; 
+						listStr+='</li>';
+						
 						listStr+='</div>';
 						listStr+='<div class="mui-table-cell mui-col-xs-1 mui-text-right"><span class="mui-badge">'+((currentPage-1)*pagerow+m+1)+'</span></div>';
 						listStr+='</div>';
 						listStr+='</div>';
 						
+						
+						
 						var li = document.createElement('li');
-	            		li.className = 'mui-table-view-cell mui-media';
+	            		li.className = 'mui-table-view-cell';
 	            		li.innerHTML=listStr;
 	            		ulObj.appendChild(li);
 						
@@ -295,21 +301,17 @@
 			}, 1500);
 		}
 			
-		window.addEventListener('knowledgeList',function(event){
+		window.addEventListener('cgdList',function(event){
 			bigInitAllInfo();
 			//初始化
 			if(event.detail.mode=="main"){
 					//主页跳转过来的
 					currentPage=1;
-					startdate='';
-					enddate='';
-					staffname='';
-					isshenhe='';
-					remarkContent='';
+					name='';
 					document.getElementById("OA_task_1").innerHTML="";
 					initData();
 					setPullRefresh();
-			}else if(event.detail.mode=="edit"){
+			}else if(event.detail.mode=="add"){
 				
 				if(currentPage!=1){
 					pagerow=currentPage*pagerow;
@@ -321,14 +323,14 @@
 			}else if(event.detail.mode=="search"){
 				currentPage=1;
 				document.getElementById("OA_task_1").innerHTML="";
-				startdate=event.detail.startdate;
-				if(typeof(startdate)=="undefined"){
-					startdate="";
-				}
-				remarkContent=event.detail.remark;
-				if(typeof(remarkContent)=="undefined"){
-					remarkContent='';
-				}
+//				startdate=event.detail.startdate;
+//				if(typeof(startdate)=="undefined"){
+//					startdate="";
+//				}
+//				remarkContent=event.detail.remark;
+//				if(typeof(remarkContent)=="undefined"){
+//					remarkContent='';
+//				}
 				setPullRefresh();
 				initData();
 			}else if(event.detail.mode=="editBack"||event.detail.mode=="searchBack"){
@@ -339,17 +341,17 @@
 		});
 			
 		function  initButtons(){
-			var add1 = document.getElementById("knowledge_add");
+			var add1 = document.getElementById("cgd_add_button");
 				add1.addEventListener('tap', function(event) {
 					if(!editHtml){
-					    editHtml = plus.webview.getWebviewById('knowledge_edit');
+					    editHtml = plus.webview.getWebviewById('cgd_add');
 					}
-					mui.fire(editHtml,'knowledgeEdit',{
+					mui.fire(editHtml,'cgdAdd',{
 						id:'',
 						mode:'list'
 					});
 					mui.openWindow({
-					    id:'knowledge_edit',
+					    id:'cgd_add',
 					    
 					});
 					
@@ -362,17 +364,7 @@
 						mui.fire(mainHtml,'show',{
 						});
 						mui.openWindow({
-							id: 'main',
-							//url:'../main.html',
-							show: {
-								aniShow: 'pop-in-left'
-							},
-							styles: {
-								popGesture: 'hide'
-							},
-							waiting: {
-								autoShow: false
-							}
+							id: 'main'
 						});
 					}, false);
 				
@@ -385,17 +377,7 @@
 			mui.fire(mainHtml,'show',{
 			});
 			mui.openWindow({
-				id: 'main',
-				url:'../main.html',
-				show: {
-					aniShow: 'pop-in-left'
-				},
-				styles: {
-					popGesture: 'hide'
-				},
-				waiting: {
-					autoShow: false
-				}
+				id: 'main'
 			});
 		}
 	</script>

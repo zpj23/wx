@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>Hello MUI</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+		<link rel="stylesheet" href="../css/mui.min.css">
+		<style>
+			html,
+			body {
+				background-color: #efeff4;
+			}
+			p {
+				text-indent: 22px;
+			}
+			span.mui-icon {
+				font-size: 14px;
+				color: #007aff;
+				margin-left: -15px;
+				padding-right: 10px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<h1 class="mui-title">采购单信息</h1>
+			<button id='cgd_save_button' class=" mui-pull-right mui-btn-link">保存</button>
+		</header>
+		<div class="mui-content">
+			<div class="mui-content-padded mui-input-row">
+				<label id="statype">进货</label>
+				<div class="mui-switch mui-active">
+					<div class="mui-switch-handle"></div>
+				</div>
+			</div>
+			<div class="mui-content-padded mui-input-row">
+				<label>采购人</label>
+				<input type="text" id="name" name="name"   placeholder="采购人" />
+			</div>
+			<div class="mui-content-padded">
+				
+				<ul class="mui-table-view" id="cgd_ul">
+				</ul>	
+			</div>
+		</div>
+	</body>
+	<script src="../js/mui.min.js"></script>
+	<script src="../js/app.js"></script>
+	<script>
+		var main,menu, mask = mui.createMask(_closeMenu);
+		var showMenu = false,mode = 'menu-move';
+		var state;
+		var ids='';
+		var nums='';
+		var sta='0';//0进货，1出货
+		var listHtml=null;
+		mui.init({
+			swipeBack: false,
+			beforeback: back
+		});
+
+		function back() {
+			if (showMenu) {
+				//菜单处于显示状态，返回键应该先关闭菜单,阻止主窗口执行mui.back逻辑；
+				closeMenu();
+				return false;
+			} else {
+				//菜单处于隐藏状态，执行返回时，要先close菜单页面，然后继续执行mui.back逻辑关闭主窗口；
+				menu.close('none');
+				return true;
+			}
+		}
+		//plusReady事件后，自动创建menu窗口；
+		mui.plusReady(function() {
+			main = plus.webview.currentWebview();
+			//setTimeout的目的是等待窗体动画结束后，再执行create webview操作，避免资源竞争，导致窗口动画不流畅；
+			setTimeout(function () {
+				//侧滑菜单默认隐藏，这样可以节省内存；
+				menu = mui.preload({
+					id: 'add_left',
+					url: 'add_left.html',
+					styles: {
+						left: 0,
+						width: '70%',
+						zindex: 9997
+					}
+				});
+			},300);
+			state=app.getState();
+			document.getElementById("cgd_save_button").addEventListener('tap', function(event) {
+				if(ids==''){
+					mui.toast("请右滑，选择商品！");
+					return;
+				}
+				var ida=ids.split(",");
+				
+				nums="";
+				for(var n=0;n<ida.length;n++){
+					if(n>0){
+						nums+=",";
+					}
+					nums+=document.getElementById("num_"+ida[n]).value;
+				}
+				
+				mui.ajax({
+		            url    : app.getRequestUrl()+'/vue/cgd/saveInfo',
+		            type   : 'POST',
+		            dataType:'json',//服务器返回json格式数据
+		            data:{
+		            	id:ids,
+		            	num:nums,
+		            	state:sta,
+		            	name:getCV("name").value,
+					    loginId:state.id,
+						isAdmin:state.isAdmin
+					},
+					async:false,
+		            success: function(data){
+		            	if(data.msg){
+		            		mui.toast("保存成功");
+		            		if(!listHtml){
+								listHtml= plus.webview.getWebviewById("cgd_list");
+							}
+							mui.fire(listHtml,'cgdList',{
+								mode:'add'
+							});
+							mui.openWindow({
+								id: 'cgd_list'
+							});
+		            	}else{
+		            		mui.toast(data.data);
+		            	}
+		            }
+		         });
+			}, false);
+			
+			mui('.mui-switch').each(function() { //循环所有toggle
+				//toggle.classList.contains('mui-active') 可识别该toggle的开关状态
+				/**
+				 * toggle 事件监听
+				 */
+				this.addEventListener('toggle', function(event) {
+					if(event.detail.isActive=='true'||event.detail.isActive==true){
+						sta="0";//进货
+						getCV("statype").innerHTML="进货";
+					}else{
+						sta="1";//出货
+						getCV("statype").innerHTML="出货";
+					}
+					
+				});
+			});
+			
+		});
+		function getCV(id){
+				return document.getElementById(id);
+			}
+		/**
+		 * 显示菜单菜单
+		 */
+		function openMenu() {
+			if (!showMenu) {
+				//侧滑菜单处于隐藏状态，则立即显示出来；
+				//显示完毕后，根据不同动画效果移动窗体；
+				menu.show('none', 0, function() {
+					menu.setStyle({
+								left: '0%',
+								transition: {
+									duration: 150
+								}
+							});
+//					switch (mode){
+//						case 'main-move':
+//							//主窗体开始侧滑；
+//							main.setStyle({
+//								left: '70%',
+//								transition: {
+//									duration: 150
+//								}
+//							});
+//							break;
+//						case 'menu-move':
+//							menu.setStyle({
+//								left: '0%',
+//								transition: {
+//									duration: 150
+//								}
+//							});
+//							break;
+//						case 'all-move':
+//							main.setStyle({
+//								left: '70%',
+//								transition: {
+//									duration: 150
+//								}
+//							});
+//							menu.setStyle({
+//								left: '0%',
+//								transition: {
+//									duration: 150
+//								}
+//							});
+//							break;
+//					}
+				});
+				//显示遮罩
+				mask.show();
+				showMenu = true;
+			}
+		}
+		/**
+		 * 关闭侧滑菜单
+		 */
+		function closeMenu () {
+			_closeMenu();
+			//关闭遮罩
+			mask.close();
+		}
+		
+		/**
+		 * 关闭侧滑菜单（业务部分）
+		 */
+		function _closeMenu() {
+			if (showMenu) {
+				//关闭遮罩；
+//				switch (mode){
+//					case 'main-move':
+//						//主窗体开始侧滑；
+//						main.setStyle({
+//							left: '0',
+//							transition: {
+//								duration: 150
+//							}
+//						});
+//						break;
+//					case 'menu-move':
+//						//主窗体开始侧滑；
+//						menu.setStyle({
+//							left: '-70%',
+//							transition: {
+//								duration: 150
+//							}
+//						});
+//						break;
+//					case 'all-move':
+//						//主窗体开始侧滑；
+//						main.setStyle({
+//							left: '0',
+//							transition: {
+//								duration: 150
+//							}
+//						});
+//						//menu页面同时移动
+//						menu.setStyle({
+//							left: '-70%',
+//							transition: {
+//								duration: 150
+//							}
+//						});
+//						
+//						break;
+//				}
+				menu.setStyle({
+							left: '-70%',
+							transition: {
+								duration: 150
+							}
+						});
+				//等窗体动画结束后，隐藏菜单webview，节省资源；
+				setTimeout(function() {
+					menu.hide();
+				}, 200);
+				//改变标志位
+				showMenu = false;
+			}
+		}
+		
+//		//变换侧滑动画移动效果；
+//		mui('.mui-input-group').on('change', 'input', function() {
+//			if (this.checked) {
+//				switch (this.value) {
+//					case 'main-move':
+//						//仅主窗口移动的时候，menu页面的zindex值要低一点；
+//						menu.setStyle({left:'0',zindex:9997});
+//						if(mode=='all-move'){
+//							menu.setStyle({
+//								left: '0%'
+//							});
+//						}
+//						mode = 'main-move';
+//						break;
+//					case 'menu-move':
+//						menu.setStyle({left:'-70%',zindex:9999});
+//						if(mode=='all-move'){
+//							menu.setStyle({
+//								left: '0%'
+//							});
+//						}
+//						mode = 'menu-move';
+//						break;
+//					case 'all-move':
+//						//切换为整体移动
+//						//首先改变移动标志
+//						slideTogether = true;
+//						//变换menu界面初始化位置，整体移动时，Menu界面left需要在-70%的地方；
+//						menu.setStyle({
+//							left: '-70%'
+//						});
+//						mode = 'all-move';
+//						break;
+//				}
+//			}
+//		});
+
+		 //点击左上角图标，打开侧滑菜单；
+//		document.querySelector('.mui-icon-bars').addEventListener('tap', openMenu);
+//		document.getElementById("show-btn").addEventListener('tap',openMenu);
+		 //在android4.4中的swipe事件，需要preventDefault一下，否则触发不正常
+		 //故，在dragleft，dragright中preventDefault
+		window.addEventListener('dragright', function(e) {
+			e.detail.gesture.preventDefault();
+		});
+		window.addEventListener('dragleft', function(e) {
+			e.detail.gesture.preventDefault();
+		});
+		 //主界面向右滑动，若菜单未显示，则显示菜单；否则不做任何操作；
+		window.addEventListener("swiperight", openMenu);
+		 //主界面向左滑动，若菜单已显示，则关闭菜单；否则，不做任何操作；
+		window.addEventListener("swipeleft", closeMenu);
+		 //menu页面向左滑动，关闭菜单；
+		window.addEventListener("menu:swipeleft", closeMenu);
+		//监听left选择功能
+		window.addEventListener("leftChoose",function(event){
+			
+			//判断是否已经添加过
+			
+			
+			var id=event.detail.id;
+			var name=event.detail.name;
+			var obj=document.getElementById('div_'+id);
+			if(null!=obj){
+				mui.toast("已添加该商品");
+				return;
+			}
+			
+			
+			var ulObj = document.body.querySelector('#cgd_ul');
+    		var listStr='';
+//  		listStr+='<div class="mui-slider-right mui-disabled">';
+//			listStr+='<a class="mui-btn mui-btn-blue editkq" name="'+arr[m].id+'"  >修改</a>';
+//			listStr+='<a class="mui-btn mui-btn-red shanchukq" name="'+arr[m].id+'" >删除</a>';
+//			listStr+='</div>';
+//			listStr+='<div class="mui-slider-handle">';
+			listStr+='<div class="mui-table t2" id="div_'+id+'">';
+			listStr+='<div class="mui-table-cell mui-col-xs-10">';
+			listStr+='<h4 class="mui-ellipsis" >'+name+'</h4>';
+			listStr+='</div>';
+			listStr+='<div class="mui-table-cell mui-col-xs-9">';
+			listStr+='<div class="mui-numbox" id="nb_'+id+'"><button class="mui-btn mui-numbox-btn-minus" type="button">-</button>';
+			listStr+='<input class="mui-numbox-input" id="num_'+id+'"  type="number" value="1"  />';
+			listStr+='<button class="mui-btn mui-numbox-btn-plus" type="button">+</button>';
+			listStr+='</div>';
+			listStr+='</div>';
+			listStr+='</div>';
+//			listStr+='</div>';
+			var li = document.createElement('li');
+    		li.className = 'mui-table-view-cell';
+    		li.innerHTML=listStr;
+    		ulObj.appendChild(li);
+			mui('#nb_'+id).numbox();
+			
+			//赋值，保存时使用
+			if(ids==''){
+				ids+=id;
+//				nums+=document.getElementById("num_"+id).value;
+			}else{
+				ids+=','+id;
+//				nums+=','+document.getElementById("num_"+id).value;
+			}
+			
+			
+		});
+		
+		
+
+		//重写mui.menu方法，Android版本menu按键按下可自动打开、关闭侧滑菜单；
+		mui.menu = function() {
+			if (showMenu) {
+				closeMenu();
+			} else {
+				openMenu();
+			}
+		}
+		window.addEventListener('cgdAdd',function(event){
+			if(event.detail.mode=="list"){
+				//新增
+				ids='';
+				nums='';
+				document.getElementById("cgd_ul").innerHTML="";
+				document.getElementById("name").value="";
+			}
+			
+		});
+		
+	</script>
+</html>

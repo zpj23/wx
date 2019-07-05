@@ -3,7 +3,7 @@
 
 	<head>
 		<meta charset="UTF-8">
-		<title>商品列表</title>
+		<title>出库列表</title>
 		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
 		<link href="../css/mui.min.css" rel="stylesheet" />
 		<!--App自定义的css-->
@@ -31,14 +31,14 @@
 	<body>
 		<header class="mui-bar mui-bar-nav">
 			<button id='mainPage' class=" mui-pull-left mui-btn-link">主页</button>
-			<h1 class="mui-title">商品列表</h1>
-			<button id='addButton' class=" mui-pull-right mui-btn-link">新增</button>
+			<h1 class="mui-title">出库列表</h1>
+			<!--<button id='addButton' class=" mui-pull-right mui-btn-link">新增</button>-->
 		</header>
 		
 		<div class="mui-content">
 			<div class="mui-content-padded">
 			<div class="mui-input-row mui-search" >
-				<input type="search" class="mui-input-clear"  readonly="readonly" placeholder="" id="goods_search_list" />
+				<input type="search" class="mui-input-clear"   placeholder="" id="store_search_list" />
 			</div>
 			</div>
 			<div class="mui-content-padded"  >
@@ -59,15 +59,15 @@
 		<script src="../js/mui.js"></script>
 		<script src="../js/app.js"></script>
 		<script type="text/javascript">
-			var add_html=null;//新增和编辑页面
 			var currentPage=1;
 			var pagerow=15;
 			var totalPage=0;
 			var mainHtml =null;
-			var searchHtml=null;
 			var search_goodsName='';
-			var search_supplierId='';
-			var search_goodsType='';
+			//判断是否进入plusReady进行初始化
+			var bigInitAllInfoFlag=false;
+			
+			
 			mui.init({
 				pullRefresh: {
 					container: '#myList',
@@ -84,76 +84,26 @@
 			});
 			//初始化加载
 			mui.plusReady(function(){
-				currentPage=1;
-				editHtml=mui.preload({
-					id: 'goods_add',
-					url: 'edit.html'
-				});
-				searchHtml=mui.preload({
-					"id": 'goods_search',
-					"url": 'search.html'
-				});	
-				initButtons();
-				state=app.getState();
-				bindEvent();
+				bigInitAllInfo();
 			});
-			function bindEvent(){
-				//编辑信息
-            	mui('#OA_task_1').on('tap', '.editkq', function(event) {
-					var elem = this;
-					var cid = elem.name;
-					if(!add_html){
-					    add_html = plus.webview.getWebviewById('goods_add');
-					}
-					mui.fire(add_html,'goodsAdd',{
-						id:cid
-					});
-					mui.openWindow({
-					    id:'goods_add'
-					});
-					//关闭之前li的状态
-					var li = elem.parentNode.parentNode;
-					setTimeout(function() {
-						mui.swipeoutClose(li);
-					}, 0);
-				});
-				//删除信息
-            	var btnArray = ['确认', '取消'];
-            	mui('#OA_task_1').on('tap', '.shanchukq', function(event) {
-					var elem = this;
-					var li = elem.parentNode.parentNode;
-					mui.confirm('确认删除该条记录？', '警告', btnArray, function(e) {
-						if (e.index == 0) {
-							var cid = elem.name;
-							mui.ajax({
-					            url      : app.getRequestUrl()+'/vue/goods/delById',
-					            type     : 'post',
-					            dataType:'json',//服务器返回json格式数据
-					            data:{ 
-								    delId:cid,
-								    loginId:state.id,
-									isAdmin:state.isAdmin
-								},
-					            success  : function(data){
-					            	if(data.msg){
-					            		li.parentNode.removeChild(li);
-					            	}else{
-					            		mui.toast("删除失败");
-					            	}
-					            },
-					            error    : function(xhr,type,errorThrown){
-					                mui.toast(type);
-					            }
-					        });
-							
-						} else {
-							setTimeout(function() {
-								mui.swipeoutClose(li);
-							}, 0);
-						}
-					});
-				});
+			function bigInitAllInfo(){
+				if(!bigInitAllInfoFlag){
+					state=app.getState();
+					currentPage=1;
+					//初始化按钮
+					bindEvent();
+					bigInitAllInfoFlag=true;
+				}
 			}
+		function bindEvent(){
+			//查询功能
+			document.getElementById('store_search_list').addEventListener('input',function(event){
+				search_goodsName=document.getElementById('store_search_list').value;
+				document.getElementById("OA_task_1").innerHTML="";
+				currentPage=1;
+				initData();
+			});
+		}
 			//往上拉
 		function pullupRefresh() {
 				setTimeout(function() {
@@ -189,86 +139,40 @@
 			}
 			
 			//初始化加载以后每次进页面加载监听
-			window.addEventListener('goodsList',function(event){
-				state=app.getState();
+			window.addEventListener('outStoreList',function(event){
+				bigInitAllInfo();
 				if(event.detail.mode=="main"){
 					//主页跳转过来的
 					currentPage=1;
-					search_goodsName='';
-					search_supplierId='';
-					search_goodsType='';
 					document.getElementById("OA_task_1").innerHTML="";
+					initData();
 					setPullRefresh();
-					initData();
-				}else if(event.detail.mode=="edit"){
-					//保存信息
-					if(currentPage!=1){
-						pagerow=currentPage*pagerow;
-					}
-					currentPage=1;
-					document.getElementById("OA_task_1").innerHTML="";
-					initData();
 				}else if(event.detail.mode=="search"){
 					currentPage=1;
 					document.getElementById("OA_task_1").innerHTML="";
-					search_goodsName=event.detail.name;
-					if(typeof(search_goodsName)=="undefined"){
-						search_goodsName="";
-					}
-					search_supplierId=event.detail.supplierId;
-					if(typeof(search_supplierId)=="undefined"){
-						search_supplierId='';
-					}
-					search_goodsType=event.detail.goodsType;
-					if(typeof(search_goodsType)=="undefined"){
-						search_goodsType='';
-					}
-					setPullRefresh();
 					initData();
+					setPullRefresh();
+					
 				}else if(event.detail.mode=="editBack"||event.detail.mode=="searchBack"){
 					//返回 不做任何操作
 				}
 				
 				
 			});
-			//初始化按钮
-			function initButtons(){
-				var add = document.getElementById("addButton");
-				add.addEventListener('tap', function(event) {
-					if(!add_html){
-					    add_html = plus.webview.getWebviewById('goods_add');
-					}
-					mui.fire(add_html,'goodsAdd',{
-						id:''
-					});
-					mui.openWindow({
-					    id:'goods_add'
-					});
-					
-				}, false);
-			}
 			
 			function  initData(){
 				mui.ajax({
-		            url    : app.getRequestUrl()+'/vue/goods/findList',
+		            url    : app.getRequestUrl()+'/vue/store/findOutStoreList',
 		            type   : 'POST',
 		            dataType:'json',//服务器返回json格式数据
 		            data:{
-		            	goodsName:search_goodsName,
-		            	supplierId:search_supplierId,
-		            	goodsType:search_goodsType,
+		            	name:search_goodsName,
 		            	cpage:currentPage,
 		            	pagerow:pagerow,
 					    loginId:state.id,
 						isAdmin:state.isAdmin
 					},
 					async:false,
-					beforeSend: function() {
-//				        plus.nativeUI.showWaiting("加载中...", null);
-				    },
-				    complete: function() {
-//				        plus.nativeUI.closeWaiting();
-				    },
 		            success: function(data){
 		            	totalPage =data.totalPage;
 		            	var dqjl=currentPage*pagerow;//默认的当前记录数
@@ -286,16 +190,12 @@
 	            		var ulObj = document.body.querySelector('#OA_task_1');
 		            	for(var m=0;m<arr.length;m++){
 		            		var listStr='';
-							listStr+='<div class="mui-slider-right mui-disabled">';
-							listStr+='<a class="mui-btn mui-btn-blue editkq" name="'+arr[m].id+'"  >修改</a>';
-							listStr+='<a class="mui-btn mui-btn-red shanchukq" name="'+arr[m].id+'" >删除</a>';
-							listStr+='</div>';
 							listStr+='<div class="mui-slider-handle">';
 							listStr+='<div class="mui-table">';
 							listStr+='<div class="mui-table-cell mui-col-xs-9">';
-							listStr+='<h4 class="mui-ellipsis" >'+arr[m].name+'</h4>';
-							listStr+='<h5>规格：'+arr[m].type+'，单位：'+arr[m].unit+'</h5>';
-							listStr+='<p class="mui-h6 mui-ellipsis">'+arr[m].supplierName+'</p>';
+							listStr+='<h4 class="mui-ellipsis" >'+arr[m].goodsname+'</h4>';
+							listStr+='<h5>规格：'+arr[m].type+' ， 数量：'+arr[m].num+' '+arr[m].unit+'</h5>';
+							listStr+='<p class="mui-h6">'+arr[m].supplierName+' '+arr[m].createtime+'</p>';
 							listStr+='</div>';
 							listStr+='<div class="mui-table-cell mui-col-xs-1 mui-text-right"><span class="mui-badge">'+((currentPage-1)*pagerow+m+1)+'</span></div>';
 							listStr+='</div>';
@@ -338,32 +238,6 @@
 						});
 					}, false);
 					
-				var goods_search = document.getElementById("goods_search_list");
-				
-				goods_search.addEventListener('tap', function(event) {
-					if(!searchHtml){
-						searchHtml=plus.webview.getWebviewById('goods_search');
-					}
-					mui.fire(searchHtml,'goodsSearch',{
-						
-					});
-					mui.openWindow({
-						id: 'goods_search',
-						show: {
-							aniShow: 'pop-in'
-						},
-						styles: {
-							popGesture: 'hide'
-							
-						},
-						
-						waiting: {
-							autoShow: false
-						}
-						
-					});
-				
-				}, false);	
 				
 				var old_back = mui.back;
 				mui.back = function(){

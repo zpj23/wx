@@ -45,15 +45,18 @@
 				<div class="mui-content-padded"></div>
 			    <div class="mui-card">
 					<div class="mui-card-content">
-						
 					    <div class="mui-input-row">
 					        <label>维修用户:</label>
 					    	<input type="text" id="username" name="username" list="url_list"  placeholder="维修用户" autocomplete="on">
-					    	<datalist id="url_list">
-							</datalist>
+					    	
 					    </div>
-					    
-					    <div class="mui-input-row">
+					    <datalist id="url_list">
+						</datalist>
+			    	</div>
+				</div>
+				<div class="mui-card">
+					<div class="mui-card-content">
+						<div class="mui-input-row">
 					        <label>金额:</label>
 								<div class="mui-numbox">
 								  <!-- "-"按钮，点击可减小当前数值 -->
@@ -63,8 +66,8 @@
 								  <button class="mui-btn mui-numbox-btn-plus" type="button">+</button>
 								</div>
 					    </div>
-			    	</div>
-				</div>
+					</div>
+				</div>	
 				<div class="mui-content-padded"></div>
 				<div class="mui-card">
 					<div class="mui-card-content" style="padding: 15px;">
@@ -91,6 +94,7 @@
 			var listHtml=null;
 			var registertime;
 			var isPayName;
+			var selectValueArr=new Array();//下拉选择框的值数组
 			mui.init();
 			mui.plusReady(function(){
 				//初始化日期		
@@ -325,20 +329,37 @@
 				        });
 					}, false);
 					
+					document.getElementById("username").addEventListener('input', function(event) {
+//						document.getElementById("url_list").innerHTML='';
+//						initDataList();
+						var tempname=document.getElementById("username").value;
+						console.log(tempname);
+						for(var m=0;m<selectValueArr.length;m++){
+							if(selectValueArr[m].indexOf(tempname)>-1){
+								document.getElementById("url_list_username").value=selectValueArr[m];
+								break;
+							}
+						}
+					});
 			}
+			
 			//初始化维修用户下拉的datalist
 			function initDataList(){
 				var ht=document.getElementById("url_list").innerHTML;
 				if(ht.trim()!=''){
 					return;
+//					document.getElementById("url_list").innerHTML='';
 				}
 				var temp=localStorage.getItem("namelist");
-				var arr=JSON.parse(temp);
+//				console.log(temp);
+				selectValueArr=JSON.parse(temp);
 				var html='';
-				if(arr.length>0){
-					for(var i=0;i<arr.length;i++){
-						html+='<option label="'+arr[i]+'" value="'+arr[i]+'" />';
+				if(selectValueArr.length>0){
+					html+='<select name="username" id="url_list_username" >';
+					for(var i=0;i<selectValueArr.length;i++){
+						html+='<option value="'+selectValueArr[i]+'" >'+selectValueArr[i]+'</option>';
 					}
+					html+='</select>';
 					document.getElementById("url_list").innerHTML=html;
 				}else{
 					document.getElementById("url_list").innerHTML='';

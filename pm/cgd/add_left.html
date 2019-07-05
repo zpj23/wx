@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>Hello MUI</title>
+		<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+		<link rel="stylesheet" href="../css/mui.min.css">
+		<style>
+			body, .mui-content {
+				background-color: #fff;
+				color: #000;
+			}
+			header.mui-bar{
+				display: none;
+			}
+			.mui-bar-nav~.mui-content{
+				padding: 0;
+			}
+			 .title{
+			  	margin: 35px 15px 10px;
+			  }
+			  .title+.content{
+			  	margin: 10px 15px 35px;
+			  	color: #bbb;
+			  	text-indent: 1em;
+			  	font-size: 14px;
+			  	line-height: 24px;
+			  }
+			  .mui-table-view{
+			  	margin-bottom: 10px;
+			  }
+		</style>
+	</head>
+	<body>
+		<div class="mui-content">
+			<div class="title">查询</div>
+				<div class="mui-content-padded">
+					<div class="mui-input-row mui-search" >
+						<input type="search" class="mui-input-clear"  placeholder="" id="cgd_search" />
+					</div>
+					
+				</div>
+				<div class="title" style="margin-bottom: 25px;">商品列表数据</div>
+				<ul class="mui-table-view" id="url_list">
+					<!--<li class="mui-table-view-cell">
+						<a class="mui-navigate-right">
+							Item 1
+						</a>
+					</li>
+					<li class="mui-table-view-cell">
+						<a class="mui-navigate-right">
+							Item 2
+						</a>
+					</li>
+					<li class="mui-table-view-cell">
+						<a class="mui-navigate-right">
+							Item 3
+						</a>
+					</li>
+					<li class="mui-table-view-cell">
+						<a class="mui-navigate-right">
+							Item 4
+						</a>
+					</li>
+					<li class="mui-table-view-cell">
+						<a class="mui-navigate-right">
+							Item 5
+						</a>
+					</li>
+					<li class="mui-table-view-cell">
+						<a class="mui-navigate-right">
+							Item 6
+						</a>
+					</li>
+					<li class="mui-table-view-cell">
+						<a class="mui-navigate-right">
+							Item 6
+						</a>
+					</li>
+					<li class="mui-table-view-cell">
+						<a class="mui-navigate-right">
+							Item 6
+						</a>
+					</li>
+					
+					<li class="mui-table-view-cell">
+						<a class="mui-navigate-right">
+							Item 6
+						</a>
+					</li>
+					<li class="mui-table-view-cell">
+						<a class="mui-navigate-right">
+							Item 6
+						</a>
+					</li>-->
+				</ul>
+		</div>
+		<script src="../js/mui.min.js"></script>
+		<script src="../js/app.js"></script>
+		<script type="text/javascript" charset="utf-8">
+			mui.init({
+				keyEventBind: {
+					backbutton: false,
+					menubutton: false
+				}
+			});
+			//获得侧滑主窗口webview对象
+			var main = null;
+			var state;
+			mui.plusReady(function () {
+				state=app.getState();
+				main = plus.webview.currentWebview().opener();
+				var cgd_search=document.getElementById('cgd_search');
+				cgd_search.addEventListener('input',function(event){
+					searchInfo(cgd_search.value);
+				});
+				//添加列表的监听事件
+				mui("#url_list").on('tap','.t1',function(event){ 
+					var id=this.getAttribute("id");
+					var name = this.getAttribute("name");
+					
+					mui.fire(main,'leftChoose',{
+						id:id,
+						name:name
+					});
+				});
+				//默认初始化数据
+				searchInfo('');
+				
+			});
+			function searchInfo(name){
+				mui.ajax({
+		            url    : app.getRequestUrl()+'/vue/goods/findList',
+		            type   : 'POST',
+		            dataType:'json',//服务器返回json格式数据
+		            data:{
+		            	goodsName:name,
+		            	supplierId:'',
+		            	goodsType:'',
+		            	cpage:'1',
+		            	pagerow:'20',
+					    loginId:state.id,
+						isAdmin:state.isAdmin
+					},
+					async:false,
+		            success: function(data){
+		            	var arr=new Array();
+	            		arr=data.list;
+	            		document.getElementById("url_list").innerHTML="";
+	            		var ulObj = document.body.querySelector('#url_list');
+		            	for(var m=0;m<arr.length;m++){
+		            		var listStr='';
+//		            		listStr+='<a class="mui-navigate-right">'+arr[m].name+'</a>';
+							listStr+='<div class="mui-table t1" id="'+arr[m].id+'" name="'+arr[m].name+'">';
+							listStr+='<div class="mui-table-cell mui-col-xs-9">';
+							listStr+='<h4 class="mui-ellipsis" >'+arr[m].name+'</h4>';
+							listStr+='<h5>规格：'+arr[m].type+'，单位：'+arr[m].unit+'</h5>';
+							listStr+='<p class="mui-h6 mui-ellipsis">'+arr[m].supplierName+'</p>';
+							listStr+='</div>';
+							listStr+='<div class="mui-table-cell mui-col-xs-1 mui-text-right"><span class="mui-badge">'+(m+1)+'</span></div>';
+							listStr+='</div>';
+							listStr+='</div>';
+							var li = document.createElement('li');
+		            		li.className = 'mui-table-view-cell';
+		            		li.innerHTML=listStr;
+		            		ulObj.appendChild(li);
+		            	}
+		            }	
+		        });    
+			}
+			function closeMenu () {
+				mui.fire(main,"menu:swipeleft");
+			}
+			//优化显示出来的侧滑菜单，只需监听该菜单的左滑事件，然后将其关闭即可；在菜单上右滑，不做任何操作；
+			window.addEventListener("swipeleft",closeMenu);  
+//			document.getElementById("close-btn").addEventListener('tap',closeMenu);
+			mui.menu = closeMenu;
+		</script>
+</body>
+
+</html>

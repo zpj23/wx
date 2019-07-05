@@ -61,7 +61,6 @@
 				<ul class="mui-table-view mui-table-view-striped mui-table-view-condensed" id="OA_task_1">
 				</ul>	
 		    </div>
-		    
 		</div>
 	</body>
 	<script src="../js/mui.js"></script>
@@ -406,6 +405,38 @@
 					});
 				
 				}, false);	
+				
+				
+//				document.getElementById("openChart").addEventListener('tap', function(event) {
+//					if(!chartHtml){
+//						chartHtml=plus.webview.getWebviewById('kq_chart');
+//					}
+//					var array = plus.webview.all();
+//					if(array){
+//						console.log(arr.length);
+//						for(var i=0,len=array.length;i<len;i++){
+//						    	console.log(array[i].getURL());
+//					        }
+//					}
+////					mui.fire(chartHtml,'kqChart',{
+////					});
+//					mui.openWindow({
+//						id: 'kq_chart',
+//						url:'echarts.html',
+//						show: {
+//							aniShow: 'pop-in'
+//						},
+//						styles: {
+//							popGesture: 'hide'
+//						},
+//						
+//						waiting: {
+//							autoShow: false
+//						}
+//						
+//					});
+//				
+//				}, false);	
 				
 		}
 		var old_back = mui.back;

@@ -15,9 +15,13 @@
 		    <h1 class="mui-title">查询条件</h1>
 		</header>
 		<div class="mui-content">
+			
 			<div class="mui-content-padded">
-				<div class="mui-input-row mui-search">
-					<input type="search" class="mui-input-clear" placeholder="" id="kq_search" />
+				<div class="mui-input-row">
+				<label>图表显示:</label>
+				<div class="mui-switch">
+					<div class="mui-switch-handle"></div>
+				</div>
 				</div>
 			</div>	
 			
@@ -62,13 +66,34 @@
 		<script type="text/javascript">
 			var state=app.getState();
 			var listHtml=null;
+			var chartHtml=null;
+			var isChartShow=false;
 			mui.init();
+			
 			mui.plusReady(function(){
 				initButtons();
 			});
 			window.addEventListener('kqSearch',function(event){
+				
 			});
 			function initButtons(){
+				
+				chartHtml=mui.preload({
+					id: 'kq_chart',
+					url: 'echarts.html'
+				});
+				
+				mui('.mui-content .mui-switch').each(function() { //循环所有toggle
+					this.addEventListener('toggle', function(event) {
+//						console.log(event.detail.isActive);
+						if(event.detail.isActive==true){
+							isChartShow=true;
+						}else{
+							isChartShow=false;
+						}
+					});
+				});
+				
 				var startdate=document.getElementById("startdate");
 				startdate.addEventListener('tap', function() {
 					var _self = this;
@@ -164,20 +189,42 @@
 				});	
 				var searchButton =document.getElementById("searchButton");
 				searchButton.addEventListener('tap', function() {
-					if(!listHtml){
-					    listHtml = plus.webview.getWebviewById('kq_list');
+					if(isChartShow){
+						
+						//查询已图表显示
+						if(!chartHtml){
+							chartHtml=plus.webview.getWebviewById('kq_chart');
+						}
+						mui.fire(chartHtml,'kqChart',{
+							mode:'search',
+							startdate:getCV('startdate').value,
+						    enddate:getCV('enddate').value,
+						    staffname:getCV('staffname').value,
+						    shenhe:getCV('shenhecode').value,
+						    remark:getCV('remark').value
+						});
+						mui.openWindow({
+						    id:'kq_chart'
+						});
+						
+					}else{
+						//查询以列表显示
+						if(!listHtml){
+						    listHtml = plus.webview.getWebviewById('kq_list');
+						}
+						mui.fire(listHtml,'kqList',{
+							mode:'search',
+							startdate:getCV('startdate').value,
+						    enddate:getCV('enddate').value,
+						    staffname:getCV('staffname').value,
+						    shenhe:getCV('shenhecode').value,
+						    remark:getCV('remark').value
+						});
+						mui.openWindow({
+						    id:'kq_list'
+						});
 					}
-					mui.fire(listHtml,'kqList',{
-						mode:'search',
-						startdate:getCV('startdate').value,
-					    enddate:getCV('enddate').value,
-					    staffname:getCV('staffname').value,
-					    shenhe:getCV('shenhecode').value,
-					    remark:getCV('remark').value
-					});
-					mui.openWindow({
-					    id:'kq_list'
-					});
+					
 					
 					
 				}, false);

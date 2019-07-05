@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>ECharts 示例</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<!--标准mui.css-->
+		<link rel="stylesheet" href="../css/mui.min.css">
+		<!--App自定义的css-->
+		<!-- <link rel="stylesheet" type="text/css" href="../css/app.css" /> -->
+		<style>
+			.chart {
+				height: 200px;
+				margin: 0px;
+				padding: 0px;
+			}
+			h5 {
+				margin-top: 30px;
+				font-weight: bold;
+			}
+			h5:first-child {
+				margin-top: 15px;
+			}
+		</style>
+		<script src="../js/mui.min.js"></script>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">图表</h1>
+		</header>
+		<div class="mui-content">
+			<div class="mui-content-padded">
+				<div class="mui-card">
+				<form class="mui-input-group">
+					<div class="mui-input-row">
+					        <label>开始日期:</label>
+					  <input type="text"  id="startdate" data-options='{"type":"date"}' class="mui-input-clear"  placeholder="开始日期" /> 
+					</div>
+					
+					<div class="mui-input-row">
+						<label>结束日期:</label>
+						<input type="text"  id="enddate" data-options='{"type":"date"}' class="mui-input-clear"  placeholder="结束日期" /> 
+					
+					</div>
+					
+					<div class="mui-input-row">
+					        <label>维修用户:</label>
+					    <input type="text" id="staffname" class="mui-input-clear" placeholder="维修用户">
+					</div>
+					<div class="mui-input-row">
+					        <label>内容:</label>
+					    <input type="text" id="remark" class="mui-input-clear" placeholder="内容">
+					</div>
+					<div class="mui-input-row">
+					        <label>是否付款:</label>
+					    <input type="text" id="shenhe" class="mui-input-clear" placeholder="是否付款" />
+					    <input type="hidden" id="ispay" value="" />
+					</div>
+					<div class="mui-button-row">
+						<button type="button" id="searchButton1" class="mui-btn mui-btn-primary" >查询</button>
+						<!--<button type="button" id="clearButton" class="mui-btn mui-btn-grey" >清空</button>-->
+					</div>
+				</form>
+			</div>
+			</div>
+			<div class="mui-content-padded">
+				<h5>饼图示例</h5>
+				<div class="chart" id="pieChart"></div>
+				<!--<h5>线图示例</h5>
+				<div class="chart" id="lineChart"></div>
+				<h5>饼图示例</h5>
+				<div class="chart" id="barChart"></div>-->
+			</div>
+		</div>
+		<script src="../js/app.js"></script>
+		<script src="../js/mui.picker.min.js"></script>
+		<script src="../libs/echarts-all.js"></script>
+		<script>
+			var state;
+			var pChart;
+			mui.plusReady(function(){
+				state=app.getState();
+				initButtons();
+			});
+			
+			window.addEventListener('kqChart',function(event){
+				if(event.detail.mode=="search"){
+					var startdate=event.detail.startdate;
+					if(typeof(startdate)=="undefined"){
+						byId("startdate").value="";
+					}
+					var enddate=event.detail.enddate;
+					if(typeof(enddate)=="undefined"){
+						byId("enddate").value='';
+					}
+					var staffname=event.detail.staffname;
+					if(typeof(staffname)=="undefined"){
+						byId("staffname").value='';
+					}
+					
+					var ispay=event.detail.shenhe;
+					if(typeof(ispay)=="undefined"){
+						byId("ispay").value='';
+					}
+					var remarkContent=event.detail.remark;
+					if(typeof(remarkContent)=="undefined"){
+						byId("remarkContent").value='';
+					}
+					initPie();
+				}
+			});
+			function initPie(){
+				mui.ajax({
+		            url      : app.getRequestUrl()+'/vue/maintain/findChartData',
+		            type     : 'post',
+		            dataType:'json',//服务器返回json格式数据
+		            data:{ 
+					    startdate:byId('startdate').value,
+						enddate:byId('enddate').value,
+						username:byId('staffname').value,
+						ispay:byId('ispay').value,
+						remark:byId('remark').value,
+					    loginId:state.id,
+						isAdmin:state.isAdmin
+					},
+					beforeSend: function() {
+				        plus.nativeUI.showWaiting("初始化中...", null);
+				    },
+				    complete: function() {
+				        plus.nativeUI.closeWaiting();
+				    },
+		            success  : function(data){
+		            	if(data.msg){
+					    	pChart= echarts.init(byId('pieChart'));
+					    	var option={
+									calculable: false,
+//									color:['#393939','#fad797'],
+									series: [{
+										name: '付款比例',
+										type: 'pie',
+										radius: '80%',
+										center: ['50%', '50%'],
+										data: data.bingtu,
+										itemStyle: {
+									        normal: {
+									          label: {
+									            show: true,
+									            position: 'outer',//数据在中间显示
+									            formatter:'{c}'//百分比显示，模板变量有 {a}、{b}、{c}、{d}，分别表示系列名，数 据名，数据值，百分比。{d}数据会根据value值计算百分比
+									          }
+									        }
+									    }
+
+										// 设置值域的标签
+//							            label: {
+//							                normal: {
+//							                  position: 'inner',  // 设置标签位置，默认在饼状图外 可选值：'outer' ¦ 'inner（饼状图上）'
+//							                  // formatter: '{a} {b} : {c}个 ({d}%)'   设置标签显示内容 ，默认显示{b}
+//							                  // {a}指series.name  {b}指series.data的name
+//							                  // {c}指series.data的value  {d}%指这一部分占总数的百分比
+//							                  formatter: '{c}'
+//							                }
+//							            }
+									}]
+								};
+							pChart.setOption(option);
+		            	}else{
+		            		mui.toast("初始化失败");
+		            	}
+		            	
+							
+		            },
+		            error    : function(xhr,type,errorThrown){
+		                mui.toast(type);
+		            }
+		       	});
+			}
+			
+			function initButtons(){
+				//付款状态
+				var shenhe=document.getElementById("shenhe");
+				shenhe.addEventListener('tap', function() {
+					 var picker = new mui.PopPicker();
+					 picker.setData([{
+					    value: "1",
+					    text: "已付款"
+					}, {
+					    value: "0",
+					    text: "欠账"
+					}]);
+					picker.show(function(rs) {
+						document.getElementById("ispay").value=rs[0].value;
+						shenhe.value=rs[0].text;
+					});
+				}, false);
+				
+				var searchButton =document.getElementById("searchButton1");
+				searchButton.addEventListener('tap', function() {
+					initPie();
+				}, false);
+				
+			}
+			
+			
+			
+			
+//			var getOption = function(chartType) {
+//				var chartOption = chartType == 'pie' ? {
+//					calculable: false,
+//					series: [{
+//						name: '访问来源',
+//						type: 'pie',
+//						radius: '65%',
+//						center: ['50%', '50%'],
+//						data: [{
+//							value: 335,
+//							name: '直接访问'
+//						}, {
+//							value: 310,
+//							name: '邮件营销'
+//						}, {
+//							value: 234,
+//							name: '联盟广告'
+//						}, {
+//							value: 135,
+//							name: '视频广告'
+//						}, {
+//							value: 1548,
+//							name: '搜索引擎'
+//						}]
+//					}]
+//				} : {
+//					legend: {
+//						data: ['蒸发量', '降水量']
+//					},
+//					grid: {
+//						x: 35,
+//						x2: 10,
+//						y: 30,
+//						y2: 25
+//					},
+//					toolbox: {
+//						show: false,
+//						feature: {
+//							mark: {
+//								show: true
+//							},
+//							dataView: {
+//								show: true,
+//								readOnly: false
+//							},
+//							magicType: {
+//								show: true,
+//								type: ['line', 'bar']
+//							},
+//							restore: {
+//								show: true
+//							},
+//							saveAsImage: {
+//								show: true
+//							}
+//						}
+//					},
+//					calculable: false,
+//					xAxis: [{
+//						type: 'category',
+//						data: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月']
+//					}],
+//					yAxis: [{
+//						type: 'value',
+//						splitArea: {
+//							show: true
+//						}
+//					}],
+//					series: [{
+//						name: '蒸发量',
+//						type: chartType,
+//						data: [2.0, 4.9, 7.0, 23.2, 25.6, 76.7, 135.6, 162.2, 32.6, 20.0, 6.4, 3.3]
+//					}, {
+//						name: '降水量',
+//						type: chartType,
+//						data: [2.6, 5.9, 9.0, 26.4, 28.7, 70.7, 175.6, 182.2, 48.7, 18.8, 6.0, 2.3]
+//					}]
+//				};
+//				return chartOption;
+//			};
+			var byId = function(id) {
+				return document.getElementById(id);
+			};
+//			var barChart = echarts.init(byId('barChart'));
+//			barChart.setOption(getOption('bar'));
+//			var lineChart = echarts.init(byId('lineChart'));
+//			lineChart.setOption(getOption('line'));
+//			var pieChart = echarts.init(byId('pieChart'));
+//			pieChart.setOption(getOption('pie'));
+//			byId("echarts").addEventListener('tap',function(){
+//				var url = this.getAttribute('data-url');
+//				plus.runtime.openURL(url);
+//			},false);
+		</script>
+	</body>
+
+</html>
