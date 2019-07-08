@@ -146,25 +146,25 @@
 							url: 'cgd/list.html'
 						});
 					}
-					if(!storeHtml){
-						storeHtml=$.preload({
-							id: 'store_list',
-							url: 'store/list.html'
-						});
-					}
-					
-					if(!inStoreHtml){
-						inStoreHtml=$.preload({
-							id: 'in_store_list',
-							url: 'store/in_list.html'
-						});
-					}
-					if(!outStoreHtml){
-						outStoreHtml=$.preload({
-							id: 'out_store_list',
-							url: 'store/out_list.html'
-						});
-					}
+//					if(!storeHtml){
+//						storeHtml=$.preload({
+//							id: 'store_list',
+//							url: 'store/list.html'
+//						});
+//					}
+//					
+//					if(!inStoreHtml){
+//						inStoreHtml=$.preload({
+//							id: 'in_store_list',
+//							url: 'store/in_list.html'
+//						});
+//					}
+//					if(!outStoreHtml){
+//						outStoreHtml=$.preload({
+//							id: 'out_store_list',
+//							url: 'store/out_list.html'
+//						});
+//					}
 					
 				}, false);
 				
@@ -316,37 +316,83 @@
 					//库存
 					doc.getElementById("store_manage").addEventListener('tap',function(event){
 						if(!storeHtml){
-						    storeHtml = plus.webview.getWebviewById('store_list');
+//						    storeHtml = plus.webview.getWebviewById('store_list');
+							mui.openWindow({
+							    id: 'store_list',
+							    url: 'store/list.html',
+							    show:{
+      								autoShow:false
+      							},	
+      							waiting:{
+      								autoShow:false
+      							}
+							});
+							
+						}else{
+							mui.fire(storeHtml,'storeList',{
+								mode:'main'
+							});
 						}
-						mui.fire(storeHtml,'storeList',{
-							mode:'main'
-						});
+						
 						mui.openWindow({
-						    id:'store_list'
+						    id:'store_list',
+						    waiting:{
+  								autoShow:false
+  							}
 						});
 					});
 					//入库
 					doc.getElementById("in_store_manage").addEventListener('tap',function(event){
 						if(!inStoreHtml){
-						    inStoreHtml = plus.webview.getWebviewById('in_store_list');
+							inStoreHtml=mui.openWindow({
+							    id:'in_store_list',
+							    url: 'store/in_list.html',
+							    show:{
+      								autoShow:false
+      							},	
+      							waiting:{
+      								autoShow:false
+      							}
+							});
+						    //inStoreHtml = plus.webview.getWebviewById('in_store_list');
+						}else{
+							mui.fire(inStoreHtml,'inStoreList',{
+								mode:'main'
+							});
 						}
-						mui.fire(inStoreHtml,'inStoreList',{
-							mode:'main'
-						});
+						
 						mui.openWindow({
-						    id:'in_store_list'
+						    id:'in_store_list',	
+  							waiting:{
+  								autoShow:false
+  							}
 						});
 					});
 					//出库
 					doc.getElementById("out_store_manage").addEventListener('tap',function(event){
 						if(!outStoreHtml){
-						    outStoreHtml = plus.webview.getWebviewById('out_store_list');
+//						    outStoreHtml = plus.webview.getWebviewById('out_store_list');
+							outStoreHtml=mui.openWindow({
+							    id:'out_store_list',
+							    url: 'store/out_list.html',
+							    show:{
+      								autoShow:false
+      							},	
+      							waiting:{
+      								autoShow:false
+      							}
+							});
+						}else{
+							mui.fire(outStoreHtml,'outStoreList',{
+								mode:'main'
+							});
 						}
-						mui.fire(outStoreHtml,'outStoreList',{
-							mode:'main'
-						});
+						
 						mui.openWindow({
-						    id:'out_store_list'
+						    id:'out_store_list',
+						    waiting:{
+  								autoShow:false
+  							}
 						});
 					});
 					

@@ -67,8 +67,6 @@
 			var search_goodsName='';
 			//判断是否进入plusReady进行初始化
 			var bigInitAllInfoFlag=false;
-			
-			
 			mui.init({
 				pullRefresh: {
 					container: '#myList',
@@ -83,9 +81,18 @@
 					}
 				}
 			});
+			
+			
 			//初始化加载
 			mui.plusReady(function(){
 				bigInitAllInfo();
+				setTimeout(function() {
+					currentPage=1;
+					document.getElementById("OA_task_1").innerHTML="";
+					initData();
+					setPullRefresh();
+				},500);	
+				
 			});
 			function bigInitAllInfo(){
 				if(!bigInitAllInfoFlag){
@@ -123,7 +130,9 @@
 			}
 		//设置上拉可重新加载数据
 			function setPullRefresh(){
-				mui('#myList').pullRefresh().refresh(true);//重置之前没有更多数据的问题,实现重新可以加载
+//				setTimeout(function() {
+					mui('#myList').pullRefresh().refresh(true);//重置之前没有更多数据的问题,实现重新可以加载
+//				},1500);
 			}
 			/**
 			 * 往下拉加载最新数据
@@ -174,6 +183,12 @@
 						isAdmin:state.isAdmin
 					},
 					async:false,
+//					beforeSend: function() {
+//				        plus.nativeUI.showWaiting("加载中...", null);
+//				    },
+//				    complete: function() {
+//				        plus.nativeUI.closeWaiting();
+//				    },
 		            success: function(data){
 		            	totalPage =data.totalPage;
 		            	var dqjl=currentPage*pagerow;//默认的当前记录数

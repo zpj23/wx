@@ -86,6 +86,13 @@
 			//初始化加载
 			mui.plusReady(function(){
 				bigInitAllInfo();
+				setTimeout(function() {
+					currentPage=1;
+					document.getElementById("OA_task_1").innerHTML="";
+					initData();
+					setPullRefresh();
+				},500);
+				
 			});
 			function bigInitAllInfo(){
 				if(!bigInitAllInfoFlag){
