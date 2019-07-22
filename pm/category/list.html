@@ -56,16 +56,31 @@
 		var mainHtml =null;
 		var CURRENTTYPECODE='';//当前列表的父级编码,多个层级用逗号分割
 		var tempPName='';//临时存储
+		//判断是否进入plusReady进行初始化
+		var bigInitAllInfoFlag=false;
+		
+		
 		mui.init();
 		mui.plusReady(function(){
-			//初始化按钮
-			initButtons();
-			editHtml=mui.preload({
-					id: 'category_edit',
-					url: 'edit.html'
-				});
-			bindEvent();
+			bigInitAllInfo();
+			//主页跳转过来的
+			CURRENTTYPECODE="DPSP";
+			initData();
 		});
+		
+		function bigInitAllInfo(){
+			if(!bigInitAllInfoFlag){
+				//初始化按钮
+				initButtons();
+				editHtml=mui.preload({
+						id: 'category_edit',
+						url: 'edit.html'
+					});
+				state=app.getState();	
+				bindEvent();
+				bigInitAllInfoFlag=true;
+			}
+		}
 		function bindEvent(){
 			//编辑
         	mui('#OA_task_1').on('tap', '.editCategoryClass', function(event) {
@@ -213,7 +228,8 @@
 		}
 			
 		window.addEventListener('categoryList',function(event){
-			state=app.getState();
+			
+			bigInitAllInfo();
 			//初始化
 			if(event.detail.mode=="main"){
 					//主页跳转过来的

@@ -63,6 +63,8 @@
 			var pagerow=15;
 			var totalPage=0;
 			var mainHtml =null;
+			//判断是否进入plusReady进行初始化
+			var bigInitAllInfoFlag=false;
 //			var searchHtml=null;
 //			var search_goodsName='';
 //			var search_supplierId='';
@@ -83,15 +85,27 @@
 			});
 			//初始化加载
 			mui.plusReady(function(){
+				bigInitAllInfo();
+				
 				currentPage=1;
-				viewHtml=mui.preload({
-					id: 'log_view',
-					url: 'view.html'
-				});
-				initButtons();
-				state=app.getState();
-				bindEvent();
+				document.getElementById("OA_task_1").innerHTML="";
+				setPullRefresh();
+				initData();
 			});
+			function bigInitAllInfo(){
+				if(!bigInitAllInfoFlag){
+					currentPage=1;
+					viewHtml=mui.preload({
+						id: 'log_view',
+						url: 'view.html'
+					});
+					initButtons();
+					state=app.getState();
+					bindEvent();
+					bigInitAllInfoFlag=true;
+				}
+			}
+			
 			function bindEvent(){
 				//查看信息
             	mui('#OA_task_1').on('tap', '.viewClass', function(event) {
@@ -123,7 +137,9 @@
 			}
 		//设置上拉可重新加载数据
 			function setPullRefresh(){
-				mui('#myList').pullRefresh().refresh(true);//重置之前没有更多数据的问题,实现重新可以加载
+				setTimeout(function() {	
+					mui('#myList').pullRefresh().refresh(true);//重置之前没有更多数据的问题,实现重新可以加载
+				},500);
 			}
 			/**
 			 * 往下拉加载最新数据
@@ -141,6 +157,7 @@
 			
 			//初始化加载以后每次进页面加载监听
 			window.addEventListener('logList',function(event){
+				bigInitAllInfo();
 				state=app.getState();
 				if(event.detail.mode=="main"){
 					//主页跳转过来的

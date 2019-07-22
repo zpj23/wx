@@ -80,7 +80,9 @@
 	    var staffname="";
 		var isshenhe="";
 		var remarkContent="";
-		
+		//判断是否进入plusReady进行初始化
+		var bigInitAllInfoFlag=false;
+			
 		mui.init({
 				pullRefresh: {
 					container: '#myList',
@@ -96,23 +98,46 @@
 				}
 			});
 		mui.plusReady(function(){
+			
+			bigInitAllInfo();
+			
+			//初始化数据
 			currentPage=1;
-			//初始化按钮
-			initButtons();
-			editHtml=mui.preload({
-					id: 'kq_edit',
-					url: 'edit.html'
-				});
-			searchHtml=mui.preload({
-					"id": 'kq_search',
-					"url": 'search.html'
-			});	
-			viewHtml=mui.preload({
-					"id": 'kq_view',
-					"url": 'view.html'
-			});	
-			bindEvent();
+			startdate='';
+			enddate='';
+			staffname='';
+			isshenhe='';
+			remarkContent='';
+			document.getElementById("OA_task_1").innerHTML="";
+			initData();
+			setPullRefresh();
+			
 		});
+		function bigInitAllInfo(){
+			if(!bigInitAllInfoFlag){
+				state=app.getState();
+				currentPage=1;
+				//初始化按钮
+				initButtons();
+				//初始化预加载页面
+				editHtml=mui.preload({
+						id: 'kq_edit',
+						url: 'edit.html'
+					});
+				searchHtml=mui.preload({
+						"id": 'kq_search',
+						"url": 'search.html'
+				});	
+				viewHtml=mui.preload({
+						"id": 'kq_view',
+						"url": 'view.html'
+				});	
+				bindEvent();
+				
+				bigInitAllInfoFlag=true;
+			}
+			
+		}
 		function bindEvent(){
         	mui('#OA_task_1').on('tap', '.editkq', function(event) {
 				var elem = this;
@@ -269,7 +294,9 @@
 		
 		//设置上拉可重新加载数据
 		function setPullRefresh(){
-			mui('#myList').pullRefresh().refresh(true);//重置之前没有更多数据的问题,实现重新可以加载
+			setTimeout(function() {	
+				mui('#myList').pullRefresh().refresh(true);//重置之前没有更多数据的问题,实现重新可以加载
+			},500);
 		}
 		/**
 		 * 往下拉加载最新数据
@@ -285,7 +312,7 @@
 		}
 			
 		window.addEventListener('kqList',function(event){
-			state=app.getState();
+			bigInitAllInfo();
 			//初始化
 			if(event.detail.mode=="main"){
 					//主页跳转过来的

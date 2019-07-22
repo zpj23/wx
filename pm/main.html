@@ -77,19 +77,10 @@
 		<script src="js/mui.js"></script>
 		<script src="js/app.js"></script>
 		<script>
-			var listHtml=null;
-			var supplierListHtml=null;
-			var goodsHtml=null;
-			var dictionaryHtml=null;
 			var state=null;
 			var downLoadInfo=null;
-			var cgdHtml=null;
-			var logHtml=null;
 			var knowledgeHtml=null;
-			var categoryHtml=null;
-			var storeHtml=null;
-			var inStoreHtml=null;
-			var outStoreHtml=null;
+			var cgdHtml=null;
 			(function($, doc) {
 				
 				$.init();
@@ -97,196 +88,52 @@
 				//
 				window.addEventListener('show', function() {
 					state = app.getState();
-//					if(!listHtml){
-//						listHtml=$.preload({
-//							id: 'kq_list',
-//							url: 'kq/list.html'
-//						});
-//					}
-//					if(!supplierListHtml){
-//						supplierListHtml=$.preload({
-//							id: 'supplier_list',
-//							url: 'supplier/list.html'
-//						});
-//					}
-//					if(!goodsHtml){
-//						goodsHtml=$.preload({
-//							id: 'goods_list',
-//							url: 'goods/list.html'
-//						});
-//					}
-					if(!dictionaryHtml){
-						dictionaryHtml=$.preload({
-							id:'dictionary_list',
-							url:'dictionary/list.html'
-						});
-					}
-					if(!categoryHtml){
-						categoryHtml=$.preload({
-							id:'category_list',
-							url:'category/list.html'
-						});
-					}
-					if(!logHtml){
-						logHtml=$.preload({
-							id:'log_list',
-							url:'log/list.html'
-						});
-					}
+					
+				}, false);
+				
+				
+				$.plusReady(function() { 
+					
 					if(!knowledgeHtml){
 						knowledgeHtml=$.preload({
 							id: 'knowledge_list',
 							url: 'knowledge/list.html'
 						});
 					}
-					
 					if(!cgdHtml){
 						cgdHtml=$.preload({
 							id: 'cgd_list',
 							url: 'cgd/list.html'
 						});
 					}
-//					if(!storeHtml){
-//						storeHtml=$.preload({
-//							id: 'store_list',
-//							url: 'store/list.html'
-//						});
-//					}
-//					
-//					if(!inStoreHtml){
-//						inStoreHtml=$.preload({
-//							id: 'in_store_list',
-//							url: 'store/in_list.html'
-//						});
-//					}
-//					if(!outStoreHtml){
-//						outStoreHtml=$.preload({
-//							id: 'out_store_list',
-//							url: 'store/out_list.html'
-//						});
-//					}
-					
-				}, false);
-				
-				
-				$.plusReady(function() { 
-					listHtml=$.preload({
-							id: 'kq_list',
-							url: 'kq/list.html'
-					});
-					supplierListHtml=$.preload({
-							id: 'supplier_list',
-							url: 'supplier/list.html'
-					});
-					goodsHtml=$.preload({
-							id: 'goods_list',
-							url: 'goods/list.html'
-					});
-//					dictionaryHtml=$.preload({
-//						id:'dictionary_list',
-//						url:'dictionary/list.html'
-//					});
-//					categoryHtml=$.preload({
-//						id:'category_list',
-//						url:'category/list.html'
-//					});
-//					logHtml=$.preload({
-//						id:'log_list',
-//						url:'log/list.html'
-//					});
-//					
-//					knowledgeHtml=$.preload({
-//							id: 'knowledge_list',
-//							url: 'knowledge/list.html'
-//					});
 					
 					//维修管理
-					var usermanageButton = doc.getElementById('user_manager');
-					usermanageButton.addEventListener('tap', function(event) {
-						if(!listHtml){
-						    listHtml = plus.webview.getWebviewById('kq_list');
-						}
-						mui.fire(listHtml,'kqList',{
-							mode:'main'
-						});
-						mui.openWindow({
-						    id:'kq_list'
-						});
-						
+					document.getElementById('user_manager').addEventListener('tap', function(event) {
+						createWebViewJudgeExists('kq_list','kq/list.html','kqList');
 					});
 //					//商品管理
 					document.getElementById('goods_manage').addEventListener('tap', function(event) {
-						if(!goodsHtml){
-						    goodsHtml = plus.webview.getWebviewById('goods_list');
-						}
-						mui.fire(goodsHtml,'goodsList',{
-							mode:'main'
-						});
-						mui.openWindow({
-						    id:'goods_list'
-						});
-						
+						createWebViewJudgeExists('goods_list','goods/list.html','goodsList');
 					});
 //					//供应商管理
-					var supplierManage=document.getElementById('supplier_manage');
-					supplierManage.addEventListener('tap', function(event) {
-						if(!supplierListHtml){
-						    supplierListHtml = plus.webview.getWebviewById('supplier_list');
-						}
-						mui.fire(supplierListHtml,'supplierList',{
-							mode:'main'
-						});
-						mui.openWindow({
-						    id:'supplier_list'
-						});
-						
+					document.getElementById('supplier_manage').addEventListener('tap', function(event) {
+						createWebViewJudgeExists('supplier_list','supplier/list.html','supplierList');
 					});
 //					
-					var dictionary_manage=document.getElementById('dictionary_manage');
-					dictionary_manage.addEventListener('tap', function(event) {
-						if(!dictionaryHtml){
-						    dictionaryHtml = plus.webview.getWebviewById('dictionary_list');
-						}
-						mui.fire(dictionaryHtml,'dictionaryList',{
-							mode:'main'
-						});
-						mui.openWindow({
-						    id:'dictionary_list'
-						});
-						
+					document.getElementById('dictionary_manage').addEventListener('tap', function(event) {
+						createWebViewJudgeExists('dictionary_list','dictionary/list.html','dictionaryList');
 					});
 					
-					var category_manage=document.getElementById('category_manage');
-					category_manage.addEventListener('tap', function(event) {
-						if(!categoryHtml){
-						    categoryHtml = plus.webview.getWebviewById('category_list');
-						}
-						mui.fire(categoryHtml,'categoryList',{
-							mode:'main'
-						});
-						mui.openWindow({
-						    id:'category_list'
-						});
-						
+					document.getElementById('category_manage').addEventListener('tap', function(event) {
+						createWebViewJudgeExists('category_list','category/list.html','categoryList');
 					});
 					
-					var log_manage=document.getElementById('log_manage');
-					log_manage.addEventListener('tap', function(event) {
-						if(!logHtml){
-						    logHtml = plus.webview.getWebviewById('log_list');
-						}
-						mui.fire(logHtml,'logList',{
-							mode:'main'
-						});
-						mui.openWindow({
-						    id:'log_list'
-						});
-						
+					document.getElementById('log_manage').addEventListener('tap', function(event) {
+						createWebViewJudgeExists('log_list','log/list.html','logList');
 					});
 					
 					
-					var knowledgeButton = doc.getElementById('knowledge_manage');
-					knowledgeButton.addEventListener('tap', function(event) {
+					doc.getElementById('knowledge_manage').addEventListener('tap', function(event) {
 						if(!knowledgeHtml){
 						    knowledgeHtml = plus.webview.getWebviewById('knowledge_list');
 						}
@@ -296,12 +143,11 @@
 						mui.openWindow({
 						    id:'knowledge_list'
 						});
-						
+						//createWebViewJudgeExists('knowledge_list','knowledge/list.html','knowledgeList');
 					});
 					
 //					//采购单
-					var cgdButton=doc.getElementById("cgd_manage");
-						cgdButton.addEventListener('tap',function(event){
+					doc.getElementById("cgd_manage").addEventListener('tap',function(event){
 						if(!cgdHtml){
 						    cgdHtml = plus.webview.getWebviewById('cgd_list');
 						}
@@ -311,70 +157,29 @@
 						mui.openWindow({
 						    id:'cgd_list'
 						});
+						
+						//createWebViewJudgeExists('cgd_list','cgd/list.html','cgdList');
 					});
 					
 					//库存
 					doc.getElementById("store_manage").addEventListener('tap',function(event){
-						if(!storeHtml){
-//						    storeHtml = plus.webview.getWebviewById('store_list');
-							mui.openWindow({
-							    id: 'store_list',
-							    url: 'store/list.html',
-							    show:{
-      								autoShow:false
-      							},	
-      							waiting:{
-      								autoShow:false
-      							}
-							});
-							
-						}else{
-							mui.fire(storeHtml,'storeList',{
-								mode:'main'
-							});
-						}
-						
-						mui.openWindow({
-						    id:'store_list',
-						    waiting:{
-  								autoShow:false
-  							}
-						});
+						createWebViewJudgeExists('store_list','store/list.html','storeList');
 					});
 					//入库
 					doc.getElementById("in_store_manage").addEventListener('tap',function(event){
-						if(!inStoreHtml){
-							inStoreHtml=mui.openWindow({
-							    id:'in_store_list',
-							    url: 'store/in_list.html',
-							    show:{
-      								autoShow:false
-      							},	
-      							waiting:{
-      								autoShow:false
-      							}
-							});
-						    //inStoreHtml = plus.webview.getWebviewById('in_store_list');
-						}else{
-							mui.fire(inStoreHtml,'inStoreList',{
-								mode:'main'
-							});
-						}
-						
-						mui.openWindow({
-						    id:'in_store_list',	
-  							waiting:{
-  								autoShow:false
-  							}
-						});
+						createWebViewJudgeExists('in_store_list','store/in_list.html','inStoreList');
 					});
 					//出库
 					doc.getElementById("out_store_manage").addEventListener('tap',function(event){
-						if(!outStoreHtml){
-//						    outStoreHtml = plus.webview.getWebviewById('out_store_list');
-							outStoreHtml=mui.openWindow({
-							    id:'out_store_list',
-							    url: 'store/out_list.html',
+						createWebViewJudgeExists('out_store_list','store/out_list.html','outStoreList');
+					});
+					
+					function createWebViewJudgeExists(id,url,listener){
+						var html=null;
+						if(!plus.webview.getWebviewById(id)){
+							html=mui.openWindow({
+							    id: id,
+							    url: url,
 							    show:{
       								autoShow:false
       							},	
@@ -382,20 +187,31 @@
       								autoShow:false
       							}
 							});
+							console.log("不存在id为"+id+"的webview，先创建再赋值");
 						}else{
-							mui.fire(outStoreHtml,'outStoreList',{
+							html=plus.webview.getWebviewById(id);
+							mui.fire(html,listener,{
 								mode:'main'
 							});
+							console.log("存在id为"+id+"的webview，直接赋值");
 						}
-						
 						mui.openWindow({
-						    id:'out_store_list',
+						    id:id,
 						    waiting:{
   								autoShow:false
   							}
 						});
-					});
-					
+//						return html;
+					}
+					function showWebViews(){
+						var array = plus.webview.all();
+				        if(array){
+				        	console.log(array.length);
+//				            for(var i=0,len=array.length;i<len;i++){
+//				                    console.log(array[i].getURL()+">>>>");
+//				                }
+				        }
+					}
 					//设置
 					var settingButton = doc.getElementById('setting');
 					//settingButton.style.display = settings.autoLogin ? 'block' : 'none';

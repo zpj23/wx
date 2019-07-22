@@ -86,12 +86,11 @@
 			//初始化加载
 			mui.plusReady(function(){
 				bigInitAllInfo();
-				setTimeout(function() {
-					currentPage=1;
-					document.getElementById("OA_task_1").innerHTML="";
-					initData();
-					setPullRefresh();
-				},500);
+				currentPage=1;
+				document.getElementById("OA_task_1").innerHTML="";
+				initData();
+				setPullRefresh();
+			
 				
 			});
 			function bigInitAllInfo(){
@@ -130,7 +129,9 @@
 			}
 		//设置上拉可重新加载数据
 			function setPullRefresh(){
-				mui('#myList').pullRefresh().refresh(true);//重置之前没有更多数据的问题,实现重新可以加载
+				setTimeout(function() {	
+					mui('#myList').pullRefresh().refresh(true);//重置之前没有更多数据的问题,实现重新可以加载
+				},500);
 			}
 			/**
 			 * 往下拉加载最新数据

@@ -86,6 +86,7 @@
 			mui.plusReady(function(){
 				bigInitAllInfo();
 				setTimeout(function() {
+					console.log('plusReady初始化');
 					currentPage=1;
 					document.getElementById("OA_task_1").innerHTML="";
 					initData();
@@ -149,6 +150,7 @@
 			window.addEventListener('outStoreList',function(event){
 				bigInitAllInfo();
 				if(event.detail.mode=="main"){
+					console.log('进入监听初始化');
 					//主页跳转过来的
 					currentPage=1;
 					document.getElementById("OA_task_1").innerHTML="";

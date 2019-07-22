@@ -57,6 +57,9 @@
 			var pagerow=15;
 			var totalPage=0;
 			var mainHtml =null;
+			//判断是否进入plusReady进行初始化
+			var bigInitAllInfoFlag=false;
+			
 			mui.init({
 				pullRefresh: {
 					container: '#myList',
@@ -73,16 +76,27 @@
 			});
 			//初始化加载
 			mui.plusReady(function(){
-				currentPage=1;
-//				totalPage=0;
-				editHtml=mui.preload({
-					id: 'supplier_add',
-					url: 'edit.html'
-				});
-				initButtons();
-				//绑定事件
-				bindEvent();
+				bigInitAllInfo();
+				initLoad();
 			});
+			
+			function bigInitAllInfo(){
+				if(!bigInitAllInfoFlag){
+					currentPage=1;
+	//				totalPage=0;
+					editHtml=mui.preload({
+						id: 'supplier_add',
+						url: 'edit.html'
+					});
+					initButtons();
+					state=app.getState();
+					//绑定事件
+					bindEvent();
+					bigInitAllInfoFlag=true;
+					
+				}	
+				
+			}
 			function bindEvent(){
 				
 				
@@ -177,7 +191,9 @@
 		}
 		//设置上拉可重新加载数据
 		function setPullRefresh(){
-			mui('#myList').pullRefresh().refresh(true);//重置之前没有更多数据的问题,实现重新可以加载
+			setTimeout(function() {	
+					mui('#myList').pullRefresh().refresh(true);//重置之前没有更多数据的问题,实现重新可以加载
+			},500);
 		}
 		/**
 		 * 往下拉加载最新数据
@@ -202,6 +218,7 @@
 		}
 			//初始化加载以后每次进页面加载监听
 			window.addEventListener('supplierList',function(event){
+				bigInitAllInfo();
 				state=app.getState();
 				//初始化
 				if(event.detail.mode=="main"){

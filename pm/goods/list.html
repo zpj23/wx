@@ -68,6 +68,9 @@
 			var search_goodsName='';
 			var search_supplierId='';
 			var search_goodsType='';
+			//判断是否进入plusReady进行初始化
+			var bigInitAllInfoFlag=false;
+		
 			mui.init({
 				pullRefresh: {
 					container: '#myList',
@@ -84,19 +87,34 @@
 			});
 			//初始化加载
 			mui.plusReady(function(){
+				bigInitAllInfo();
+				//初始化数据
 				currentPage=1;
-				editHtml=mui.preload({
-					id: 'goods_add',
-					url: 'edit.html'
-				});
-				searchHtml=mui.preload({
-					"id": 'goods_search',
-					"url": 'search.html'
-				});	
-				initButtons();
-				state=app.getState();
-				bindEvent();
+				search_goodsName='';
+				search_supplierId='';
+				search_goodsType='';
+				document.getElementById("OA_task_1").innerHTML="";
+				setPullRefresh();
+				initData();
 			});
+			
+			function bigInitAllInfo(){
+				if(!bigInitAllInfoFlag){
+					currentPage=1;
+					editHtml=mui.preload({
+						id: 'goods_add',
+						url: 'edit.html'
+					});
+					searchHtml=mui.preload({
+						"id": 'goods_search',
+						"url": 'search.html'
+					});	
+					initButtons();
+					state=app.getState();
+					bindEvent();
+					bigInitAllInfoFlag=true;
+				}
+			}	
 			function bindEvent(){
 				//编辑信息
             	mui('#OA_task_1').on('tap', '.editkq', function(event) {
@@ -172,7 +190,9 @@
 			}
 		//设置上拉可重新加载数据
 			function setPullRefresh(){
-				mui('#myList').pullRefresh().refresh(true);//重置之前没有更多数据的问题,实现重新可以加载
+				setTimeout(function() {	
+					mui('#myList').pullRefresh().refresh(true);//重置之前没有更多数据的问题,实现重新可以加载
+				},500);
 			}
 			/**
 			 * 往下拉加载最新数据
@@ -190,7 +210,7 @@
 			
 			//初始化加载以后每次进页面加载监听
 			window.addEventListener('goodsList',function(event){
-				state=app.getState();
+				bigInitAllInfo();
 				if(event.detail.mode=="main"){
 					//主页跳转过来的
 					currentPage=1;
