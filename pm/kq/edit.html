@@ -136,11 +136,7 @@
 		            		getCV('id').value=currentId;
 		            		var cinfo=data.data;
 					    	getCV('username').value=cinfo.username;
-					    	var wd= new Date(cinfo.registertime);
-					    	var day=wd.getDate();
-							var month=wd.getMonth() + 1;
-							var year=wd.getFullYear();
-					    	getCV('registertime').value=year+"-"+month+"-"+day+" "+wd.getHours()+":"+wd.getMinutes();
+					    	getCV('registertime').value=(cinfo.registertime).substring(0,16);
 					    	getCV('jine').value=cinfo.jine;
 					    	getCV('remark').value=cinfo.remark;
 					    	

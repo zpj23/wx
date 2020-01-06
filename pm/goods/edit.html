@@ -31,6 +31,10 @@
 					        <label>单位:</label>
 					    	<input type="text" id="unit" class="mui-input-clear" placeholder="台,箱,袋,把,盒等">
 					    </div>
+					    <!-- <div class="mui-input-row">
+					        <label>进货时间:</label>
+					    	<input type="text" id="purchaseDate" class="mui-input-clear" placeholder="格式例如：190901">
+					    </div> -->
 					    <div class="mui-input-row">
 					        <label>进价:</label>
 					    	<div class="mui-numbox">
@@ -142,6 +146,8 @@
 					    	getCV('supplierId').value=cinfo.supplierId;
 					    	getCV('goodsType').value=cinfo.goodsType;
 					    	getCV('goodsTypeName').value=cinfo.goodsTypeName;
+					    	// getCV('purchaseDate').value=cinfo.purchaseDate;
+					    	
 					    	var gt=cinfo.goodsType;
 					    	var splbArr=gt.split(",");
 					    	if(gt!=""){
@@ -178,6 +184,8 @@
 			    	getCV('supplierId').value='';
 			    	getCV('goodsType').value='';
 			    	getCV('goodsTypeName').value='';
+			    	// getCV('purchaseDate').value='';
+			    	
 				}
 			}
 			
@@ -217,6 +225,7 @@
 							    supplierName:getCV('supplierName').value,
 							    supplierId:getCV('supplierId').value,
 							    goodsType:getCV('goodsType').value,
+							    purchaseDate:'',
 							    loginId:state.id,
 								isAdmin:state.isAdmin
 							},

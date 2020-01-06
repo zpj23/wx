@@ -43,7 +43,11 @@
 			<ul class="mui-table-view mui-table-view-striped mui-table-view-condensed" id="OA_task_1">
 			</ul>	
 		</div>
+		<div class="mui-content">
+			<br/>
+		</div>
 		<footer class="mui-bar mui-bar-footer">
+			<button id='backList1' class=" mui-pull-left mui-btn-link">返回上一级</button>
 			<button id='category_update' class=" mui-pull-right mui-btn-link">更新</button>
 		</footer>
 	</body>
@@ -126,10 +130,10 @@
 								isAdmin:state.isAdmin
 							},
 				            success  : function(data){
-				            	if(data.msg){
+				            	if(data.code){
 				            		li.parentNode.removeChild(li);
 				            	}else{
-				            		mui.toast("删除失败");
+				            		mui.toast(data.msg);
 				            	}
 				            },
 				            error    : function(xhr,type,errorThrown){
@@ -153,7 +157,15 @@
 				tempPName=str.split("_")[1];
 				initData();
 			});
-			
+			var backbutton=document.getElementById("backList1");
+			backbutton.addEventListener('tap', function(){
+				if(CURRENTTYPECODE=='DPSP'){
+					jumpToMain();
+				}else{
+					CURRENTTYPECODE=CURRENTTYPECODE.substring(0,CURRENTTYPECODE.lastIndexOf(","));
+					initData();
+				}
+			}, false);
 			
 		}
 		//初始化数据
@@ -189,7 +201,6 @@
             		if(arr.length>0){
             			for(var m=0;m<arr.length;m++){
 	            			var listStr='';
-	            			
 	            			listStr+='<div class="mui-slider-left mui-disabled">';
 							listStr+='<a class="mui-btn mui-btn-blue editCategoryClass" name="'+arr[m].typeCode+'_'+arr[m].typeName+'" >修改</a>';
 							listStr+='<a class="mui-btn mui-btn-red deleteCategory" name="'+arr[m].typeCode+'" >删除</a>';
@@ -203,7 +214,7 @@
 							listStr+='<div class="mui-slider-handle">';
 							listStr+='<div class="mui-table">';
 							listStr+='<div class="mui-table-cell mui-col-xs-9">';
-							listStr+='<h4 class="mui-ellipsis" >'+arr[m].typeName+'，编码：'+arr[m].typeCode+'</h4>';
+							listStr+='<h4 class="mui-ellipsis" >'+arr[m].typeName+'</h4>';
 //							listStr+='<h5>父级：'+arr[m].parentTypeName+'，编码：'+tempCode+'</h5>';
 							listStr+='</div>';
 							listStr+='<div class="mui-table-cell mui-col-xs-1 mui-text-right"><span class="mui-badge">'+arr[m].orderNum+'</span></div>';

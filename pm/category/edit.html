@@ -34,12 +34,12 @@
 					    	<input type="text" id="name" class="mui-input-clear" placeholder="名称">
 					    </div>
 			    	</div>
-			    	<div class="mui-card-content">
-					    <div class="mui-input-row">
-					        <label>编码:</label>
-					    	<input type="text" id="code" class="mui-input-clear" placeholder="编码">
-					    </div>
-			    	</div>
+			    	<!-- <div class="mui-card-content"> -->
+					    <!-- <div class="mui-input-row"> -->
+					        <!-- <label>编码:</label> -->
+					    	<input type="hidden" id="code"  placeholder="编码">
+					    <!-- </div> -->
+			    	<!-- </div> -->
 			    	<div class="mui-card-content">
 					    <div class="mui-input-row">
 					        <label>排序:</label>
@@ -89,7 +89,7 @@
 			  	if(mode=="add"){
 			  		getCV('pCode').value=event.detail.parentTypeCode;
 			  		getCV('pName').value=event.detail.parentTypeName;
-			  		getCV('code').value="";
+			  		getCV('code').value="CODE"+new Date().getTime();
 		    		getCV('name').value="";
 		    		getCV('orderNum').value=1;
 			  		beforeCode='';
