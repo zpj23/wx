@@ -359,9 +359,12 @@
 				if(selectValueArr.length>0){
 					// html+='<select name="username" id="url_list_username" >';
 					for(var i=0;i<selectValueArr.length;i++){
-						if(canshu!=''&&selectValueArr[i].indexOf(canshu)>-1){
+						if(canshu==''){
+							html+='<option value="'+selectValueArr[i]+'" >'+selectValueArr[i]+'</option>';
+						}else if(canshu!=''&&selectValueArr[i].indexOf(canshu)>-1){
 							html+='<option value="'+selectValueArr[i]+'" >'+selectValueArr[i]+'</option>';
 						}
+						
 					}
 					// html+='</select>';
 					document.getElementById("url_list_username").innerHTML=html;
