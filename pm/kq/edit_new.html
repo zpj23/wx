@@ -47,14 +47,14 @@
 					<div class="mui-card-content">
 					    <div class="mui-input-row">
 					        <label>维修用户:</label>
-					    	<input type="text" id="username"  list="url_list" name="username"  placeholder="维修用户" >
-					    	<datalist id="url_list"> 
-								<select name="username"   id="url_list_username" >
-								</select>
-							</datalist>
+					    	<input type="text" id="username" name="username"  placeholder="维修用户" >
 					    </div>
 					    <div class="mui-input-row">
 					        <label>维修用户选择:</label>
+							<!-- <datalist id="url_list"> -->
+								<select name="username"  onchange="selectOne()" id="url_list_username" >
+								</select>
+							<!-- </datalist> -->
 					    </div>
 			    	</div>
 				</div>
@@ -331,26 +331,26 @@
 					
 					document.getElementById("username").addEventListener('input', function(event) {
 						var tempname=document.getElementById("username").value;
-//						initDataList(tempname);
-						 for(var m=0;m<selectValueArr.length;m++){
-						 	if(selectValueArr[m].indexOf(tempname)>-1){
-						 		 document.getElementById("url_list_username").value=selectValueArr[m];
-						 		break;
-						 	}
-						 }
+						initDataList(tempname);
+						// for(var m=0;m<selectValueArr.length;m++){
+						// 	if(selectValueArr[m].indexOf(tempname)>-1){
+						// 		 document.getElementById("url_list_username").value=selectValueArr[m];
+						// 		break;
+						// 	}
+						// }
 					});
 			}
 			//选择其中一个
-//			function selectOne(){
-//				document.getElementById("username").value=document.getElementById("url_list_username").value;
-//			}
+			function selectOne(){
+				document.getElementById("username").value=document.getElementById("url_list_username").value;
+			}
 			//初始化维修用户下拉的datalist
 			function initDataList(canshu){
-				 var ht=document.getElementById("url_list_username").innerHTML;
-				 if(ht.trim()!=''){
-					 return;
+				// var ht=document.getElementById("url_list_username").innerHTML;
+				// if(ht.trim()!=''){
+					// return;
 //					document.getElementById("url_list").innerHTML='';
-				 }
+				// }
 				if(selectValueArr.length==0){
 					var temp=localStorage.getItem("namelist");
 					selectValueArr=JSON.parse(temp);
@@ -360,9 +360,9 @@
 					var selectedState="";
 					// html+='<select name="username" id="url_list_username" >';
 					for(var i=0;i<selectValueArr.length;i++){
-//						if(i==0){
-//							selectedState="selected";
-//						}
+						if(i==0){
+							selectedState="selected";
+						}
 						if(canshu==''){
 							html+='<option value="'+selectValueArr[i]+'" '+selectedState+' >'+selectValueArr[i]+'</option>';
 						}else if(canshu!=''&&selectValueArr[i].indexOf(canshu)>-1){
